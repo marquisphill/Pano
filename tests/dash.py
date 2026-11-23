@@ -3,6 +3,9 @@
 # Every numbered line should end in True, and each "errors" line should be [].
 # Nothing here reaches the outside world: the labs list, the weather, the staging preview and the
 # Claude API are all answered by the test itself. No real key is used or needed.
+# It also runs against the real dashboard (phase 5). It tells the two apart by the page itself:
+# Dashboard-DEV has Launch turned off (LAUNCH_OFF) and saves under dev- names; the real one does
+# neither. On the real one, GitHub is answered by the test too, so Launch never reaches GitHub.
 import json, re, urllib.request
 from playwright.sync_api import sync_playwright
 U = 'http://localhost:8773/index.html'
@@ -14,6 +17,10 @@ engine = get('/Pano/latest/pano.js')
 skills = {n: get(f'/Pano/latest/skills/{n}.js') for n in EARLY + LATE}
 code = engine + ''.join(skills.values())
 page = get('/index.html')
+P = 'dev-' if 'LAUNCH_OFF' in page else ''   # the prefix this copy's saved names carry
+REAL = not P
+N = lambda js: js.replace('dev-pd-', P + 'pd-')   # DEV names in a check, as this copy spells them
+print('site', 'the real dashboard' if REAL else 'Dashboard-DEV')
 
 
 def merge(a, b):
@@ -64,7 +71,9 @@ print('files 6 every tour and talk the menu or a button names exists', all(k in 
       and all(k in brain['talks']['scripts'] for k in brain['talks']['order'] + brain['talks']['small']))
 ADAPTER = {n: re.search(r'^    %s[:,].*\n' % n, page, re.M) for n in ['tours', 'background', 'talks', 'topics', 'chat']}
 print('files 7 the page adapter has one line for each skill', all(ADAPTER.values()))
-print('files 8 every name the page saves under starts with dev-', all(k.startswith('dev-') for k in re.findall(r"(?:wall|cb|key|mem|seen|greeted|head): '([^']+)'", page)))
+_names = re.findall(r"(?:wall|cb|key|mem|seen|greeted|head): '([^']+)'", page)
+if REAL: print('files 8 every name the page saves under is the real dashboard\'s own (pd-, no dev-)', bool(_names) and all(k.startswith('pd-') for k in _names), _names)
+else: print('files 8 every name the page saves under starts with dev-', all(k.startswith('dev-') for k in _names))
 
 MENU = "()=>[...document.querySelectorAll('#gacts button')].map(b=>b.textContent)"
 ON = "()=>Pano.here.skills().filter(s=>s.on).map(s=>s.name)"
@@ -76,10 +85,10 @@ class Site:
     def __init__(self, b, W=1280, H=800, greeted=True, store=None, html=None, block=None, api=None, session=None):
         self.c = b.new_context(viewport={'width': W, 'height': H}, has_touch=W <= 640)
         init = ''.join("try{if(!sessionStorage.getItem('__t'))localStorage.setItem(%s,%s)}catch(e){}" % (json.dumps(k), json.dumps(v)) for k, v in (store or {}).items())
-        if greeted: init += "try{sessionStorage.setItem('dev-pd-pano-greeted','1')}catch(e){}"
+        if greeted: init += N("try{sessionStorage.setItem('dev-pd-pano-greeted','1')}catch(e){}")
         init += ''.join("try{if(!sessionStorage.getItem('__t'))sessionStorage.setItem(%s,%s)}catch(e){}" % (json.dumps(k), json.dumps(v)) for k, v in (session or {}).items())
         self.c.add_init_script(init + "try{sessionStorage.setItem('__t','1')}catch(e){}")   # planted once, so a reload keeps what the page saved
-        self.pg = pg = self.c.new_page(); self.errs = []; self.got = []; self.calls = []; self.asked = []
+        self.pg = pg = self.c.new_page(); self.errs = []; self.got = []; self.calls = []; self.asked = []; self.dispatched = []
         self.api = api or (lambda kind, body: (200, {'data': []}) if kind == 'models' else (200, {'content': [{'type': 'text', 'text': json.dumps(FAKE)}], 'stop_reason': 'end_turn'}))
         pg.on('pageerror', lambda e: self.errs.append(str(e)))
         pg.on('response', lambda r: self.got.append((r.url.split('localhost:8773')[-1], r.status)))
@@ -99,6 +108,11 @@ class Site:
             self.asked.append({'kind': kind, 'headers': r.request.headers, 'body': body})
             status, out = self.api(kind, body)
             return r.fulfill(status=status, headers=CORS, content_type='application/json', body=json.dumps(out))
+        if REAL and 'api.github.com' in url:   # the real page can Launch: answer GitHub here, never the real one
+            if r.request.method == 'OPTIONS': return r.fulfill(status=204, headers=CORS)
+            if '/dispatches' in url:
+                self.dispatched.append(json.loads(r.request.post_data)); return r.fulfill(status=204, headers=CORS)
+            return r.fulfill(status=200, headers=CORS, content_type='application/json', body=json.dumps({'workflow_runs': []}))
         if 'labs.json' in url: return r.fulfill(status=200, headers=CORS, content_type='application/json', body=json.dumps(LABS))
         if 'marquisphill.github.io' in url: return r.fulfill(status=200, content_type='text/html', body='<p>staging stand-in</p>')
         return r.abort()   # weather and anything else: offline
@@ -145,7 +159,7 @@ with sync_playwright() as p:
 
     # ---------- the page as it is, at three sizes ----------
     for tag, W, H in [('phone', 390, 800), ('fold', 880, 900), ('desk', 1280, 800)]:
-        s = Site(b, W, H, greeted=False, store={'pd-gh-token': 'FAKE_REAL_TOKEN', 'pd-pano-key': 'FAKE_REAL_KEY'}); s.wait(900)
+        s = Site(b, W, H, greeted=False, store=None if REAL else {'pd-gh-token': 'FAKE_REAL_TOKEN', 'pd-pano-key': 'FAKE_REAL_KEY'}); s.wait(900)
         files = ['/Pano/latest/pano.css', '/Pano/latest/pano.js', '/Pano/latest/brain/dashboard.json', '/Pano/latest/brain/core.json'] + [f'/Pano/latest/skills/{n}.js' for n in EARLY + LATE]
         print(tag, '1 his files came from /Pano/latest/', all((f, 200) in s.got for f in files), [f for f in files if (f, 200) not in s.got])
         print(tag, '2 tours, background, talks, topics and chat are on; windows and bin are off', s.pg.evaluate(ON) == ON_HERE)
@@ -158,8 +172,12 @@ with sync_playwright() as p:
         print(tag, '7 his bubble wears the page colors', s.pg.evaluate("()=>getComputedStyle(gbubble).backgroundColor===getComputedStyle(document.documentElement).getPropertyValue('--bubble').trim().replace(/^#(..)(..)(..)$/,(m,r,g,b)=>`rgb(${parseInt(r,16)}, ${parseInt(g,16)}, ${parseInt(b,16)})`)"))
         print(tag, '8 no sideways scroll', s.pg.evaluate("()=>document.documentElement.scrollWidth<=innerWidth+1"))
         keys = s.pg.evaluate("()=>[Object.keys(localStorage),Object.keys(sessionStorage)]")
-        print(tag, '9 only dev- names are saved', all(k.startswith('dev-') or k in ('pd-gh-token', 'pd-pano-key') for k in keys[0]) and all(k.startswith('dev-') or k == '__t' for k in keys[1]), keys)
-        print(tag, '10 the real key and token are ignored, and nothing was sent to GitHub or Claude', s.menu()[-2] == CH['menu_give'] and s.calls == [] and s.asked == [])
+        if REAL:
+            print(tag, '9 only the real dashboard\'s own names are saved (no dev-, none of the portfolio\'s)', all(k.startswith(('pd-', 'wx-')) for k in keys[0]) and all(k.startswith('pd-') or k == '__t' for k in keys[1]), keys)
+            print(tag, '10 with no key or token saved, nothing was sent to GitHub or Claude', s.menu()[-2] == CH['menu_give'] and s.calls == [] and s.asked == [])
+        else:
+            print(tag, '9 only dev- names are saved', all(k.startswith('dev-') or k in ('pd-gh-token', 'pd-pano-key') for k in keys[0]) and all(k.startswith('dev-') or k == '__t' for k in keys[1]), keys)
+            print(tag, '10 the real key and token are ignored, and nothing was sent to GitHub or Claude', s.menu()[-2] == CH['menu_give'] and s.calls == [] and s.asked == [])
         s.pg.screenshot(path=f'/tmp/pano-qa/dash-{tag}-hello.png')
         s.done(tag)
 
@@ -174,7 +192,7 @@ with sync_playwright() as p:
         c1 = s.cat()
         print(tag, 'head 2 the head can be dragged, and dragging does not open his menu', c1['head'] and abs(c1['x'] - c['x']) > 40 and s.say() == '')
         s.pg.reload(); s.wait(2600)
-        print(tag, 'head 3 after a reload he is still a head, under this site\'s own name', s.cat()['head'] and s.pg.evaluate("()=>sessionStorage.getItem('dev-pd-pano-head')==='1' && sessionStorage.getItem('panoHead')===null"))
+        print(tag, 'head 3 after a reload he is still a head, under this site\'s own name', s.cat()['head'] and s.pg.evaluate(N("()=>sessionStorage.getItem('dev-pd-pano-head')==='1' && sessionStorage.getItem('panoHead')===null")))
         s.pg.click('#gcat'); s.wait(1800)
         print(tag, 'head 4 tapping the head brings him back with his menu', not s.cat()['head'] and s.menu()[:3] == TOURS)
         if W > 640:
@@ -192,11 +210,11 @@ with sync_playwright() as p:
         print(tag, 'wall 1 he offers this page\'s three backgrounds', s.menu() == [B['options']['plain'] + B['default_mark'], B['options']['sunrise'], B['options']['ocean'], B['never_mind']])
         s.tap(B['options']['sunrise'], 500); print(tag, 'wall 2 then asks about colorblindness', B['ask_colorblind'] in s.say())
         s.tap(B['no'], 4200)
-        print(tag, 'wall 3 the new background is on and saved', s.pg.evaluate("()=>document.getElementById('wall').dataset.wall==='sunrise' && localStorage.getItem('dev-pd-wall')==='sunrise' && getComputedStyle(document.getElementById('wall')).backgroundImage.includes('gradient')"))
+        print(tag, 'wall 3 the new background is on and saved', s.pg.evaluate(N("()=>document.getElementById('wall').dataset.wall==='sunrise' && localStorage.getItem('dev-pd-wall')==='sunrise' && getComputedStyle(document.getElementById('wall')).backgroundImage.includes('gradient')")))
         s.open_menu(); s.tap(M['change_background']); s.tap(B['options']['ocean'], 500); s.tap(B['yes'], 500)
         print(tag, 'wall 4 he offers the four colorblind modes', s.menu() == [B['modes'][m] for m in ['protan', 'deutan', 'tritan', 'mono']])
         s.tap(B['modes']['protan'], 7000)
-        print(tag, 'wall 5 the mode is applied to the whole page and saved', s.pg.evaluate("()=>document.documentElement.dataset.cb==='protan' && getComputedStyle(document.documentElement).filter.includes('cb-protan') && localStorage.getItem('dev-pd-cb')==='protan' && document.getElementById('wall').dataset.wall==='ocean'"))
+        print(tag, 'wall 5 the mode is applied to the whole page and saved', s.pg.evaluate(N("()=>document.documentElement.dataset.cb==='protan' && getComputedStyle(document.documentElement).filter.includes('cb-protan') && localStorage.getItem('dev-pd-cb')==='protan' && document.getElementById('wall').dataset.wall==='ocean'")))
         print(tag, 'wall 6 and he passes on Phill\'s note', B['phill_note'] in s.say() and not s.pg.evaluate("()=>!!document.querySelector('.grayveil,.wipeline,.wallnext')"))
         s.pg.screenshot(path=f'/tmp/pano-qa/dash-{tag}-wall.png')
         s.pg.reload(); s.wait(2000)
@@ -260,7 +278,7 @@ with sync_playwright() as p:
         s.done(tag + ' launch no token')
 
         # launching, with a (fake) token saved on this DEV copy: straight to Feature
-        s = Site(b, W, H, store={'dev-pd-gh-token': json.dumps('FAKE_DEV_TOKEN')}); s.open_menu()
+        s = Site(b, W, H, store={N('dev-pd-gh-token'): json.dumps('FAKE_DEV_TOKEN')}); s.open_menu()
         s.tap(TOURS[0], 2800)
         print(tag, 'tour 15 launch with a token: four steps, starting at Feature', '· 1 of 4' in s.say() and 'Feature' in s.say())
         s.tap('Next', 600)
@@ -270,7 +288,11 @@ with sync_playwright() as p:
         s.tap('Skip', 2800)
         print(tag, 'tour 18 the Launch step repeats what was typed, safely', '· 3 of 4' in s.say() and 'Test <feature>' in s.say() and s.pg.evaluate("()=>!document.querySelector('#gsay feature')"))
         s.tap('Launch it for me', 900)
-        print(tag, 'tour 19 Launch is off on DEV: the form refuses and nothing is sent to GitHub', 'turned off' in s.pg.inner_text('#lpStatus') and s.calls == [])
+        if REAL:
+            d = s.dispatched
+            print(tag, 'tour 19 Launch is on: the form sends one launch, with what was typed, to the test\'s stand-in for GitHub', len(d) == 1 and d[0]['ref'] == 'main' and d[0]['inputs']['feature'] == 'Test <feature>' and 'failed' not in s.pg.evaluate("()=>localStorage.getItem('pd-proto-requests-v2')"), d)
+        else:
+            print(tag, 'tour 19 Launch is off on DEV: the form refuses and nothing is sent to GitHub', 'turned off' in s.pg.inner_text('#lpStatus') and s.calls == [])
         s.done(tag + ' launch')
 
     # ---------- talks ----------
@@ -292,7 +314,7 @@ with sync_playwright() as p:
         print(tag, 'talk 4 the last bubble offers to launch it, fill it in, or start over', s.menu()[:3] == ends and TK['other_topics'] in s.menu())
         s.tap(ends[1], 1500)
         print(tag, 'talk 5 "Just fill it in" puts the prompt in the launch card', s.pg.evaluate("()=>document.getElementById('lpIdea').value") == B_['ideas']['skills']['chart'] and B_['cta'] in s.pg.evaluate("()=>document.getElementById('lpNotes').value"))
-        saved = s.pg.evaluate("()=>[JSON.parse(localStorage.getItem('dev-pd-pano-mem')),JSON.parse(localStorage.getItem('dev-pd-pano-seen'))]")
+        saved = s.pg.evaluate(N("()=>[JSON.parse(localStorage.getItem('dev-pd-pano-mem')),JSON.parse(localStorage.getItem('dev-pd-pano-seen'))]"))
         print(tag, 'talk 6 he remembers the prompt and that this talk was heard', saved[0]['prompt']['feature'] == B_['ideas']['skills']['chart'] and saved[1]['talks'] == ['builder'])
         # a lesson with a quiz: a right answer, then his reply leads the next bubble
         s.open_menu(); s.tap(TK['menu_button'])
@@ -338,11 +360,11 @@ with sync_playwright() as p:
         s.give_key('ghp_' + 'a' * 30, 500)
         print(tag, 'chat 4 a GitHub token is turned away before anything is sent', CH['wrong_key']['github'] in s.say() and s.asked == [] and s.pg.evaluate("()=>!gkey.hidden"))
         s.give_key(KEY)
-        print(tag, 'chat 5 a key Anthropic rejects is not saved', CH['key_check']['invalid'] in s.say() and s.pg.evaluate("()=>localStorage.getItem('dev-pd-pano-key')===null") and [a['kind'] for a in s.asked] == ['models'])
+        print(tag, 'chat 5 a key Anthropic rejects is not saved', CH['key_check']['invalid'] in s.say() and s.pg.evaluate(N("()=>localStorage.getItem('dev-pd-pano-key')===null")) and [a['kind'] for a in s.asked] == ['models'])
         mode['models'] = (200, {'data': []})
         s.give_key(KEY, 2200)
-        print(tag, 'chat 6 a key that checks out is saved on this device under the DEV name only', s.pg.evaluate("()=>JSON.parse(localStorage.getItem('dev-pd-pano-key'))") == KEY and any(k in s.say() for k in CH['key_saved']) and s.menu()[-2] == CH['menu_has']
-              and s.pg.evaluate("()=>localStorage.getItem('pd-pano-key')===null"))
+        print(tag, 'chat 6 a key that checks out is saved on this device under this copy\'s own name only', s.pg.evaluate(N("()=>JSON.parse(localStorage.getItem('dev-pd-pano-key'))")) == KEY and any(k in s.say() for k in CH['key_saved']) and s.menu()[-2] == CH['menu_has']
+              and s.pg.evaluate("n=>localStorage.getItem(n)===null", 'dev-pd-pano-key' if REAL else 'pd-pano-key'))   # and not under the other copy's name
         s.type('why is the sky blue', 2200)
         ask = s.asked[-1]; body = ask['body'] or {}
         sysm = body.get('system'); systext = sysm[0]['text'] if isinstance(sysm, list) else (sysm or '')
@@ -371,17 +393,17 @@ with sync_playwright() as p:
         print(tag, 'chat 16 too many requests: he asks for a minute', CH['errors']['busy'] in s.say())
         mode['messages'] = (401, {'error': {'message': 'invalid x-api-key'}})
         s.type('qqq another question', 2200)
-        print(tag, 'chat 17 a key that stops working is forgotten and he asks again', CH['errors']['rejected'] in s.say() and s.pg.evaluate("()=>localStorage.getItem('dev-pd-pano-key')===null && !gkey.hidden"))
+        print(tag, 'chat 17 a key that stops working is forgotten and he asks again', CH['errors']['rejected'] in s.say() and s.pg.evaluate(N("()=>localStorage.getItem('dev-pd-pano-key')===null && !gkey.hidden")))
         print(tag, 'chat 18 every request went to api.anthropic.com and nowhere else', s.calls == [] and all(a['kind'] in ('models', 'messages') for a in s.asked))
         s.done(tag + ' chat')
 
     # a key already saved: the menu shows his brain, and it can be taken back
-    s = Site(b, store={'dev-pd-pano-key': json.dumps(KEY)}); s.open_menu()
+    s = Site(b, store={N('dev-pd-pano-key'): json.dumps(KEY)}); s.open_menu()
     print('key 1 with a saved key his menu says so', s.menu()[-2] == CH['menu_has'])
     s.tap(CH['menu_has'], 600)
     print('key 2 the ask box stays while he explains', CH['has_brain'] in s.say() and s.pg.evaluate("()=>!gask.hidden && gkey.hidden"))
     s.tap(CH['forget'], 1800)
-    print('key 3 "Forget my brain" removes the key', s.pg.evaluate("()=>localStorage.getItem('dev-pd-pano-key')===null") and s.menu()[-2] == CH['menu_give'])
+    print('key 3 "Forget my brain" removes the key', s.pg.evaluate(N("()=>localStorage.getItem('dev-pd-pano-key')===null")) and s.menu()[-2] == CH['menu_give'])
     s.done('key')
 
     # ---------- he waits before tucking away: 10s quiet, 20s when waiting on the visitor ----------
