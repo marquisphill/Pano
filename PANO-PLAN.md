@@ -20,6 +20,8 @@ Paño is Phill's red cartoon cat guide. Today he exists as two separate copies o
 | `Professional-Portfolio2-STAGING` | https://marquisphill.github.io/Professional-Portfolio2-STAGING/ | Staging portfolio. All changes land here first. |
 | `Personal-Dashboard` | https://marquisphill.github.io/Personal-Dashboard/ | Phill's personal dashboard. Private repo. No staging. |
 | `Pano` | (this repo) | Paño's future home. Public. |
+| `Portfolio-DEV` | https://marquisphill.github.io/Portfolio-DEV/ (once Pages is on) | DEV copy of the portfolio for this build. Temporary; deleted in phase 6. Public. |
+| `Dashboard-DEV` | https://marquisphill.github.io/Dashboard-DEV/ (once Pages is on) | DEV copy of the dashboard. Created public; see the open question in the Status log. |
 
 **Portfolio Paño** lives inside `index.html` of the portfolio (one big file: CSS, markup, then one script). Everything is scripted; there is no AI. His lines are typed into the code. What he can do:
 - Guided tours (résumé, history, projects, skills, contact) with a highlight ring; windows covering a target are minimized first.
@@ -69,7 +71,8 @@ Each site keeps a small **adapter**: one line that loads Paño plus a short bloc
 Each phase fits in one chat and ends with every site still working.
 
 **Phase 0. Set up the workshop** (small)
-- Phill creates two more empty repos: a portfolio DEV copy and a dashboard DEV copy. He picks the names. (`Pano` already exists.)
+- The three repos exist: `Pano`, `Portfolio-DEV`, `Dashboard-DEV` (created 2026-11-22).
+- **Before copying the dashboard:** `Personal-Dashboard` is private and `Dashboard-DEV` was created public. Ask Phill whether to make `Dashboard-DEV` private first. Do not copy the dashboard's files into a public repo without his answer.
 - Copy the staging portfolio into the portfolio DEV repo and the dashboard into the dashboard DEV repo. Turn on GitHub Pages for both DEV repos and for `Pano` (Phill may need to do this in repo settings).
 - Give DEV copies their own storage key names. Turn off Launch on the dashboard DEV copy.
 - Done when: both DEV sites load and behave like the real ones, and the tests pass against the portfolio DEV site.
@@ -111,4 +114,4 @@ Each phase fits in one chat and ends with every site still working.
 
 Update this at the end of every phase: date, what was done, decisions, anything left open.
 
-- **2026-11-22.** Plan written. `Pano` repo created by Phill. Test scripts saved to `tests/`. **Next: Phase 0.** Phill still needs to create the two DEV repos and choose their names.
+- **2026-11-22.** Plan written. Phill created `Pano`, `Portfolio-DEV` and `Dashboard-DEV`. Test scripts saved to `tests/` (copied over, not yet re-run from here). **Next: Phase 0.** Open question for Phill: `Dashboard-DEV` is public but the real dashboard repo is private; should the DEV copy be made private before the dashboard is copied in?
