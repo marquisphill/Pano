@@ -1,0 +1,86 @@
+/* Paño: body, speech bubble and highlight ring.
+   Lifted out of the portfolio homepage in Phase 1 (see PANO-PLAN.md). Loaded by each site.
+   Colors such as var(--red-ink) and var(--ink-soft) come from the page. */
+
+/* ---------- the cat guide ---------- */
+.gcat{position:fixed;left:0;top:0;width:76px;height:92px;z-index:9050;padding:0;cursor:pointer;filter:drop-shadow(0 6px 12px rgba(0,0,0,.5));will-change:transform}
+.gcat[hidden]{display:none}
+.gbody{display:block;width:100%;height:100%;transform-origin:50% 100%}
+.gcat svg{width:100%;height:100%;display:block;overflow:visible;transition:transform .25s}
+.gcat svg.flip{transform:scaleX(-1)}
+.gtail{transform-box:view-box;transform-origin:46px 111px;animation:gtail 2.6s ease-in-out infinite}
+.gcat.walking .gtail{animation-duration:.45s}
+@keyframes gtail{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
+.geyes{transform-box:fill-box;transform-origin:50% 50%;animation:gblink 5s infinite}
+@keyframes gblink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+.ghead{transform-box:view-box;transform-origin:41px 54px;transition:transform .3s}
+.gcat:hover .ghead{transform:rotate(-8deg)}
+.gcat.talk .ghead{animation:gnod .5s ease-in-out 2}
+@keyframes gnod{0%,100%{transform:rotate(0)}50%{transform:rotate(-7deg)}}
+.gmouth{transform-box:fill-box;transform-origin:50% 0;transform:scale(.4,0);transition:transform .22s cubic-bezier(.16,1,.3,1)}
+.gcat.chomp .gmouth{transform:scale(2.3,3.1)}
+.gcat.chomp .ghead{transform:rotate(-10deg) scale(1.12)}
+.gcat.chomp .geyes{animation:none;transform:scaleY(.55)}
+.gcat:focus-visible{outline:2px solid #3ddc84;outline-offset:4px;border-radius:8px}
+.gcat{touch-action:none;cursor:grab}
+/* being recycled: wary over the bin, then unimpressed, then a contemptuous paw lick */
+.glid{transform:translateY(-9px);transition:transform .45s ease}
+.gcat.wary .glid{transform:translateY(-1.6px)}
+.gcat.meh .glid{transform:translateY(.4px)}
+.gcat.lick .glid{transform:translateY(1.6px)}
+.gcat.meh .geyes{translate:1.6px 1.3px}
+.gcat.meh .gtail{animation-duration:5s}
+.gflat{opacity:0;transition:opacity .2s}
+.gcat.wary .gflat{opacity:1}
+.gtongue{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0)}
+.gcat.lick .gtongue{animation:gtongue .6s ease-in-out infinite}
+@keyframes gtongue{0%,100%{transform:scaleY(0)}40%,60%{transform:scaleY(1)}}
+.gleg{opacity:.7;transition:opacity .2s}
+.gpaw{opacity:0;transform-box:view-box;transform-origin:31px 80px;transform:rotate(30deg);transition:transform .35s,opacity .2s}
+.gcat.lick .gleg{opacity:0}
+.gcat.lick .gpaw{opacity:1;transform:rotate(0)}
+.gcat.lick .gpp{animation:gppaw .6s ease-in-out infinite}
+@keyframes gppaw{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+.gcat.lick .ghead{transform:rotate(16deg) translate(-3px,2px)}
+.gcat.head .gleg,.gcat.head .gpaw{display:none}
+.gcat.dragging{cursor:grabbing;transition:none}
+.gcat.dragging .gbody{transform:scale(1.08)}
+.gcat.head{width:144px;height:108px;z-index:2147483000}
+.gwavy{display:none}
+.gcat.head .gtail,.gcat.head .gtorso,.gcat.head .gwhisk{display:none}
+.gcat.head .gwavy{display:inline}
+.gwavy path{fill:none;stroke:#ff4d4f;stroke-width:1.6;stroke-linecap:round;transform-box:fill-box;animation:gwig 1.1s ease-in-out infinite alternate}
+.gwavy .wl{transform-origin:100% 50%}.gwavy .wr{transform-origin:0 50%}
+.gwavy path:nth-child(2){animation-delay:-.35s}.gwavy path:nth-child(3){animation-delay:-.6s}.gwavy path:nth-child(4){animation-delay:-.9s}
+@keyframes gwig{0%{transform:rotate(-7deg) scaleY(1)}50%{transform:rotate(1deg) scaleY(-1)}100%{transform:rotate(7deg) scaleY(1)}}
+.gbubble{position:fixed;z-index:9060;width:310px;max-width:calc(100vw - 16px);box-sizing:border-box;padding:14px 14px 12px;border-radius:14px;background:#0f1b14;border:1px solid #2a9a5f;box-shadow:0 16px 40px rgba(0,0,0,.55);color:#e6f2ea;font-size:13.5px;line-height:1.5}
+.gbubble[hidden]{display:none}
+.gbubble::after{content:"";position:absolute;left:var(--tx,50%);bottom:-8px;width:14px;height:14px;background:#0f1b14;border-right:1px solid #2a9a5f;border-bottom:1px solid #2a9a5f;transform:translateX(-50%) rotate(45deg)}
+.gbubble.below::after{bottom:auto;top:-8px;transform:translateX(-50%) rotate(225deg)}
+.gbubble.beside::after{display:none}
+.gsay{margin:0 24px 10px 0}
+.gname{display:block;color:var(--red-ink);font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.gstep{display:block;color:var(--ink-soft);font-size:11.5px;margin-bottom:2px}
+.gacts{display:flex;flex-wrap:wrap;gap:6px}
+.gacts:empty{display:none}
+.gbtn{min-height:34px;padding:0 12px;border-radius:999px;background:#15241b;border:1px solid #22402e;color:#e6f2ea;font-size:13px;cursor:pointer}
+.gbtn:hover,.gbtn:focus-visible{border-color:#3ddc84;background:#1a3324}
+.gbtn.pri{background:#3ddc84;border-color:#3ddc84;color:#04140b;font-weight:600}
+.gbtn.quiet{background:none;border-color:transparent;color:var(--ink-soft)}
+.gbtn.quiet:hover{color:#e6f2ea}
+.gx{position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.gx:hover{background:#15241b}
+.gx svg{width:10px;height:10px}
+.gring{position:fixed;z-index:9055;pointer-events:none;border:2px solid #3ddc84;border-radius:12px;animation:gring 1.4s ease-out infinite;transition:opacity .2s}
+.gring[hidden]{display:none}
+@keyframes gring{0%{box-shadow:0 0 0 0 rgba(61,220,132,.55)}100%{box-shadow:0 0 0 14px rgba(61,220,132,0)}}
+@media (prefers-reduced-motion:reduce){.gtail,.geyes,.gring,.gcat.talk .ghead,.gwavy path,.gcat.lick .gtongue,.gcat.lick .gpp{animation:none}}
+
+@media (max-width:640px){
+  .gcat{width:54px;height:65px;z-index:9065}
+  .gcat.head{width:120px;height:90px;z-index:2147483000}
+  .gbubble{left:8px!important;right:8px;top:auto!important;bottom:calc(52px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;padding-left:40px;padding-right:76px}
+  .gbubble .gx{right:auto;left:6px}
+  .gbubble.gtop{top:calc(8px + env(safe-area-inset-top,0px))!important;bottom:auto}
+  .gbubble::after{display:none}
+}

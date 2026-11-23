@@ -5,4 +5,6 @@ Paño is the red cartoon cat who guides visitors around Phill's portfolio and pe
 - **The plan and current status:** [PANO-PLAN.md](PANO-PLAN.md)
 - **Tests:** [tests/](tests/)
 
-Nothing here is loaded by a live site yet. The build happens in phases, described in the plan.
+- **His body and engine:** [latest/pano.js](latest/pano.js) and [latest/pano.css](latest/pano.css). The top of `pano.js` explains how a page loads him.
+
+Only the DEV copy of the portfolio loads these files so far. Staging, production and the dashboard still carry their own copies. The build happens in phases, described in the plan.
