@@ -45,7 +45,7 @@ On the dashboard, when the scripts run out:
 - **With a Claude token on the device**, Paño keeps chatting through Claude using `dashboard.json → claude_chat.system_prompt`. The brain fills `{{core.facts}}` and `{{dashboard.facts}}` with those JSON blocks. Claude may chat about cats in general and say when it's guessing. It never states a new fact about Corner or Panela as true.
 - **Without a token**, Paño says that's all he knows for sure (`claude_chat.when_scripts_run_out.without_token`).
 
-The portfolio has `claude_chat.enabled: false`, so scripts only.
+The portfolio has `claude_chat.enabled: false`, so scripts only. Phill confirmed this on 2026-11-23: the portfolio's Paño stays scripted.
 
 ## A talk topic
 
@@ -74,7 +74,7 @@ The portfolio has `claude_chat.enabled: false`, so scripts only.
 
 ## A tour
 
-Each step has `say`, `target` (what he points at), `done` (what counts as the visitor doing it), `act` (what the "Do it for me" button does) and `next` (a button that moves on). They are plain descriptors. The engine reads `css`, `css_visible`, `when_visible`, `click` and `focus` itself. The rest are about one site's page, so that page's adapter supplies them as `tourHelpers`.
+Each step has `say`, `target` (what he points at), `done` (what counts as the visitor doing it), `act` (what the "Do it for me" button does) and `next` (a button that moves on). They are plain descriptors. The engine reads `css`, `css_visible`, `when_visible`, `click` and `focus` itself. The rest are about one site's page, so that page's adapter supplies them as `tours` (see `../skills/README.md`). A tour is offered only on a page that can read every one of its steps.
 
 | Descriptor | Portfolio helper | Dashboard |
 | --- | --- | --- |

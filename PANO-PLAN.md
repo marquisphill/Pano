@@ -49,7 +49,7 @@ This repo is served by GitHub Pages and holds three things:
 | Organize / close windows | A window system | Yes | No |
 | Recycle bin | A bin icon | Yes | No |
 | Background + colorblind modes | A background | Yes | Yes |
-| Claude chat | A Console key | Phill decides in phase 3 | Yes |
+| Claude chat | A Console key | No (stays scripted; decided 2026-11-23) | Yes |
 
 Each site keeps a small **adapter**: one line that loads Paño plus a short block telling him what the page has.
 
@@ -109,6 +109,7 @@ Each phase fits in one chat and ends with every site still working.
 - The dashboard has no staging; its DEV copy is enough.
 - Paño stays scripted. He is not being turned into a Console-built AI agent.
 - One phase per chat, to keep usage down.
+- The portfolio's Paño stays scripted. No Claude chat skill on the portfolio. (2026-11-23)
 
 ## Status log
 
@@ -156,3 +157,17 @@ Update this at the end of every phase: date, what was done, decisions, anything 
     - `portfolio.json` still holds `greetings`, `idle_nudges`, `sign_offs`, `fallbacks` and talk topics that nothing reads. They differ from what he says today (`lines`). They were left for the talking skill, if Phill wants one in phase 3.
     - A brain edit reaches the DEV site only after GitHub Pages' 10-minute cache runs out.
   - **Next: Phase 3** (split him into skills; each declares what it needs; the adapter says what the page has). It starts with a question for Phill: should the portfolio's Paño get the Claude chat skill, or stay scripted?
+- **2026-11-23. Phase 3 done.** Paño's abilities are now separate skills, and a page gets only the ones it supports.
+  - **Decision (Phill): the portfolio's Paño stays scripted.** No Claude chat skill on the portfolio. The chat skill is still to be written, in phase 4, for the dashboard only.
+  - **The skills:** `latest/skills/tours.js`, `background.js`, `windows.js` and `bin.js`. Each starts with a note saying what it needs from the page. The code was moved, not rewritten. `latest/skills/README.md` explains how a skill is written and how to add one. `pano.js` is now only his body and engine: walking, bubble, ring, tour runner, menu, head mode, idle timing, dragging. Head mode and dragging need nothing from a page, so they stayed in the engine.
+  - **The "does this page support it" check:** each skill names the adapter entries it needs (`background`, `windows`, `bin`). If the page's adapter has them, the skill is on and adds its buttons to his menu. If not, he does not offer it and nothing breaks. Tours are checked one by one: a tour is offered only if the page can read every step, so a tour made only of plain `css` steps works on any page, and the portfolio's icon-and-window tours need the page's `tours` entry. Running `Pano.here.skills()` in a page's console lists which skills are on and why any are off.
+  - **The portfolio adapter** in Portfolio-DEV's page now ends with one line per skill: `tours`, `background`, `windows`, `bin`. The background names, colorblind mode names and saved-setting names moved out of `pano.js` into the `background` line. The page now tells him about windows with `pano.notice('window-opened')` and `pano.notice('window-closed')`.
+  - **How skills load:** the page still has one line for him. `pano.js` writes the four skill files in right after itself while the page is being read, so they are ready before the page starts him and a saved background shows with no flash. If he is added to a page that has already loaded, the files are fetched and he waits. If one cannot be fetched he goes without that skill.
+  - **Tests:** new `tests/skills.py`, added to `run_all.sh`. It checks the four files load, all four are on, and his menu is unchanged; then it takes each adapter line out in turn and checks that skill goes while the rest work (no tour buttons; no background button; no clean-up offer or window buttons; he can be dropped on the bin with no reaction). It also covers the saved background, a blocked skill file, and late loading. All 29 checks pass at the sizes it runs. `tests/brain.py` now reads the skill files too. The full suite was run against the phase 2 pair and the phase 3 pair, side by side. Outputs were identical for head (3 sizes), bin, cases, sweep, lifted, clean (phone, fold), and tours (desk, fold, phone). Differences: one `idle.py` timing by 0.2s; two `wall.py` mid-wipe readings by 0.1; the known `wins.py` flicker; and `clean.py desk` "bubble after", which re-runs showed flickering between the two answers on old and new alike (the test reads the bubble just as his 2.6s note closes; now listed in `tests/README.md`).
+  - **Checked live:** see the end of this entry's commit; both DEV addresses were driven after the pushes.
+  - **Found along the way, for phase 4:**
+    - Still portfolio-shaped inside the code: the taskbar height (44, 48 and 52 appear in the engine and in `windows.js`), and his styles are one file (`pano.css`) including the moods only skills use.
+    - The background skill expects the page to supply the styles for its own backgrounds, the `cb-*` filters, and the `wallnext`, `grayveil` and `wipeline` layers. The dashboard has none of these yet. The last three are the same on any page and could move into `pano.css`.
+    - If a page lists no colorblind modes, he skips that question and just changes the background.
+    - Unchanged from phase 2: the per-tab names (`catGreeted`, `panoHead`) are shared by all sites; shared lines should move to `core.json` when the dashboard loads its brain.
+  - **Next: Phase 4** (dashboard adapter; move the dashboard's Claude chat in as a skill; delete the dashboard DEV copy's old Paño code). It needs push access to `Dashboard-DEV`. Start by comparing the dashboard's Paño with this one, as noted under Phase 0.

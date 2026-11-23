@@ -51,6 +51,7 @@ That is how to prove a change did nothing visible: serve the old site on one por
 | `sweep.py` | Broken images, dead links, direct links, resizing the browser. | `sweep.py` |
 | `lifted.py` | The page loads Paño from `/Pano/latest/` and no longer carries his code; the page still works if his files fail to load. | `lifted.py` |
 | `brain.py` | What he says comes from `latest/brain/portfolio.json`: no lines left in the code or the page, his menu and greeting match the brain, editing the JSON alone changes them, the page still works if the brain cannot be fetched. It also walks the tours that are written but not in his menu yet. | `brain.py` |
+| `skills.py` | Each ability is its own file in `latest/skills/`. A skill is offered only when the page's adapter has what it needs: the test takes each adapter entry out in turn and checks that skill goes and the rest still work. Also: a saved background shows with no flash, a skill file that cannot be fetched, and Paño added to a page that has already loaded. | `skills.py` |
 | `devdash.py` | Dashboard DEV copy only: it uses its own storage names, ignores the real token and key, and Launch is off. | Serve `Dashboard-DEV` on 8773, then `devdash.py`. It still has its own Paño inside the page until phase 4. |
 
 ## Reading the output
@@ -63,6 +64,7 @@ Some known quirks:
 - Timings in `idle.py` include about a second for Paño's walk to the top, and vary by a few tenths of a second between runs.
 - `wins.py` line `desk 4 menu with one window` sometimes prints an empty list `[]` and sometimes the menu items, on the same site. It is a timing flicker in the test. The `short` line is steady.
 - `sweep.py` lists `Failed to load resource` errors and ends in `bad` when the machine running the tests cannot reach outside addresses such as Google Analytics. That is the test machine, not the site.
+- `clean.py` on desktop, line `bubble after`, sometimes prints `HIDDEN` and sometimes the "All organized!" note, on the same site. The test reads the bubble just as that note closes.
 - `clean.py 880 900 fold` stops with a timeout: at that width an open window covers the icon the test tries to double-click. It did this before phase 1 too.
 - `tours.py` sometimes prints a `click-race` line and an extra step. That is the test clicking a button as it is replaced.
 - A full run takes 20 minutes or more. `tours.py` is the slow one.

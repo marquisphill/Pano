@@ -4,16 +4,21 @@
    How a page uses him:
      1. <link rel="stylesheet" href="/Pano/latest/pano.css"> in the head.
      2. <script src="/Pano/latest/pano.js"></script> in the body, at the spot where his
-        elements should sit. Loading this file puts his markup there, hidden.
+        elements should sit. Loading this file puts his markup there, hidden, and loads his
+        skills from skills/ next to this file.
      3. const pano = Pano.init({ ... }) once the page's own script has set itself up.
         The object passed in (the "adapter") tells him what this page has. See init() below.
 
-   What he says is not in this file. His lines, his tours and his menu come from his brain:
-   brain/<site>.json next to this file (see brain/README.md). The adapter names the brain to
-   load. He stays hidden until it has arrived; if it never does, the page carries on without him.
+   This file is his body and engine: drawing, walking, the speech bubble, the highlight ring,
+   the tour runner, his menu, head mode, idle timing and dragging. Two things live elsewhere:
 
-   Phase 1 moved the code here and Phase 2 moved the words out, both without changing what he
-   does. His abilities are still one block (Phase 3 splits them into skills). */
+   What he says. His lines, his tours and his menu come from his brain: brain/<site>.json next
+   to this file (see brain/README.md). The adapter names the brain to load. He stays hidden
+   until it has arrived; if it never does, the page carries on without him.
+
+   What he can do. Each ability is a skill: one file in skills/ (see skills/README.md). A skill
+   declares what it needs from the page, as names of adapter entries. If the adapter has them,
+   the skill is on and adds itself to his menu. If not, he simply does not offer it. */
 (() => {
   const MARKUP = `<button class="gcat" id="gcat" hidden><span class="gbody"><svg viewBox="0 0 100 120" aria-hidden="true">
   <defs>
@@ -61,23 +66,40 @@
   }
   mount();
 
-  /* init(host): start Paño on this page. Everything in host is optional unless marked.
-       ga(name, params)        report an analytics event
+  /* ---------- skills ---------- */
+  // His skills, in the order they appear in his menu. Each is skills/<name>.js and calls Pano.skill().
+  const SKILLS = ['tours', 'background', 'windows', 'bin'];
+  const REG = {}, loading = [];
+  // skill(name, { needs: [adapter entries], start(p, host) }): start() returns what the skill offers. See skills/README.md.
+  function skill(name, def) { REG[name] = def; }
+  // Load them. While the page is still being read they are written in right after this file, so they
+  // are ready before the page's own script calls init() (a saved background shows with no flash).
+  // If this file was added to a finished page, they are fetched and he waits for them.
+  if (HOME && me && !me.async && !me.defer && document.readyState === 'loading') {
+    document.write(SKILLS.map(n => `<script src="${HOME}skills/${n}.js"><\/script>`).join(''));
+  } else if (HOME) {
+    for (const n of SKILLS) loading.push(new Promise(done => {
+      const sc = document.createElement('script');
+      sc.src = HOME + 'skills/' + n + '.js'; sc.onload = sc.onerror = done;
+      document.head.appendChild(sc);
+    }));
+  }
+
+  /* init(host): start Paño on this page. host is the adapter. Everything is optional unless marked.
+     About the page in general:
        brain                   (needed) which brain to load: a site name ('portfolio' loads
                                brain/portfolio.json from beside this file) or the address of a brain file
-       tourHelpers             how to read the tour descriptors that are about this page:
-                               { target: { icon(value, step), ... }, done: { window(value), ... },
-                                 act: { open(value, el), ... } }. css, css_visible, when_visible,
-                               click and focus are built in and need no helper.
-       desk                    (needed) the element whose data-wall attribute sets the background
-       keys: { wall, cb }      (needed) names used to save the background and colorblind choice
+       ga(name, params)        report an analytics event
        canGreet()              false when he should not say hello on arrival
        toast, hideToast()      a page notification he must never cover
-       binIcon()               the Recycle Bin icon, if the page has one
        closeOverlayAt(el)      close a page menu or popup that el belongs to; resolves true if it did
        windowOf(el), paneOf(el), scrollInPane(el, toStart, smooth)
-       windows: { WINS, topWin, focusW, keepOnScreen, rectDelta, closeW, minimizeW }
-     Returns what the page may call: checkClutter(), windowClosed(), busy(), rest(), menu(text). */
+     What the page has for his skills. Leave an entry out and he does not offer that skill:
+       tours                   readers for tour steps about this page (skills/tours.js)
+       background              { desk, walls, modes, keys } (skills/background.js)
+       windows                 { WINS, topWin, focusW, keepOnScreen, rectDelta, closeW, minimizeW } (skills/windows.js)
+       bin                     { icon() } (skills/bin.js)
+     Returns what the page may call: notice(what), busy(), rest(), menu(text), skills(). */
   function init(host) {
     host = host || {};
     mount();
@@ -105,8 +127,6 @@
     const anim = (el, k, o) => reduce ? { finished: Promise.resolve() } : el.animate(k, o);
 
     /* ---------- what the page handed over ---------- */
-    const HELP = host.tourHelpers || {};
-    const KEYS = host.keys || { wall: 'pano-wall', cb: 'pano-cb' };
     const canGreet = host.canGreet || (() => true);
     const toast = host.toast || null, hideToast = host.hideToast || (() => {});
     const closeOverlayAt = host.closeOverlayAt || (async () => false);
@@ -115,13 +135,12 @@
     const scrollInPane = host.scrollInPane || ((el, toStart) => el.scrollIntoView({ block: toStart ? 'start' : 'nearest' }));
     const WM = host.windows || {};
     const WINS = WM.WINS || new Map();
-    const topWin = WM.topWin || (() => null), focusW = WM.focusW || (() => {}), keepOnScreen = WM.keepOnScreen || (() => {});
-    const rectDelta = WM.rectDelta || (() => 'none'), closeW = WM.closeW || (async () => {}), minimizeW = WM.minimizeW || (async () => {});
+    const minimizeW = WM.minimizeW || (async () => {});   // on a tour, windows covering what he points at are minimized
 
     const gcat = $('#gcat'), gbodyEl = $('.gbody', gcat), gsvg = $('svg', gcat), gbub = $('#gbubble'), gsay = $('#gsay'), gacts = $('#gacts'), gring = $('#gring');
     const CAT_W = () => narrow() ? 54 : 76, CAT_H = () => narrow() ? 65 : 92;
     const sleep = ms => new Promise(r => setTimeout(r, ms));
-    let catPos = { x: 0, y: 0 }, tour = null, stepToken = 0, ringTarget = null, ringRAF = 0, msgSeq = 0;
+    let catPos = { x: 0, y: 0 }, tour = null, stepToken = 0, ringTarget = null, ringRAF = 0, msgSeq = 0, idleT = 0;
 
     const dockSpot = () => ({ x: innerWidth - CAT_W() - 16, y: innerHeight - 52 - CAT_H() - 12 });
     // first visit: tucked into the bottom-right corner, just above the taskbar
@@ -314,45 +333,13 @@
     }
 
     /* ---------- his brain: every line, tour and menu entry comes from JSON ---------- */
-    let L = {}, TOURS = {}, GOALS = [];
+    let L = {}, BRAIN = null;
     const fill = (t, vals) => String(t).replace(/\{(\w+)\}/g, (m, k) => k in vals ? vals[k] : m);
     const named = () => `<span class="gname">${L.name}</span>`;
-    const visible = sel => { const e = $(sel); return e && !e.hidden ? e : null; };
-    // a tour step in the brain is plain data; these turn it into the checks and actions the runner uses
-    function readTarget(d) {
-      const kind = Object.keys(d).find(k => HELP.target && HELP.target[k]);
-      return () => {
-        if (d.when_visible && !visible(d.when_visible)) return null;
-        if (d.when_window && !(HELP.done && HELP.done.window && HELP.done.window(d.when_window))) return null;
-        if (d.css) return $(d.css);
-        return kind ? HELP.target[kind](d[kind], d) : null;
-      };
-    }
-    function readDone(d) {
-      const kind = Object.keys(d).find(k => HELP.done && HELP.done[k]);
-      return () => d.css_visible ? !!visible(d.css_visible) : !!(kind && HELP.done[kind](d[kind], d));
-    }
-    function readAct(d) {
-      const kind = Object.keys(d).find(k => HELP.act && HELP.act[k]);
-      return el => {
-        if (d.click) { const e = $(d.click); if (e) e.click(); }
-        else if (d.focus) { const e = $(d.focus); if (e) e.focus(); }
-        else if (kind) HELP.act[kind](d[kind], el, d);
-      };
-    }
     function useBrain(B) {
+      BRAIN = B;
       L = B.lines || {};
-      TOURS = {};
-      for (const [key, t] of Object.entries(B.tours || {})) {
-        if (!t || !Array.isArray(t.steps)) continue;
-        TOURS[key] = t.steps.map(st => ({
-          say: st.say, next: st.next, actLabel: st.actLabel,
-          target: readTarget(st.target || {}),
-          done: st.done ? readDone(st.done) : null,
-          act: st.act ? readAct(st.act) : null
-        }));
-      }
-      GOALS = ((B.menu && B.menu.show) || []).filter(k => TOURS[k]).map(k => [B.tours[k].label, k]);
+      each('brain', B);
       gcat.setAttribute('aria-label', L.labels.cat_button);
       gbub.setAttribute('aria-label', L.name);
       $('#gx').setAttribute('aria-label', L.labels.close);
@@ -363,6 +350,22 @@
       .then(B => { useBrain(B); return true; })
       .catch(e => { console.warn('Paño could not load his brain from ' + brainURL + ', so he is staying hidden.', e); return false; });
 
+    /* ---------- his skills: each one is a file in skills/, used only if this page has what it needs ---------- */
+    const live = [], report = [];
+    const each = (hook, ...a) => live.forEach(s => s[hook] && s[hook](...a));
+    const any = hook => live.some(s => s[hook] && s[hook]());
+    const calmCat = () => each('calm');
+    function startSkills() {
+      for (const name of SKILLS) {
+        const def = REG[name];
+        if (!def) { report.push({ name, on: false, why: 'its file did not load' }); console.warn('Paño could not load his "' + name + '" skill, so he is going without it.'); continue; }
+        const missing = (def.needs || []).filter(k => host[k] == null);
+        if (missing.length) { report.push({ name, on: false, why: 'this page has no ' + missing.join(', ') }); continue; }
+        const s = def.start(api, host) || {};
+        s.name = name; live.push(s); report.push({ name, on: true });
+        if (BRAIN && s.brain) s.brain(BRAIN);
+      }
+    }
     // touch screens get "tap" instead of "click"
     const forTouch = t => (narrow() || matchMedia('(pointer: coarse)').matches)
       ? L.touch.swaps.reduce((out, w) => w.whole_word ? out.replace(new RegExp('\\b' + w.find + '\\b', 'g'), w.say) : out.replace(w.find, w.say), t)
@@ -370,8 +373,8 @@
 
     function guideBusy() { return !!tour || !gbub.hidden; }
 
-    async function runTour(key) {
-      const steps = TOURS[key], token = ++stepToken;
+    async function runTour(key, steps) {
+      const token = ++stepToken;
       tour = key; ga('guide_choice', { goal: key });
       for (let i = 0; i < steps.length; i++) {
         const st = steps[i];
@@ -417,9 +420,7 @@
       await moveCat(homeSpot(), false);
       if (token !== stepToken) return;
       say(named() + text, [
-        ...GOALS.map(([label, k]) => ({ label, fn: () => runTour(k) })),
-        { label: L.menu.change_background, fn: () => askWall() },
-        ...windowActions(),
+        ...live.flatMap(s => s.menu ? s.menu() : []),
         { label: again ? L.menu.leave_again : L.menu.leave_first, quiet: true, fn: () => guideRest(L.menu.bye) }
       ]);
     }
@@ -434,206 +435,6 @@
       say(msg);
       const mine = msgSeq;
       setTimeout(() => { if (mine === msgSeq) hideBubble(); }, 2600);
-    }
-
-    /* ---------- change the background (and, if asked, apply a colorblind mode) ---------- */
-    const WALLS = ['mountain', 'green', 'black'];
-    const CB_MODES = ['protan', 'deutan', 'tritan', 'mono'];
-    const deskEl = host.desk;
-    let recoloring = false;
-    const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
-    function setWall(k) { if (k && k !== 'mountain') deskEl.dataset.wall = k; else delete deskEl.dataset.wall; }
-    function setCB(m) { if (m) document.documentElement.dataset.cb = m; else delete document.documentElement.dataset.cb; }
-    // remember the visitor's choice between visits
-    if (WALLS.includes(store.get(KEYS.wall))) setWall(store.get(KEYS.wall));
-    if (CB_MODES.includes(store.get(KEYS.cb))) setCB(store.get(KEYS.cb));
-
-    async function askWall() {
-      const token = ++stepToken;
-      tour = null; ringOff(); gbub.hidden = true;
-      await moveCat(homeSpot(), false);
-      if (token !== stepToken) return;
-      const B = L.background;
-      say(named() + B.ask, [
-        ...WALLS.map(k => ({ label: B.options[k] + (k === 'mountain' ? B.default_mark : ''), fn: () => askColorblind(k) })),
-        { label: B.never_mind, quiet: true, fn: () => guideRest() }
-      ]);
-    }
-    function askColorblind(wall) {
-      say(named() + L.background.ask_colorblind, [
-        { label: L.background.yes, fn: () => askMode(wall) },
-        { label: L.background.no, fn: () => applyLook(wall, null) }
-      ]);
-    }
-    function askMode(wall) {
-      say(named() + L.background.ask_mode, CB_MODES.map(m => ({ label: L.background.modes[m], fn: () => applyLook(wall, m) })));
-    }
-    async function applyLook(wall, mode) {
-      if (recoloring) return;
-      const token = ++stepToken;
-      recoloring = true;
-      say(named() + L.background.changing);
-      ga('change_background', { wall, colorblind_mode: mode || 'none' });
-      store.set(KEYS.wall, wall === 'mountain' ? null : wall); store.set(KEYS.cb, mode);
-      const canVeil = !reduce && window.CSS && (CSS.supports('backdrop-filter', 'grayscale(1)') || CSS.supports('-webkit-backdrop-filter', 'grayscale(1)'));
-      if (reduce) { setWall(wall); setCB(mode); }
-      else {
-        let veil = null;
-        if (mode && canVeil) {
-          // everything, Paño included, drains to black and white...
-          veil = document.createElement('div'); veil.className = 'grayveil'; document.body.appendChild(veil);
-          await veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'ease-in-out', fill: 'forwards' }).finished;
-          setCB(mode);               // the color correction goes on underneath, unseen
-          await sleep(3000);         // ...and stays that way for three seconds
-        } else { await sleep(900); setCB(mode); }
-        // then a line of light sweeps top to bottom, bringing the color and the new background with it
-        const next = document.createElement('div'); next.className = 'wallnext'; next.dataset.wall = wall;
-        deskEl.insertBefore(next, deskEl.firstChild);
-        const line = document.createElement('div'); line.className = 'wipeline'; document.body.appendChild(line);
-        const T = { duration: 1700, easing: 'cubic-bezier(.45,0,.3,1)', fill: 'forwards' };
-        await Promise.all([
-          next.animate([{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0 0)' }], T).finished,
-          veil ? veil.animate([{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(100% 0 0 0)' }], T).finished : null,
-          line.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${innerHeight}px)`, opacity: 1, offset: .97 }, { transform: `translateY(${innerHeight}px)`, opacity: 0 }], T).finished
-        ]);
-        setWall(wall);
-        next.remove(); line.remove(); if (veil) veil.remove();
-      }
-      recoloring = false;
-      if (token !== stepToken) return;
-      if (mode) {
-        cheer();
-        say(named() + L.background.phill_note, [
-          { label: L.background.thanks, quiet: true, fn: () => guideRest() }
-        ]);
-      } else guideRest(L.background.done);
-    }
-
-    /* ---------- tidy up: with more than 3 windows open, the cat offers to eat the extras ---------- */
-    const CLUTTER = 3;
-    let cleanupArmed = true, cleaning = false;
-    function eatLayer() {
-      let layer = document.getElementById('eatlayer');
-      if (!layer) { layer = document.createElement('div'); layer.id = 'eatlayer'; layer.style.cssText = 'position:fixed;inset:0;z-index:9055;pointer-events:none'; document.body.appendChild(layer); }
-      return layer;
-    }
-    function openCount() { let n = 0; WINS.forEach(W => { if (W.state === 'open' || W.state === 'min') n++; }); return n; }
-    function checkClutter() {
-      if (!cleanupArmed || cleaning || recoloring || tour || gcat.hidden || openCount() <= CLUTTER) return;
-      cleanupArmed = false;
-      offerCleanup();
-    }
-    async function offerCleanup() {
-      const token = ++stepToken;
-      ringOff(); gbub.hidden = true;
-      await moveCat({ x: innerWidth / 2 - CAT_W() / 2, y: (innerHeight - 44) / 2 - CAT_H() / 2 }, false);
-      if (token !== stepToken) return;
-      say(named() + L.cleanup.offer, [
-        ...(narrow() ? [] : [{ label: L.cleanup.organize, pri: true, fn: () => organizeWindows() }]),
-        { label: narrow() ? L.cleanup.yes : L.cleanup.close, pri: narrow(), fn: () => eatWindows(token) },
-        { label: L.cleanup.no, quiet: true, fn: () => guideRest(L.cleanup.declined) }
-      ]);
-      ga('cleanup_offer', { windows: openCount() });
-    }
-    // menu extras, offered whenever two or more windows are open
-    function windowActions() {
-      if (openCount() < 2) return [];
-      return [
-        ...(narrow() ? [] : [{ label: L.menu.organize, fn: () => organizeWindows() }]),
-        { label: L.menu.close_all, fn: () => eatWindows(stepToken) }
-      ];
-    }
-    // stack every window like a fanned deck of cards: same size, stepped diagonally, every title bar and its buttons showing
-    async function organizeWindows() {
-      const token = ++stepToken;
-      tour = null; ringOff(); gbub.hidden = true;
-      const list = [...WINS.values()].filter(W => (W.state === 'open' || W.state === 'min') && !W.busy)
-        .sort((a, b) => (a.state === 'min') - (b.state === 'min') ? (b.state === 'min') - (a.state === 'min') : (+a.el.style.zIndex || 0) - (+b.el.style.zIndex || 0));
-      const n = list.length;
-      if (n < 2) return guideRest(L.cleanup.nothing);
-      ga('organize_windows', { windows: n });
-      const A = { w: innerWidth, h: innerHeight - 44 }, pad = 12;
-      const stepY = Math.max(32, Math.min(38, (A.h - 2 * pad - 260) / (n - 1)));
-      const stepX = Math.max(22, Math.min(38, (A.w - 2 * pad - 380) / (n - 1)));
-      const w = Math.max(360, Math.min(860, A.w - 2 * pad - stepX * (n - 1)));
-      const h = Math.max(240, Math.min(620, A.h - 2 * pad - stepY * (n - 1)));
-      const x0 = Math.max(pad, (A.w - (w + stepX * (n - 1))) / 2), y0 = Math.max(pad, (A.h - (h + stepY * (n - 1))) / 2);
-      await Promise.all(list.map(async (W, i) => {
-        W.busy = true;
-        const wasMin = W.state === 'min';
-        const first = wasMin ? W.task.getBoundingClientRect() : W.el.getBoundingClientRect();
-        if (wasMin) { W.el.style.visibility = ''; W.state = 'open'; }
-        W.el.classList.remove('max');
-        Object.assign(W.el.style, { left: Math.round(x0 + i * stepX) + 'px', top: Math.round(y0 + i * stepY) + 'px', width: Math.round(w) + 'px', height: Math.round(h) + 'px' });
-        keepOnScreen(W.el);
-        focusW(W);
-        const last = W.el.getBoundingClientRect();
-        if (!reduce) await W.el.animate([{ transform: rectDelta(first, last), opacity: wasMin ? 0 : 1 }, { transform: 'none', opacity: 1 }], { duration: SPRING_WIN.duration, easing: SPRING_WIN.easing, delay: i * 60, fill: 'backwards' }).finished;
-        W.busy = false;
-      }));
-      const top = list[n - 1]; focusW(top); top.el.focus({ preventScroll: true });
-      cleanupArmed = false;
-      if (token !== stepToken) return;
-      cheer();
-      guideRest(L.cleanup.organized);
-      armIdle();
-    }
-    async function eatWindows(token) {
-      if (token !== stepToken || cleaning) return;
-      cleaning = true; gbub.hidden = true;
-      const keep = topWin();
-      const victims = [...WINS.values()].filter(W => W !== keep && W.state !== 'closed' && !W.busy);
-      ga('cleanup_accept', { closed: victims.length });
-      gcat.classList.add('chomp');
-      // he grows and opens wide before eating
-      const grow = reduce ? null : gbodyEl.animate([{ scale: '1' }, { scale: narrow() ? '2.1' : '1.9' }], { duration: 420, easing: SPRING_WIN.easing, fill: 'forwards' });
-      await sleep(reduce ? 0 : 480);
-      const m = $('.gmouth', gcat).getBoundingClientRect(), mx = m.left + m.width / 2, my = m.top + m.height / 2;
-      await Promise.all(victims.map(async (W, i) => {
-        W.busy = true;
-        if (!reduce && W.state === 'open') {
-          await sleep(i * 220);
-          const r = W.el.getBoundingClientRect();
-          const dx = mx - (r.left + r.width / 2), dy = my - (r.top + r.height / 2);
-          // 1) shrink toward the cat while still behind the window you're reading
-          // 2) pop over it and fly up to his mouth, about mouth-sized
-          // 3) slide into the mouth and disappear
-          const tilt = i % 2 ? 1 : -1;
-          const sMouth = Math.max(.05, (m.width * 1.5) / r.width);
-          const mid = `translate(${dx * .4}px, ${dy * .4}px) scale(.45) rotate(${tilt * 6}deg)`;
-          const lip = `translate(${dx}px, ${dy - m.height * 1.5}px) scale(${sMouth}) rotate(${tilt * 8}deg)`;
-          W.el.style.transformOrigin = '50% 50%';
-          W.inner.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: 'forwards' });
-          const a1 = W.el.animate([
-            { transform: 'none', borderRadius: '8px' },
-            { transform: mid, borderRadius: '14px' }
-          ], { duration: 380, easing: 'cubic-bezier(.3,0,.5,1)', fill: 'forwards' });
-          await a1.finished;
-          // the desktop is its own layer under the cat, so lift the window above everything for the last stretch
-          W.el.style.transform = mid; W.el.style.borderRadius = '14px'; a1.cancel();
-          W.el.style.boxShadow = '0 0 0 2px #3ddc84, 0 0 24px rgba(61,220,132,.55)';
-          eatLayer().appendChild(W.el);
-          await W.el.animate([
-            { transform: mid, opacity: 1, borderRadius: '14px', easing: 'cubic-bezier(.4,0,.4,1)' },
-            { transform: lip, opacity: 1, borderRadius: '24%', offset: .52, easing: 'cubic-bezier(.75,0,1,.7)' },
-            { transform: `translate(${dx}px, ${dy}px) scale(${sMouth * .08}, ${sMouth * .3}) rotate(0deg)`, opacity: 1, borderRadius: '50%', offset: .96 },
-            { transform: `translate(${dx}px, ${dy}px) scale(.001)`, opacity: 0, borderRadius: '50%' }
-          ], { duration: 780, fill: 'forwards' }).finished;
-          gbodyEl.animate([{ transform: 'none' }, { transform: 'scale(1.18,.84)' }, { transform: 'scale(.96,1.05)' }, { transform: 'none' }], { duration: 320, easing: 'ease-out' });
-        }
-        await closeW(W, true);
-      }));
-      await sleep(reduce ? 0 : 150);
-      gcat.classList.remove('chomp');
-      if (grow) { await gbodyEl.animate([{ scale: getComputedStyle(gbodyEl).scale }, { scale: '1' }], { duration: 320, easing: EASE_OUT }).finished; grow.cancel(); }
-      cleaning = false;
-      if (keep && keep.state === 'open') { focusW(keep); keep.el.focus({ preventScroll: true }); }
-      if (token !== stepToken) return;
-      cheer();
-      await sleep(reduce ? 0 : 450);
-      if (token !== stepToken) return;
-      guideRest(L.cleanup.cleaned);
-      armIdle();
     }
 
     /* ---------- head mode ---------- */
@@ -667,10 +468,11 @@
     // How long he waits before tucking away:
     //   4s  when he has nothing to say (chat closed, a short note shown, or he was just dragged)
     //   10s when he's waiting on the user: a tour step, his menu, or a yes/no question
-    // He never tucks away while the pointer is on him or his bubble, while he's being dragged or eating,
+    // He never tucks away while the pointer is on him or his bubble, while he's being dragged, while a skill
+    // is keeping him busy (eating windows, changing the background, sulking by the bin),
     // or during a tour while the user is still working in the window he's pointing at.
     const IDLE_QUIET = 4000, IDLE_WAITING = 10000;
-    let hasInteracted = false, idleT = 0;
+    let hasInteracted = false;
     const waitingOnUser = () => !!tour || (!gbub.hidden && gacts.children.length > 0);
     function touchPano() { hasInteracted = true; armIdle(); }
     // is a mouse pointer resting on him or his bubble? (touch has no hover, so it never counts)
@@ -687,7 +489,7 @@
       if (!hasInteracted || headMode) return;
       idleT = setTimeout(() => {
         if (headMode) return;
-        if (cleaning || dragging || sulking || recoloring || mouseOnPano()) return armIdle();
+        if (dragging || any('keepsHimHere') || mouseOnPano()) return armIdle();
         goHead();
       }, waitingOnUser() ? IDLE_WAITING : IDLE_QUIET);
     }
@@ -708,7 +510,7 @@
     /* ---------- drag him anywhere; a tap still opens his menu ---------- */
     let drag = null, dragging = false, suppressClick = false;
     gcat.addEventListener('pointerdown', e => {
-      if (cleaning || e.button > 0) return;
+      if (any('ignoresDrag') || e.button > 0) return;
       touchPano();
       const r = gcat.getBoundingClientRect();
       drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: r.left, oy: r.top, moved: false };
@@ -727,9 +529,7 @@
       const w = headMode ? HEAD_W() : CAT_W(), h = headMode ? HEAD_H() : CAT_H();
       setCat(clampSpot({ x: drag.ox + dx, y: drag.oy + dy }, w, h));
       if (!narrow()) placeBubble();
-      const hot = overBin();
-      const bin = binIcon(); if (bin) bin.classList.toggle('binhot', hot);
-      gcat.classList.toggle('wary', hot);
+      each('dragMove');
     });
     function endDrag(e) {
       if (!drag || e.pointerId !== drag.id) return;
@@ -738,62 +538,19 @@
         gcat.classList.remove('dragging');
         if (headMode) headMoved = true;   // stays where it's dropped, until the next time he tucks away
         setTimeout(() => { suppressClick = false; }, 0);
-        if (overBin()) { dragging = false; drag = null; refuseRecycle(); return; }
-        gcat.classList.remove('wary');
+        // a skill may take over from here (the Recycle Bin does)
+        let after = null;
+        for (const sk of live) if (sk.drop && (after = sk.drop())) break;
+        if (after) { dragging = false; drag = null; after(); return; }
       }
       dragging = false; drag = null; armIdle();
     }
 
-    /* ---------- drop him on the Recycle Bin and he is not having it ---------- */
-    let sulking = false;
-    const binIcon = host.binIcon || (() => null);
-    function calmCat() {
-      gcat.classList.remove('wary', 'meh', 'lick');
-      const bin = binIcon(); if (bin) bin.classList.remove('binhot', 'binreject');
-      sulking = false;
-    }
-    // his middle is over the bin icon, and the icon isn't hidden behind a window
-    function overBin() {
-      const bin = binIcon(); if (!bin) return false;
-      const b = bin.getBoundingClientRect(), c = gcat.getBoundingClientRect(), pad = 14;
-      const cx = c.left + c.width / 2, cy = c.top + c.height / 2;
-      if (!(cx > b.left - pad && cx < b.right + pad && cy > b.top - pad && cy < b.bottom + pad)) return false;
-      const under = document.elementsFromPoint(b.left + b.width / 2, b.top + b.height / 2).find(n => !n.closest('#gcat, #gbubble, #gring'));
-      return !!under && bin.contains(under);
-    }
-    async function refuseRecycle() {
-      const token = ++stepToken;
-      tour = null; ringOff(); gbub.hidden = true;
-      clearTimeout(idleT); sulking = true;
-      ga('pano_recycle_attempt', {});
-      const bin = binIcon(), b = bin.getBoundingClientRect();
-      bin.classList.remove('binhot', 'binreject'); void bin.offsetWidth; bin.classList.add('binreject');
-      gcat.classList.remove('wary'); gcat.classList.add('meh');
-      // the bin spits him out into open wallpaper beside it (on phones, to his usual talking spot)
-      const spot = narrow() ? dockSpot() : clampSpot({ x: b.right + 34, y: b.top + b.height / 2 - CAT_H() / 2 + 14 }, CAT_W(), CAT_H() + 48);
-      await moveCat(spot, false);
-      if (token !== stepToken) return calmCat();
-      if (!reduce) gbodyEl.animate([{ transform: 'scale(1.08,.84)' }, { transform: 'scale(.97,1.04)', offset: .55 }, { transform: 'none' }], { duration: 500, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-      await sleep(reduce ? 0 : 620);
-      if (token !== stepToken) return calmCat();
-      gcat.classList.add('lick');
-      await sleep(reduce ? 0 : 750);
-      if (token !== stepToken) return calmCat();
-      say(named() + L.bin.refuse);
-      gcat.classList.remove('talk');   // he says it without looking up from his paw
-      await sleep(4600);
-      if (token !== stepToken) { if (!dragging) calmCat(); return; }
-      gcat.classList.remove('lick');
-      await sleep(reduce ? 0 : 900);
-      if (token !== stepToken) return;
-      sulking = false; gcat.classList.remove('meh'); bin.classList.remove('binreject');
-      armIdle();
-    }
     gcat.addEventListener('pointerup', endDrag);
     gcat.addEventListener('pointercancel', endDrag);
 
     gcat.addEventListener('click', () => {
-      if (suppressClick || cleaning || recoloring) return;
+      if (suppressClick || any('ignoresTaps')) return;
       if (headMode) { guideMenu(L.menu.ask); return; }
       if (!gbub.hidden && !tour) guideRest();
       else guideMenu(L.menu.ask);
@@ -806,9 +563,28 @@
       placeBubble();
     });
 
+    /* ---------- what a skill is handed (the "p" in skills/*.js) ---------- */
+    const api = {
+      $, ga, reduce, narrow, sleep, anim, fill, named, forTouch, SPRING_WIN, SPRING_MENU, EASE_OUT,
+      get L() { return L; },                                   // his lines, once his brain has arrived
+      cat: gcat, body: gbodyEl, bubble: gbub,
+      catW: CAT_W, catH: CAT_H, homeSpot, dockSpot, clampSpot,
+      say, hideBubble, moveCat, setCat, cheer, ringOff,
+      // one thing at a time: take() starts something new, and mine(token) says whether it is still the latest
+      take: () => ++stepToken, token: () => stepToken, mine: t => t === stepToken,
+      runTour, stopTour() { tour = null; }, onTour: () => !!tour,
+      rest: guideRest, menu: guideMenu, calm: calmCat,
+      armIdle, stopIdle() { clearTimeout(idleT); },
+      dragging: () => dragging,
+      ignoringTaps: () => any('ignoresTaps')
+    };
+    // skills written into the page start now; ones still on their way start when they land
+    const skillsReady = loading.length ? Promise.all(loading).then(startSkills) : (startSkills(), Promise.resolve());
+
     // say hello once per visit; returning in the same session, the cat just sits there
     // (he waits for his brain first: without it he has nothing to say, so he stays hidden)
     setTimeout(async () => {
+      await skillsReady;
       if (!(await brainReady)) return;
       gcat.hidden = false;
       let wasHead = false;
@@ -821,14 +597,15 @@
       if (!seen && canGreet()) setTimeout(() => guideMenu(L.hello), 700);
     }, 900);
 
-    return {
-      checkClutter,                                                         // call after a window opens
-      windowClosed() { if (openCount() <= CLUTTER) cleanupArmed = true; },   // call after a window closes
+    return Pano.here = {
+      notice: (what, ...more) => each('notice', what, ...more),             // tell him something happened: 'window-opened', 'window-closed'
+      skills: () => report.map(r => ({ ...r })),                            // which skills are on here, and why not
       busy: guideBusy,                                                      // on a tour, or his bubble is showing
       rest: guideRest,                                                      // close the bubble and go home
       menu: guideMenu
     };
   }
 
-  window.Pano = { init, version: 'latest' };
+  // Pano.here is what the latest init() returned, for the page's console and the tests
+  window.Pano = { init, skill, skills: SKILLS, here: null, version: 'latest' };
 })();

@@ -9,7 +9,8 @@ BRAIN = '/Pano/latest/brain/portfolio.json'
 # read his files from the served copy, the same ones the page gets
 get = lambda path: urllib.request.build_opener(urllib.request.ProxyHandler({})).open(U.rsplit('/', 1)[0] + path).read().decode('utf-8')
 brain = json.loads(get(BRAIN))
-engine = get('/Pano/latest/pano.js')
+# his engine and his skills (phase 3 split the skills into their own files)
+engine = ''.join(get('/Pano/latest/' + f) for f in ['pano.js', 'skills/tours.js', 'skills/background.js', 'skills/windows.js', 'skills/bin.js'])
 PAGE_OWN = ['Tap a file to open it.']   # the portfolio's file explorer says this itself, in its own hint
 OPEN = "k=>document.querySelector(`[data-open=\"${k}\"]`).click()"
 
