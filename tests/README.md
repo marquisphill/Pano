@@ -36,6 +36,20 @@ diff -r /tmp/pano-before /tmp/pano-after --exclude=shots --exclude=.scripts
 
 That is how to prove a change did nothing visible: serve the old site on one port and the new one on another, run both, and compare.
 
+Sites that load a numbered version (staging and production load `/Pano/v1/`) need the version as a third argument, so the checks that look at his files read that folder:
+
+```bash
+tests/run_all.sh /tmp/pano-after 8773 v1
+```
+
+`run_dash.sh` takes the same third argument.
+
+To compare two copies of a site directly (every computed style on Paño, his bubble, a screenshot of the whole page, and the saved settings, in nine poses at three sizes):
+
+```bash
+python3 tests/same.py 8774 8773       # old site on 8774, new site on 8773
+```
+
 The dashboard has its own two tests. Serve the dashboard instead of the portfolio, then:
 
 ```bash
@@ -61,6 +75,7 @@ tests/run_dash.sh /tmp/pano-dash               # runs devdash.py and dash.py, an
 | `lifted.py` | The page loads Paño from `/Pano/latest/` and no longer carries his code; the page still works if his files fail to load. | `lifted.py` |
 | `brain.py` | What he says comes from `latest/brain/portfolio.json` and the shared `core.json`: no lines left in the code or the page, his menu and greeting match the brain, editing the JSON alone changes them, the page still works if the brain cannot be fetched. It also walks the tours that are written but not in his menu yet. | `brain.py` |
 | `skills.py` | Each ability is its own file in `latest/skills/`. A skill is offered only when the page's adapter has what it needs: the test takes each adapter entry out in turn and checks that skill goes and the rest still work. Also: a saved background shows with no flash, a skill file that cannot be fetched, and Paño added to a page that has already loaded. | `skills.py` |
+| `same.py` | Two copies of a site show Paño the same: computed styles, bubble, whole-page screenshot and saved settings, in nine poses (greeting, a tour step, the background and colorblind questions, mid-change, Phill's note, after it, head mode) at three sizes. Written for phase 5 (staging before and after moving to `/Pano/v1/`). | `same.py <old port> <new port>` |
 | `devdash.py` | Dashboard DEV copy only: it uses its own storage names, ignores the real token and key, and Launch is off. | Serve `Dashboard-DEV` on 8773, then `devdash.py`. |
 | `dash.py` | The dashboard on the shared Paño (phase 4). His files come from `/Pano/latest/` and the page carries none of his code or lines. Head mode and dragging. Background and colorblind modes. The three tours, including the steps that depend on the page (token saved or not, weather loaded or not). Talks and the prompt builder. His stories. The Claude chat, with a faked reply: wrong keys, a rejected key, a saved key, what is sent to Claude, errors. Each adapter entry taken out in turn. The four tours written but not offered. | Serve `Dashboard-DEV` on 8773, then `dash.py`. About 12 minutes. |
 
