@@ -1,4 +1,5 @@
 # Phase 2 check: what Paño says comes from his brain (latest/brain/portfolio.json), not from code.
+# Since phase 4 the lines both sites share are in latest/brain/core.json; the two are merged, and portfolio.json wins.
 # Serve the site with tests/serve.py, then: python3 tests/brain.py
 # Every numbered line should end in True, and "errors" should be [].
 # The "later" lines at the end walk the tours that are written but not in his menu yet.
@@ -8,7 +9,17 @@ U = 'http://localhost:8773/index.html'
 BRAIN = '/Pano/latest/brain/portfolio.json'
 # read his files from the served copy, the same ones the page gets
 get = lambda path: urllib.request.build_opener(urllib.request.ProxyHandler({})).open(U.rsplit('/', 1)[0] + path).read().decode('utf-8')
+CORE = '/Pano/latest/brain/core.json'
 brain = json.loads(get(BRAIN))
+core = json.loads(get(CORE))
+
+
+def merge(a, b):
+    if not isinstance(a, dict) or not isinstance(b, dict): return b
+    return {k: merge(a[k], b[k]) if k in a and k in b else (b[k] if k in b else a[k]) for k in {**a, **b}}
+
+
+lines = merge(core.get('lines', {}), brain['lines'])   # what he ends up with: shared lines under the portfolio's own
 # his engine and his skills (phase 3 split the skills into their own files)
 engine = ''.join(get('/Pano/latest/' + f) for f in ['pano.js', 'skills/tours.js', 'skills/background.js', 'skills/windows.js', 'skills/bin.js'])
 PAGE_OWN = ['Tap a file to open it.']   # the portfolio's file explorer says this itself, in its own hint
@@ -25,7 +36,7 @@ def strings(v):
 
 
 def has(path):
-    v = brain['lines']
+    v = lines
     for k in path.split('.'):
         if not isinstance(v, dict): return True   # reached a line or a list; what follows is code (.length, .reduce)
         if k not in v: return False
@@ -33,7 +44,7 @@ def has(path):
     return True
 
 
-spoken = [s for s in strings(brain['lines']) if len(s) > 12] + [st['say'] for t in brain['tours'].values() if isinstance(t, dict) for st in t['steps']]
+spoken = [s for s in strings(lines) if len(s) > 12] + [st['say'] for t in brain['tours'].values() if isinstance(t, dict) for st in t['steps']]
 used = sorted(set(re.findall(r'\bL\.([a-z_]+(?:\.[a-z_]+)*)', engine)))
 print('files 1 every line the engine asks for is in the brain', all(has(u) for u in used), [u for u in used if not has(u)])
 print('files 2 the engine carries none of his lines', not [s for s in spoken if s in engine])
@@ -57,7 +68,7 @@ with sync_playwright() as p:
         pg.on('response', lambda r: got.append((r.url.split('localhost:8773')[-1], r.status)))
         pg.goto(U); pg.wait_for_timeout(3000)
         html = pg.evaluate("fetch(location.href).then(r=>r.text())")
-        print(tag, '1 his brain came from', BRAIN, (BRAIN, 200) in got)
+        print(tag, '1 his brain came from', BRAIN, (BRAIN, 200) in got and (CORE, 200) in got)
         print(tag, '2 the page file carries none of his lines', not [s for s in spoken if s in html and s not in PAGE_OWN])
         print(tag, '3 he greets with the line in the brain', brain['lines']['hello'] in pg.inner_text('#gsay'))
         labels = pg.evaluate("()=>[...document.querySelectorAll('#gacts button')].map(b=>b.textContent)")

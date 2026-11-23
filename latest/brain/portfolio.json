@@ -39,7 +39,7 @@
   },
   "show_fallback": "Every core topic has a portfolio show target, so nothing extra is needed here.",
   "lines": {
-    "_note": "Every line Paño says on the portfolio today, outside the tours. The engine (pano.js) reads these; nothing he says is typed into the code. Only <b> and <span> tags are used. {n} and {total} are filled in by the engine.",
+    "_note": "Every line Paño says on the portfolio today, outside the tours. The engine (pano.js) reads these; nothing he says is typed into the code. Only <b> and <span> tags are used. {n} and {total} are filled in by the engine. Lines both sites share (the background and colorblind questions, the tick for things already seen) are in core.json under lines; a line here with the same key wins.",
     "name": "Phill’s cat",
     "labels": {
       "cat_button": "Ask Phill’s cat for a guided tour",
@@ -81,28 +81,11 @@
       ]
     },
     "background": {
-      "ask": "Which background would you like?",
       "options": {
         "mountain": "Misty mountains",
         "green": "All green",
         "black": "All black"
-      },
-      "default_mark": " (default)",
-      "never_mind": "Never mind",
-      "ask_colorblind": "Are you colorblind?",
-      "yes": "Yes",
-      "no": "No",
-      "ask_mode": "Which colorblind mode should I apply to the site?",
-      "modes": {
-        "protan": "Red-weak (protanopia)",
-        "deutan": "Green-weak (deuteranopia)",
-        "tritan": "Blue-yellow (tritanopia)",
-        "mono": "No color (monochrome)"
-      },
-      "changing": "Okay, I am changing the background now for you.",
-      "phill_note": "Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.",
-      "thanks": "Thanks, Paño",
-      "done": "Done! Enjoy the new view."
+      }
     },
     "cleanup": {
       "offer": "You have a lot of windows open. Can I clean them up?",

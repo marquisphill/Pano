@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "updated": "2026-11-22",
+  "updated": "2026-11-23",
   "about": "Paño's shared brain. Both sites load this file, then their own profile: portfolio.json on the portfolio, dashboard.json on the dashboard. The profile sets who Paño is talking to, what he can show, and any site-only topics.",
   "load_order": [
     "core.json",
@@ -1247,5 +1247,33 @@
       ],
       "source": "facts.cats"
     }
-  ]
+  ],
+  "lines": {
+    "_note": "Lines both sites say. Each site's own file (portfolio.json, dashboard.json) has its own \"lines\"; the two are merged and the site's version wins where both have a key. Under background, each site adds \"options\": its own names for its backgrounds.",
+    "menu": {
+      "show_menu": "Show me the menu"
+    },
+    "tour": {
+      "seen_mark": "✓ "
+    },
+    "background": {
+      "ask": "Which background would you like?",
+      "default_mark": " (default)",
+      "never_mind": "Never mind",
+      "ask_colorblind": "Are you colorblind?",
+      "yes": "Yes",
+      "no": "No",
+      "ask_mode": "Which colorblind mode should I apply to the site?",
+      "modes": {
+        "protan": "Red-weak (protanopia)",
+        "deutan": "Green-weak (deuteranopia)",
+        "tritan": "Blue-yellow (tritanopia)",
+        "mono": "No color (monochrome)"
+      },
+      "changing": "Okay, I am changing the background now for you.",
+      "phill_note": "Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.",
+      "thanks": "Thanks, Paño",
+      "done": "Done! Enjoy the new view."
+    }
+  }
 }

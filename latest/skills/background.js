@@ -6,9 +6,12 @@
        modes: [...],      the page's names for its colorblind modes (leave out to skip that question)
        keys: { wall, cb } names used to save the two choices in the browser
      }
-   The page also supplies the styles: [data-wall="..."] on desk and on .wallnext, html[data-cb="..."],
-   and the .wallnext, .grayveil and .wipeline layers used for the reveal. His words for each name
-   are in his brain under lines.background. */
+   The page also supplies the look of each background: [data-wall="..."] on desk and on .wallnext
+   (the new background is drawn on a .wallnext layer placed inside desk, then wiped in).
+   The reveal layers (.wallnext, .grayveil, .wipeline) and the four colorblind filters
+   (html[data-cb="protan|deutan|tritan|mono"]) are the same on any page, so he brings them himself,
+   unless the page already carries its own (it has an element with id "cb-protan").
+   His words for each name are in his brain under lines.background. */
 Pano.skill('background', {
   needs: ['background'],
   start(p, host) {
@@ -19,6 +22,22 @@ Pano.skill('background', {
     const deskEl = cfg.desk;
     const reduce = p.reduce, sleep = p.sleep, named = p.named;
     let recoloring = false;
+    if (!document.getElementById('cb-protan')) {
+      document.head.insertAdjacentHTML('beforeend', `<style id="pano-background">
+.wallnext{position:absolute;inset:0;z-index:0;pointer-events:none;clip-path:inset(0 0 100% 0)}
+.grayveil{position:fixed;inset:0;z-index:2147483646;pointer-events:none;opacity:0;-webkit-backdrop-filter:grayscale(1);backdrop-filter:grayscale(1)}
+.wipeline{position:fixed;left:0;right:0;top:0;height:3px;z-index:2147483647;pointer-events:none;background:#fff;box-shadow:0 0 18px 6px rgba(255,255,255,.75),0 0 60px 18px rgba(255,255,255,.35);opacity:0}
+html[data-cb="protan"]{filter:url(#cb-protan)}
+html[data-cb="deutan"]{filter:url(#cb-deutan)}
+html[data-cb="tritan"]{filter:url(#cb-tritan)}
+html[data-cb="mono"]{filter:grayscale(1) contrast(1.2)}
+</style>`);
+      document.body.insertAdjacentHTML('beforeend', `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="cb-protan" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  -0.2549 1.2549 0 0 0  0.3031 -0.5451 1.242 0 0  0 0 0 1 0"/></filter>
+  <filter id="cb-deutan" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  -0.4375 1.4375 0 0 0  0.2625 -0.5625 1.3 0 0  0 0 0 1 0"/></filter>
+  <filter id="cb-tritan" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1.05 -0.3825 0.3325 0 0  0 1.2345 -0.2345 0 0  0 0 1 0 0  0 0 0 1 0"/></filter>
+</svg>`);
+    }
     const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
     function setWall(k) { if (k && k !== PLAIN) deskEl.dataset.wall = k; else delete deskEl.dataset.wall; }
     function setCB(m) { if (m) document.documentElement.dataset.cb = m; else delete document.documentElement.dataset.cb; }

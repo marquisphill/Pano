@@ -19,7 +19,8 @@ ON = "()=>Pano.here.skills().filter(s=>s.on).map(s=>s.name)"
 
 print('files 1 each skill is its own file and says what it needs', all(re.search(r"Pano\.skill\('%s',\s*\{\s*needs: \[" % n, files[n]) for n in NAMES))
 print('files 2 the engine carries none of the skills', not [w for w in ['askWall', 'applyLook', 'eatWindows', 'organizeWindows', 'refuseRecycle', 'overBin', 'readTarget', 'grayveil', 'eatlayer'] if w in engine])
-print('files 3 the engine lists the same skills', re.search(r"const SKILLS = \[([^\]]*)\]", engine).group(1).replace("'", '').split(', ') == NAMES)
+# (since phase 4 the engine also knows skills a page must ask for; these four are the ones loaded on every page)
+print('files 3 the engine lists the same skills', re.search(r"const EARLY = \[([^\]]*)\]", engine).group(1).replace("'", '').split(', ') == NAMES)
 ADAPTER = {n: re.search(r'^    %s: .*\n' % n, page, re.M) for n in NAMES}
 print('files 4 the page adapter has one line for each skill', all(ADAPTER.values()))
 
