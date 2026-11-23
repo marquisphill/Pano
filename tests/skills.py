@@ -70,7 +70,8 @@ with sync_playwright() as p:
         print(tag, 'errors', errs); c.close()
 
     # a saved background is on the page before it is first shown (the skills are ready when the page starts him)
-    c, pg, errs, got = fresh(b, init="""try{localStorage.setItem('dev-pf-wall','black')}catch(e){}
+    # (DEV saves it as dev-pf-wall, staging and production as pf-wall; both are set so it works on either)
+    c, pg, errs, got = fresh(b, init="""try{localStorage.setItem('dev-pf-wall','black');localStorage.setItem('pf-wall','black')}catch(e){}
         document.addEventListener('DOMContentLoaded',()=>{window.__wallAtStart=document.getElementById('desktop').dataset.wall||''})""")
     print('saved 1 the saved background is set as the page finishes loading', pg.evaluate("()=>window.__wallAtStart") == 'black')
     print('saved errors', errs); c.close()
