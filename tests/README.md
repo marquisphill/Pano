@@ -50,6 +50,7 @@ That is how to prove a change did nothing visible: serve the old site on one por
 | `cases.py` | The two case-study windows and their clickable diagrams. | `cases.py` |
 | `sweep.py` | Broken images, dead links, direct links, resizing the browser. | `sweep.py` |
 | `lifted.py` | The page loads Paño from `/Pano/latest/` and no longer carries his code; the page still works if his files fail to load. | `lifted.py` |
+| `brain.py` | What he says comes from `latest/brain/portfolio.json`: no lines left in the code or the page, his menu and greeting match the brain, editing the JSON alone changes them, the page still works if the brain cannot be fetched. It also walks the tours that are written but not in his menu yet. | `brain.py` |
 | `devdash.py` | Dashboard DEV copy only: it uses its own storage names, ignores the real token and key, and Launch is off. | Serve `Dashboard-DEV` on 8773, then `devdash.py`. It still has its own Paño inside the page until phase 4. |
 
 ## Reading the output
@@ -66,5 +67,6 @@ Some known quirks:
 - `tours.py` sometimes prints a `click-race` line and an extra step. That is the test clicking a button as it is replaced.
 - A full run takes 20 minutes or more. `tours.py` is the slow one.
 - `wall.py` prints a Pillow deprecation warning. It is harmless.
+- `brain.py` lines starting `later` are for tours not yet in his menu. They should read `steps shown N of N | finished True | errors []`.
 
 The portfolio scripts were written for the portfolio. In phase 4 they need a way to point at the dashboard too. `devdash.py` is the only dashboard test so far.

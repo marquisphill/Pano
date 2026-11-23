@@ -8,11 +8,14 @@
      3. const pano = Pano.init({ ... }) once the page's own script has set itself up.
         The object passed in (the "adapter") tells him what this page has. See init() below.
 
-   Phase 1 moved the code without changing what it does. His tours and lines still arrive
-   from the page (Phase 2 moves them to the brain) and his abilities are still one block
-   (Phase 3 splits them into skills). */
+   What he says is not in this file. His lines, his tours and his menu come from his brain:
+   brain/<site>.json next to this file (see brain/README.md). The adapter names the brain to
+   load. He stays hidden until it has arrived; if it never does, the page carries on without him.
+
+   Phase 1 moved the code here and Phase 2 moved the words out, both without changing what he
+   does. His abilities are still one block (Phase 3 splits them into skills). */
 (() => {
-  const MARKUP = `<button class="gcat" id="gcat" hidden aria-label="Ask Phill’s cat for a guided tour"><span class="gbody"><svg viewBox="0 0 100 120" aria-hidden="true">
+  const MARKUP = `<button class="gcat" id="gcat" hidden><span class="gbody"><svg viewBox="0 0 100 120" aria-hidden="true">
   <defs>
     <clipPath id="gEyeL" clipPathUnits="userSpaceOnUse"><ellipse cx="-6" cy="0" rx="3.1" ry="4.1"/></clipPath>
     <clipPath id="gEyeR" clipPathUnits="userSpaceOnUse"><ellipse cx="6" cy="0" rx="3.1" ry="4.1"/></clipPath>
@@ -38,8 +41,8 @@
     <path d="M30.6 50.6 v1.6 M32.6 50 v1.8 M34.6 50.6 v1.6" stroke="#b92c2e" stroke-width=".9" stroke-linecap="round"/>
   </g></g>
 </svg></span></button>
-<div class="gbubble" id="gbubble" hidden role="dialog" aria-label="Phill’s cat">
-  <button class="gx" id="gx" aria-label="Close the guide"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#8fa898" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+<div class="gbubble" id="gbubble" hidden role="dialog">
+  <button class="gx" id="gx"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#8fa898" stroke-width="1.8" stroke-linecap="round"/></svg></button>
   <p class="gsay" id="gsay" aria-live="polite"></p>
   <div class="gacts" id="gacts"></div>
 </div>
@@ -47,6 +50,7 @@
 
   // put his elements into the page where this script tag sits (or at the end of the body)
   const me = document.currentScript;
+  const HOME = me && me.src ? new URL('.', me.src).href : '';   // the folder this file was loaded from
   let mounted = false;
   function mount() {
     if (mounted || document.getElementById('gcat')) { mounted = true; return; }
@@ -59,7 +63,12 @@
 
   /* init(host): start Paño on this page. Everything in host is optional unless marked.
        ga(name, params)        report an analytics event
-       tours, goals            (needed) the guided tours and the menu entries that start them
+       brain                   (needed) which brain to load: a site name ('portfolio' loads
+                               brain/portfolio.json from beside this file) or the address of a brain file
+       tourHelpers             how to read the tour descriptors that are about this page:
+                               { target: { icon(value, step), ... }, done: { window(value), ... },
+                                 act: { open(value, el), ... } }. css, css_visible, when_visible,
+                               click and focus are built in and need no helper.
        desk                    (needed) the element whose data-wall attribute sets the background
        keys: { wall, cb }      (needed) names used to save the background and colorblind choice
        canGreet()              false when he should not say hello on arrival
@@ -96,7 +105,7 @@
     const anim = (el, k, o) => reduce ? { finished: Promise.resolve() } : el.animate(k, o);
 
     /* ---------- what the page handed over ---------- */
-    const TOURS = host.tours || {}, GOALS = host.goals || [];
+    const HELP = host.tourHelpers || {};
     const KEYS = host.keys || { wall: 'pano-wall', cb: 'pano-cb' };
     const canGreet = host.canGreet || (() => true);
     const toast = host.toast || null, hideToast = host.hideToast || (() => {});
@@ -304,9 +313,59 @@
       await moveCat({ x, y }, flip);
     }
 
+    /* ---------- his brain: every line, tour and menu entry comes from JSON ---------- */
+    let L = {}, TOURS = {}, GOALS = [];
+    const fill = (t, vals) => String(t).replace(/\{(\w+)\}/g, (m, k) => k in vals ? vals[k] : m);
+    const named = () => `<span class="gname">${L.name}</span>`;
+    const visible = sel => { const e = $(sel); return e && !e.hidden ? e : null; };
+    // a tour step in the brain is plain data; these turn it into the checks and actions the runner uses
+    function readTarget(d) {
+      const kind = Object.keys(d).find(k => HELP.target && HELP.target[k]);
+      return () => {
+        if (d.when_visible && !visible(d.when_visible)) return null;
+        if (d.when_window && !(HELP.done && HELP.done.window && HELP.done.window(d.when_window))) return null;
+        if (d.css) return $(d.css);
+        return kind ? HELP.target[kind](d[kind], d) : null;
+      };
+    }
+    function readDone(d) {
+      const kind = Object.keys(d).find(k => HELP.done && HELP.done[k]);
+      return () => d.css_visible ? !!visible(d.css_visible) : !!(kind && HELP.done[kind](d[kind], d));
+    }
+    function readAct(d) {
+      const kind = Object.keys(d).find(k => HELP.act && HELP.act[k]);
+      return el => {
+        if (d.click) { const e = $(d.click); if (e) e.click(); }
+        else if (d.focus) { const e = $(d.focus); if (e) e.focus(); }
+        else if (kind) HELP.act[kind](d[kind], el, d);
+      };
+    }
+    function useBrain(B) {
+      L = B.lines || {};
+      TOURS = {};
+      for (const [key, t] of Object.entries(B.tours || {})) {
+        if (!t || !Array.isArray(t.steps)) continue;
+        TOURS[key] = t.steps.map(st => ({
+          say: st.say, next: st.next, actLabel: st.actLabel,
+          target: readTarget(st.target || {}),
+          done: st.done ? readDone(st.done) : null,
+          act: st.act ? readAct(st.act) : null
+        }));
+      }
+      GOALS = ((B.menu && B.menu.show) || []).filter(k => TOURS[k]).map(k => [B.tours[k].label, k]);
+      gcat.setAttribute('aria-label', L.labels.cat_button);
+      gbub.setAttribute('aria-label', L.name);
+      $('#gx').setAttribute('aria-label', L.labels.close);
+    }
+    const brainURL = !host.brain ? '' : /[\/.]/.test(host.brain) ? new URL(host.brain, location.href).href : HOME + 'brain/' + host.brain + '.json';
+    const brainReady = !brainURL ? Promise.resolve(false) : fetch(brainURL)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(B => { useBrain(B); return true; })
+      .catch(e => { console.warn('Paño could not load his brain from ' + brainURL + ', so he is staying hidden.', e); return false; });
+
     // touch screens get "tap" instead of "click"
     const forTouch = t => (narrow() || matchMedia('(pointer: coarse)').matches)
-      ? t.replace('Double-click a file, or select it and press <b>Open</b>.', 'Tap a file to open it.').replace('Double-click to open it.', 'Tap to open it.').replace(/\bClick\b/g, 'Tap')
+      ? L.touch.swaps.reduce((out, w) => w.whole_word ? out.replace(new RegExp('\\b' + w.find + '\\b', 'g'), w.say) : out.replace(w.find, w.say), t)
       : t;
 
     function guideBusy() { return !!tour || !gbub.hidden; }
@@ -318,7 +377,7 @@
         const st = steps[i];
         const el = await waitFor(st.target);
         if (token !== stepToken) return;
-        if (!el) return guideMenu('Hmm, I lost track of that. What would you like to do?', true);
+        if (!el) return guideMenu(L.menu.lost, true);
         bringFront(el);
         ringOff();
         gbub.hidden = true;
@@ -330,10 +389,10 @@
         let iv;
         const outcome = await new Promise(resolve => {
           const acts = [];
-          if (st.act) acts.push({ label: 'Do it for me', pri: !st.next, fn: () => st.act(el) });
+          if (st.act) acts.push({ label: st.actLabel || L.tour.do_it, pri: !st.next, fn: () => st.act(el) });
           if (st.next) acts.push({ label: st.next, pri: true, fn: () => resolve('next') });
-          acts.push({ label: 'Stop the tour', quiet: true, fn: () => resolve('stop') });
-          say(`<span class="gstep">Step ${i + 1} of ${steps.length}</span>${forTouch(st.say)}`, acts);
+          acts.push({ label: L.tour.stop, quiet: true, fn: () => resolve('stop') });
+          say(`<span class="gstep">${fill(L.tour.step, { n: i + 1, total: steps.length })}</span>${forTouch(st.say)}`, acts);
           iv = setInterval(() => {
             if (token !== stepToken) return resolve('cancel');
             let ok = false; try { ok = st.done && st.done(); } catch (e) {}
@@ -342,13 +401,13 @@
         });
         clearInterval(iv);
         if (outcome === 'cancel' || token !== stepToken) return;
-        if (outcome === 'stop') return guideRest('Okay! Click me any time you want a hand.');
+        if (outcome === 'stop') return guideRest(L.menu.bye);
         ringOff(); cheer();
         await sleep(outcome === 'done' ? 450 : 250);
         if (token !== stepToken) return;
       }
       ga('guide_complete', { goal: key });
-      guideMenu('Done! What would you like to do next?', true);
+      guideMenu(L.menu.after_tour, true);
     }
     async function guideMenu(text, again) {
       const token = ++stepToken;
@@ -357,11 +416,11 @@
       gbub.hidden = true;
       await moveCat(homeSpot(), false);
       if (token !== stepToken) return;
-      say(`<span class="gname">Phill’s cat</span>${text}`, [
+      say(named() + text, [
         ...GOALS.map(([label, k]) => ({ label, fn: () => runTour(k) })),
-        { label: 'Change the background', fn: () => askWall() },
+        { label: L.menu.change_background, fn: () => askWall() },
         ...windowActions(),
-        { label: again ? 'I’m good, thanks' : 'Just looking around', quiet: true, fn: () => guideRest('Okay! Click me any time you want a hand.') }
+        { label: again ? L.menu.leave_again : L.menu.leave_first, quiet: true, fn: () => guideRest(L.menu.bye) }
       ]);
     }
     async function guideRest(msg) {
@@ -378,42 +437,42 @@
     }
 
     /* ---------- change the background (and, if asked, apply a colorblind mode) ---------- */
-    const WALLS = [['Misty mountains', 'mountain'], ['All green', 'green'], ['All black', 'black']];
-    const CB_MODES = [['Red-weak (protanopia)', 'protan'], ['Green-weak (deuteranopia)', 'deutan'], ['Blue-yellow (tritanopia)', 'tritan'], ['No color (monochrome)', 'mono']];
-    const CAT_NAME = '<span class="gname">Phill’s cat</span>';
+    const WALLS = ['mountain', 'green', 'black'];
+    const CB_MODES = ['protan', 'deutan', 'tritan', 'mono'];
     const deskEl = host.desk;
     let recoloring = false;
     const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
     function setWall(k) { if (k && k !== 'mountain') deskEl.dataset.wall = k; else delete deskEl.dataset.wall; }
     function setCB(m) { if (m) document.documentElement.dataset.cb = m; else delete document.documentElement.dataset.cb; }
     // remember the visitor's choice between visits
-    if (WALLS.some(w => w[1] === store.get(KEYS.wall))) setWall(store.get(KEYS.wall));
-    if (CB_MODES.some(m => m[1] === store.get(KEYS.cb))) setCB(store.get(KEYS.cb));
+    if (WALLS.includes(store.get(KEYS.wall))) setWall(store.get(KEYS.wall));
+    if (CB_MODES.includes(store.get(KEYS.cb))) setCB(store.get(KEYS.cb));
 
     async function askWall() {
       const token = ++stepToken;
       tour = null; ringOff(); gbub.hidden = true;
       await moveCat(homeSpot(), false);
       if (token !== stepToken) return;
-      say(CAT_NAME + 'Which background would you like?', [
-        ...WALLS.map(([label, k]) => ({ label: label + (k === 'mountain' ? ' (default)' : ''), fn: () => askColorblind(k) })),
-        { label: 'Never mind', quiet: true, fn: () => guideRest() }
+      const B = L.background;
+      say(named() + B.ask, [
+        ...WALLS.map(k => ({ label: B.options[k] + (k === 'mountain' ? B.default_mark : ''), fn: () => askColorblind(k) })),
+        { label: B.never_mind, quiet: true, fn: () => guideRest() }
       ]);
     }
     function askColorblind(wall) {
-      say(CAT_NAME + 'Are you colorblind?', [
-        { label: 'Yes', fn: () => askMode(wall) },
-        { label: 'No', fn: () => applyLook(wall, null) }
+      say(named() + L.background.ask_colorblind, [
+        { label: L.background.yes, fn: () => askMode(wall) },
+        { label: L.background.no, fn: () => applyLook(wall, null) }
       ]);
     }
     function askMode(wall) {
-      say(CAT_NAME + 'Which colorblind mode should I apply to the site?', CB_MODES.map(([label, m]) => ({ label, fn: () => applyLook(wall, m) })));
+      say(named() + L.background.ask_mode, CB_MODES.map(m => ({ label: L.background.modes[m], fn: () => applyLook(wall, m) })));
     }
     async function applyLook(wall, mode) {
       if (recoloring) return;
       const token = ++stepToken;
       recoloring = true;
-      say(CAT_NAME + 'Okay, I am changing the background now for you.');
+      say(named() + L.background.changing);
       ga('change_background', { wall, colorblind_mode: mode || 'none' });
       store.set(KEYS.wall, wall === 'mountain' ? null : wall); store.set(KEYS.cb, mode);
       const canVeil = !reduce && window.CSS && (CSS.supports('backdrop-filter', 'grayscale(1)') || CSS.supports('-webkit-backdrop-filter', 'grayscale(1)'));
@@ -444,19 +503,19 @@
       if (token !== stepToken) return;
       if (mode) {
         cheer();
-        say(CAT_NAME + 'Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.', [
-          { label: 'Thanks, Paño', quiet: true, fn: () => guideRest() }
+        say(named() + L.background.phill_note, [
+          { label: L.background.thanks, quiet: true, fn: () => guideRest() }
         ]);
-      } else guideRest('Done! Enjoy the new view.');
+      } else guideRest(L.background.done);
     }
 
     /* ---------- tidy up: with more than 3 windows open, the cat offers to eat the extras ---------- */
     const CLUTTER = 3;
     let cleanupArmed = true, cleaning = false;
     function eatLayer() {
-      let L = document.getElementById('eatlayer');
-      if (!L) { L = document.createElement('div'); L.id = 'eatlayer'; L.style.cssText = 'position:fixed;inset:0;z-index:9055;pointer-events:none'; document.body.appendChild(L); }
-      return L;
+      let layer = document.getElementById('eatlayer');
+      if (!layer) { layer = document.createElement('div'); layer.id = 'eatlayer'; layer.style.cssText = 'position:fixed;inset:0;z-index:9055;pointer-events:none'; document.body.appendChild(layer); }
+      return layer;
     }
     function openCount() { let n = 0; WINS.forEach(W => { if (W.state === 'open' || W.state === 'min') n++; }); return n; }
     function checkClutter() {
@@ -469,10 +528,10 @@
       ringOff(); gbub.hidden = true;
       await moveCat({ x: innerWidth / 2 - CAT_W() / 2, y: (innerHeight - 44) / 2 - CAT_H() / 2 }, false);
       if (token !== stepToken) return;
-      say('<span class="gname">Phill’s cat</span>You have a lot of windows open. Can I clean them up?', [
-        ...(narrow() ? [] : [{ label: 'Organize them', pri: true, fn: () => organizeWindows() }]),
-        { label: narrow() ? 'Yes' : 'Close them', pri: narrow(), fn: () => eatWindows(token) },
-        { label: 'No thanks', quiet: true, fn: () => guideRest('Okay! They’re all yours.') }
+      say(named() + L.cleanup.offer, [
+        ...(narrow() ? [] : [{ label: L.cleanup.organize, pri: true, fn: () => organizeWindows() }]),
+        { label: narrow() ? L.cleanup.yes : L.cleanup.close, pri: narrow(), fn: () => eatWindows(token) },
+        { label: L.cleanup.no, quiet: true, fn: () => guideRest(L.cleanup.declined) }
       ]);
       ga('cleanup_offer', { windows: openCount() });
     }
@@ -480,8 +539,8 @@
     function windowActions() {
       if (openCount() < 2) return [];
       return [
-        ...(narrow() ? [] : [{ label: 'Organize windows', fn: () => organizeWindows() }]),
-        { label: 'Close all windows', fn: () => eatWindows(stepToken) }
+        ...(narrow() ? [] : [{ label: L.menu.organize, fn: () => organizeWindows() }]),
+        { label: L.menu.close_all, fn: () => eatWindows(stepToken) }
       ];
     }
     // stack every window like a fanned deck of cards: same size, stepped diagonally, every title bar and its buttons showing
@@ -491,7 +550,7 @@
       const list = [...WINS.values()].filter(W => (W.state === 'open' || W.state === 'min') && !W.busy)
         .sort((a, b) => (a.state === 'min') - (b.state === 'min') ? (b.state === 'min') - (a.state === 'min') : (+a.el.style.zIndex || 0) - (+b.el.style.zIndex || 0));
       const n = list.length;
-      if (n < 2) return guideRest('Nothing to organize yet.');
+      if (n < 2) return guideRest(L.cleanup.nothing);
       ga('organize_windows', { windows: n });
       const A = { w: innerWidth, h: innerHeight - 44 }, pad = 12;
       const stepY = Math.max(32, Math.min(38, (A.h - 2 * pad - 260) / (n - 1)));
@@ -516,7 +575,7 @@
       cleanupArmed = false;
       if (token !== stepToken) return;
       cheer();
-      guideRest('All organized! Click any title bar to bring that window forward.');
+      guideRest(L.cleanup.organized);
       armIdle();
     }
     async function eatWindows(token) {
@@ -573,7 +632,7 @@
       cheer();
       await sleep(reduce ? 0 : 450);
       if (token !== stepToken) return;
-      guideRest('All clean! I kept the one you were looking at.');
+      guideRest(L.cleanup.cleaned);
       armIdle();
     }
 
@@ -720,7 +779,7 @@
       gcat.classList.add('lick');
       await sleep(reduce ? 0 : 750);
       if (token !== stepToken) return calmCat();
-      say('<span class="gname">Phill’s cat</span>How dare you try to recycle me, human.');
+      say(named() + L.bin.refuse);
       gcat.classList.remove('talk');   // he says it without looking up from his paw
       await sleep(4600);
       if (token !== stepToken) { if (!dragging) calmCat(); return; }
@@ -735,9 +794,9 @@
 
     gcat.addEventListener('click', () => {
       if (suppressClick || cleaning || recoloring) return;
-      if (headMode) { guideMenu('What would you like to do?'); return; }
+      if (headMode) { guideMenu(L.menu.ask); return; }
       if (!gbub.hidden && !tour) guideRest();
-      else guideMenu('What would you like to do?');
+      else guideMenu(L.menu.ask);
     });
     $('#gx').addEventListener('click', () => guideRest());
     addEventListener('resize', () => {
@@ -748,7 +807,9 @@
     });
 
     // say hello once per visit; returning in the same session, the cat just sits there
-    setTimeout(() => {
+    // (he waits for his brain first: without it he has nothing to say, so he stays hidden)
+    setTimeout(async () => {
+      if (!(await brainReady)) return;
       gcat.hidden = false;
       let wasHead = false;
       try { wasHead = sessionStorage.getItem('panoHead') === '1'; } catch (e) {}
@@ -757,7 +818,7 @@
       anim(gbodyEl, [{ transform: 'translateY(40px) scale(.5)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: SPRING_WIN.duration, easing: SPRING_WIN.easing });
       let seen = false;
       try { seen = sessionStorage.getItem('catGreeted') === '1'; sessionStorage.setItem('catGreeted', '1'); } catch (e) {}
-      if (!seen && canGreet()) setTimeout(() => guideMenu('Hi! I can show you around. What would you like to do?'), 700);
+      if (!seen && canGreet()) setTimeout(() => guideMenu(L.hello), 700);
     }, 900);
 
     return {

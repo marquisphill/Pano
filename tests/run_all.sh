@@ -31,6 +31,8 @@ run bin   bin.py
 run wall  wall.py
 run cases cases.py
 run sweep sweep.py
+run lifted lifted.py
+run brain brain.py
 run tours-desk  tours.py desk  "app:contact,app:skills"
 run tours-fold  tours.py fold  "app:contact,app:skills"
 run tours-phone tours.py phone "app:contact,app:skills"
