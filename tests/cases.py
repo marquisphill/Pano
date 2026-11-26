@@ -8,7 +8,7 @@ with sync_playwright() as p:
         for key in ['brdskill','reports']:
             pg.goto('about:blank'); pg.goto(U+'#ailab'); pg.wait_for_timeout(1500)
             # open from the AI Lab folder like a visitor would
-            name='BRD Digest' if key=='brdskill' else 'Report Consolidator'
+            name='BRD Q&A Skill' if key=='brdskill' else 'Report Consolidator'
             f=pg.query_selector(f'#layer .window .file:has-text("{name}")')
             f.dblclick() if W>640 else f.click(); pg.wait_for_timeout(1400)
             if W<=640 and not pg.query_selector('.window[aria-label*="Pipeline"]'):
