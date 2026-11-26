@@ -20,11 +20,11 @@ A kit that lets anyone put Paño, Phill's red cartoon cat, on their own website 
   - Skills turn on only when the adapter provides what they need, and `Pano.here.skills()` explains why any skill is off.
   - Tour steps that only use `css`, `css_visible`, `when_visible`, `click`, `focus` and `submit` need no adapter code. `layout.scrolls: true` handles pages that scroll.
 - **Gaps:**
-  - No neutral default lines. Shared lines (menu, tour, background) only exist in Phill's `core.json`, so a brain that does not extend it shows blanks.
-  - `extends` only goes one level (`loadBrain` in `pano.js`). It needs to chain (site → base).
-  - `skills/background.js` uses `p.L.background.phill_note`. Rename it, and keep the old key working or update Phill's brains.
-  - The cat's colors are written into his drawing (`MARKUP` at the top of `pano.js`). Make them CSS variables, with the current red as the default.
-  - Brain mistakes fail silently. A missing line shows blank, and a tour with a step the page can't read just drops out of the menu.
+  - ~~No neutral default lines.~~ Fixed in K1: `latest/base.json`.
+  - ~~`extends` only goes one level.~~ Fixed in K1: it chains.
+  - ~~`phill_note`.~~ Fixed in K1: now `background.note`, and Phill's `core.json` updated.
+  - ~~The cat's colors are written into his drawing.~~ Fixed in K1: `--pano-*` variables.
+  - Brain mistakes fail silently. A missing line shows blank, and a tour with a step the page can't read just drops out of the menu. (K2. Since K1 a brain built on base has every line, so blanks only come from a misspelt key.)
   - The background skill expects the page to style its own backgrounds (`[data-wall="..."]` on the desk element and on `.wallnext`). A plain site has none, so the kit needs a default set the site owner's AI does not have to write.
   - Not needed for this version, but noted: the skill list is fixed (`EARLY`/`LATE` in `pano.js`), and the early skills load with `document.write`.
 
@@ -70,7 +70,7 @@ their-site/
 
 **K1. Neutral engine** (medium)
 - `latest/base.json`: neutral default wording for every line the engine and the four early skills (`tours`, `background`, `windows`, `bin`) use.
-- `extends` that chains (site → base, and Phill's site → `core.json` → base if that is how it lands). Proposed: a bare name like `"extends": "base"` resolves to the file beside `pano.js`, the way `brain: 'portfolio'` already does, so a site owner's brain never names a version. Full and relative addresses keep working.
+- `extends` that chains (site → base, and Phill's site → `core.json` → base). `"extends": "base"` resolves to the file beside `pano.js`, so a site owner's brain never names a version. Full and relative addresses keep working.
 - Rename `phill_note` (to something neutral like `note`, skipped when empty). Keep the old key working or update Phill's brains.
 - The cat's colors as `--pano-*` CSS variables, with today's red as the default.
 - His name comes from the brain everywhere (bubble, screen-reader labels, any line that says it).
@@ -132,6 +132,13 @@ From Phill's kickoff prompt (2026-11-26):
 Added during the build:
 
 - **The kit's first release is `v3/`.** `v2/` already exists and is live (2026-11-26).
+- **`"extends": "base"`** (or `"base.json"`) always means `base.json` beside `pano.js`, so a site's brain never names a version. Any other `extends` is an address relative to the file that names it. (K1)
+- **Only `lines` pass down an `extends` chain.** Tours, menu and everything else are each file's own. (K1)
+- **Phill's `core.json` extends base**, so his sites run `portfolio.json`/`dashboard.json` → `core.json` → `base.json`. All his own lines win, so nothing he says changed. (K1)
+- **`{cat_name}`** in any line or tour step is his name (`lines.name`). Not `{name}`: tour lines already use that for the tour's name. (K1)
+- **`phill_note` is now `background.note`.** Phill's `core.json` was updated; the old key is not read any more (`v1/` and `v2/` keep their own copies). With no note, he just says `background.done`. (K1)
+- **His colors** are `--pano-fur`, `--pano-leg`, `--pano-paw`, `--pano-eyes`, `--pano-mouth`, `--pano-tongue`, plus `--pano-close` for the bubble's close button. The defaults are today's colors. (K1)
+- **A brain with no `menu.show` offers all its tours**, in the order written. A background with no words in `options` is shown by its name. (K1)
 
 ## Status log
 
@@ -144,3 +151,17 @@ Update this at the end of every phase: date, what was done, decisions, anything 
   - **Baseline**, saved in `tests/baseline/k0/` (its README explains each line). Local copies of `Portfolio-DEV` (`06df063`) and `Dashboard-DEV` (`7fb4c14`) served with a frozen copy of `01978af`. Dashboard: `dash.py` 205 of 205, `devdash.py` all True, no page errors. Portfolio: `lifted` 20 of 20, `skills` 29 of 29, and the rest matches the known quirks in `tests/README.md` (the `clean-fold` timeout, `sweep`'s blocked outside addresses). One expected miss: `brain.py`'s `later hackathon-photos` stops at step 3 of 4, because `v2` moved that tour to the portfolio's new layout and `Portfolio-DEV`'s page still has the old one. It is not offered in his menu.
   - **For K1, from a first look at the code:** the engine and the four early skills read about 40 lines (`menu.*`, `tour.*`, `background.*`, `cleanup.*`, `bin.refuse`, `labels.*`, `touch.swaps`, `name`, `hello`); `base.json` needs each of them. His colors are 6 values in `MARKUP` (fur `#ff4d4f`, darker fur `#c93436` and `#b92c2e`, mouth `#3a0608`, tongue `#ff8a8c`, eyes `#07100b`) plus the wavy whiskers in `pano.css`. Lines that say his name today are typed out ("Phill’s cat", "Ask Paño the cat for help"); `base.json` can use a `{name}` gap instead, while Phill's brains keep their own words. Phill's `core.json` currently extends nothing, so the chain would be `portfolio.json` → `core.json` → `base.json`, with today's lines still winning.
   - **Next: K1** (neutral engine). Make the "before" copy from `01978af` (or the latest `main` if it has moved), and run it side by side with the working copy on both DEV sites.
+- **2026-11-26. K1 done** (same chat as K0; Phill said start it here). Branch only; nothing merged, so the DEV sites still run `main`'s `latest/` until Phill approves the merge.
+  - **`latest/base.json`**: neutral wording for every line the engine and the four everyday skills say (menu, tour, touch swaps, background and colorblind, window clean-up, Recycle Bin, labels, hello), plus the tour lines used only with a memory. Lines that say his name use `{cat_name}`. No facts, no tours, nothing about Phill.
+  - **Engine** (`latest/pano.js`): `extends` chains, with a loop guard (a brain that extends itself keeps him hidden and says why in the console). `"base"`/`"base.json"` means the base beside `pano.js`. `{cat_name}` is filled in across lines and tours. His drawing takes its colors from `--pano-*` variables (see Decisions); the defaults are the exact old colors. The init comment and header explain all of it.
+  - **Skills:** `background.js` reads `background.note` (was `phill_note`) and skips it when empty; a background or mode with no words shows its name. `tours.js` offers every tour when a brain has no `menu.show`.
+  - **Styles** (`latest/pano.css`): the wavy whiskers follow `--pano-fur`; the name and quiet-text colors, which fell back on the portfolio's own `--red-ink` and `--ink-soft`, now have the same values built in, for sites that have neither.
+  - **Phill's brains:** `core.json` now says `"extends": "base"` and its `phill_note` is `note`. `portfolio.json` and `dashboard.json` are unchanged. DEV sites fetch one more small file (`base.json`, 4 KB) before he appears.
+  - **Tests.** New `tests/kitbase.py` with a fictional plain site, `tests/sites/kite-shop/` (a scrolling page with a form, no window system). Its brain is only `"extends": "base"`, a name and one two-step css tour. 34 of 34 True, no page errors: he greets in base's words with his own name, labels and menu are right, the tour scrolls, rings and finishes at phone and desktop sizes, nothing he says is blank, the page recolors him, the background works with no option words and no note, a three-file chain works, `"base.json"` works, a loop keeps him hidden, `menu.show` is optional. `brain.py` now merges base under core. `dash.py` reads `note` instead of `phill_note` (same check, same label).
+  - **Before/after**, both DEV sites, old (`01978af`, its own tests) and new served side by side and run at the same time. Dashboard: outputs identical, 205 of 205 both. Portfolio: identical apart from known quirks: one `idle.py` timing (4.8s vs 5.0s), two `wall.py` mid-wipe readings, and the `clean-fold` timeout on both. `brain.py`'s two `later hackathon-photos` False lines are on both, as in K0. `same.py` (styles, bubble, whole-page screenshots, saved settings, nine poses, three sizes): 107 of 108, then 108 of 108 on a re-run. The one miss was a 19 by 13 pixel spot in the phone taskbar after Phill's note, with every computed style the same.
+  - **Not checked:** the live DEV addresses (this environment can't reach `github.io`, and nothing is merged yet). Windows and bin with a base-only brain (base has their lines, but the kite shop has no window system).
+  - **Found, for later phases:**
+    - The background skill still needs the page to style each background (`[data-wall="..."]` on its desk element and on `.wallnext`). The kite shop does this in a few lines of CSS. K3 should give the kit a ready set, or K1's engine could carry one; either way their AI should not have to invent it.
+    - A plain site needs `layout: { bar: { wide: 0, narrow: 0 }, scrolls: true }` and its own `keys` (per-tab names), or he keeps clear of a taskbar that is not there and shares `catGreeted` with other sites on the same domain. The kit's adapter template should set both.
+    - `--pano-bubble` and the other bubble colors default to the portfolio's dark green. Fine for now; K3's `colors.css` template should list them.
+  - **Next: K2** (checker): `Pano.check()`, `kit/brain.schema.json`, and a test for both. `tests/sites/kite-shop/` is a ready page to check against.
