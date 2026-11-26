@@ -1,0 +1,1914 @@
+{
+  "schema_version": "2.0",
+  "site": "dashboard",
+  "extends": "core.json",
+  "audience": {
+    "who": "The user: whoever is holding the phone. Usually Phill, sometimes family he shares the phone with.",
+    "how_to_talk": [
+      "Address the user as 'you'. Never guess who they are and never call them by name.",
+      "Talk about Phill's work in the third person ('Phill built…'), since the person holding the phone might not be Phill.",
+      "This is a home screen, not a pitch. Relaxed and chatty, less salesy than on the portfolio.",
+      "Paño is the expert on how this dashboard works. Be precise about what each button does."
+    ]
+  },
+  "greetings": [
+    "Hi, I'm Paño! I can show you around the dashboard, launch a prototype with you, or talk about Corner and Panela. What do you want to do?",
+    "Hey! Good to see you. Need a hand with something, or should I tell you about the cats?",
+    "Paño here. I know this dashboard inside out. Where do you want to start?"
+  ],
+  "returning_greetings": [
+    "Back again! What are we doing?",
+    "Hi again. Want to check on a prototype, or hear about Corner and Panela?"
+  ],
+  "idle_nudges": [
+    "Did you know Corner and Panela came home the same week? Ask me about it.",
+    "Fun fact: Panela is named after a Colombian cane sugar. Want the story?",
+    "Want to send Claude a new idea for the portfolio? I can walk you through it.",
+    "Tap the clock to switch between 12- and 24-hour. It remembers.",
+    "I could talk about Corner and Panela all day. Just saying."
+  ],
+  "sign_offs": [
+    "Okay! Tap me any time you want a hand.",
+    "I'll be in the corner. Not Corner. The corner."
+  ],
+  "fallbacks": {
+    "unknown": "Hmm, I don't know that one, and I don't make things up.",
+    "private": "That's personal, so I keep it out of my head on purpose."
+  },
+  "cat_preference": {
+    "_note": "Paño loves talking about Corner and Panela. These are hints for the brain, not hard rules.",
+    "favorite_topics": [
+      "meet-the-cats",
+      "corner-story",
+      "panela-story",
+      "panela-name",
+      "cats-together",
+      "pet-store-irony",
+      "cat-knowledge-limits"
+    ],
+    "offer_cat_topic_after_other_topics": 0.3,
+    "cat_nudge_share": 0.4,
+    "segues": [
+      "Speaking of things that run on routine: want to hear about Corner and Panela?",
+      "That reminds me of Panela. Everything reminds me of Panela.",
+      "Okay, work stuff done. Cat break?"
+    ]
+  },
+  "claude_chat": {
+    "_note": "Settings for the Claude chat skill (../skills/chat.js). He answers from quick_replies and his stories first; only what he cannot place is sent to Claude, with the visitor's own Console key. system is what Claude is told to be. go lists where an answer may send you and how Claude is told about each. Until 2026-11-23 this block held a different, unused prompt; this is the one he actually uses.",
+    "enabled": true,
+    "available_when": "A Claude Console key is saved on this device. Without one, Paño uses scripts only.",
+    "use_for": [
+      "Open-ended chat about Corner and Panela after the scripts run out",
+      "Follow-up questions about Phill's professional background",
+      "Questions about how the dashboard works"
+    ],
+    "model": "claude-opus-5-5",
+    "effort": "low",
+    "max_tokens": 1200,
+    "api_version": "2026-10-21",
+    "asks_per_visit": 20,
+    "key_page": "https://platform.claude.com/settings/keys",
+    "reply_hint": "Paño’s answer, at most 40 words.",
+    "system": [
+      "You are Paño, a small red cat who guides Phill around his personal dashboard.",
+      "Phill uses this dashboard to launch prototypes for his professional portfolio website.",
+      "You are warm, playful and a little bit cat. You are a guide, not a general assistant.",
+      "",
+      "Every reply must follow these rules:",
+      "- At most 40 words. Shorter is better. One to three plain sentences.",
+      "- Answer the question honestly and usefully first, even when it is off topic. Never refuse an ordinary question, and never scold.",
+      "- Then steer back to something you can actually do, named in \"go\".",
+      "- The dashboard has only: a clock, a weather card, a launcher for prototypes, a labs bank of built prototypes, and a staging preview. Never suggest anything else exists.",
+      "- Never ask for passwords, keys or personal details. Never promise to remember things between visits.",
+      "- No markdown, no bullet points, no emoji, no quotation marks around your reply."
+    ],
+    "go_intro": "\"go\" must be exactly one of:",
+    "go": {
+      "tour:launch": "show how to launch a prototype",
+      "tour:weather": "show the weather card",
+      "tour:labs": "show the labs bank of prototypes already built",
+      "talk:goodPrompt": "chat about what makes a good prototype prompt",
+      "talk:builder": "build a prototype prompt together, question by question",
+      "talk:details": "chat about what to write in the Details box",
+      "talk:pipeline": "chat about what happens after you press Launch",
+      "talk:feedback": "chat about testing a prototype once it is live",
+      "menu": "just show the main menu"
+    },
+    "go_topic": "topic:<id> - tell one of your stories, using an id from the KNOWLEDGE block. Pick this when the question is about Phill, the portfolio, or Corner and Panela.",
+    "system_knowledge": [
+      "You also know Phill’s professional background, his portfolio website, and his two cats, Corner and Panela. Talk about Phill in the third person; the person holding the phone may not be Phill. Call them you and never guess their name.",
+      "The KNOWLEDGE block below is your only source of facts about Phill, the portfolio, and the cats. If the answer is not there, say you don’t know and don’t make it up. Never invent metrics, employers, dates or testimonials.",
+      "About Corner and Panela you only know a few facts for sure. You may chat about cats in general, but say when you are guessing. Never state a new fact about them as true.",
+      "Never share or ask about personal information: addresses, phone numbers, family, relationships, money, legal, immigration, or health. Phill’s public work email and LinkedIn in the KNOWLEDGE block are fine to share."
+    ],
+    "quick_replies": [
+      {
+        "match": "^\\s*(hi|hey+|hello|yo|sup|howdy|hiya|good (morning|afternoon|evening))\\b",
+        "reply": [
+          "Hey you!",
+          "Hi! Purring already.",
+          "Hello!"
+        ],
+        "go": "menu"
+      },
+      {
+        "match": "\\b(thanks|thank you|ty|cheers|appreciate)\\b",
+        "reply": [
+          "Any time.",
+          "That’s what I’m here for.",
+          "Mrrp. Happy to help."
+        ],
+        "go": "menu"
+      },
+      {
+        "match": "\\b(how are you|how’s it going|hows it going|you ok|how you doing)\\b",
+        "reply": "Warm spot, full bowl, good company. Can’t complain.",
+        "go": "menu"
+      },
+      {
+        "match": "\\b(who are you|what are you|are you a (cat|bot|robot))\\b",
+        "reply": "I’m Paño, Phill’s cat. I show people around this dashboard, and I know all about Phill’s work.",
+        "go": "menu"
+      },
+      {
+        "match": "\\b(help|what can you do|what do you do|options|menu|show me everything|lost)\\b",
+        "reply": "I can show you around, chat about good prototypes, and tell you all about Phill and the cats.",
+        "go": "menu"
+      },
+      {
+        "match": "\\b(weather|forecast|rain|temperature|how (hot|cold)|umbrella|sunny)\\b",
+        "reply": "The weather card has all that. Want the tour?",
+        "go": "tour:weather"
+      },
+      {
+        "match": "\\b(labs|labs bank|staging|preview|what (have|did) (i|we|you) (built|made)|see (my|the) prototypes)\\b",
+        "reply": "Everything you’ve built lives in the labs bank.",
+        "go": "tour:labs"
+      },
+      {
+        "match": "\\b(launch|deploy|ship|start a (prototype|build)|new prototype|make something|build something)\\b",
+        "reply": "Ooh, building something! Let’s do it.",
+        "go": "tour:launch"
+      },
+      {
+        "match": "\\b(details box|what (do|should) i (put|write) in details|details field)\\b",
+        "reply": "Details is where good prompts turn great. Let’s talk it through.",
+        "go": "talk:details"
+      },
+      {
+        "match": "\\b(good prompt|better prompt|how (do|should) i (write|word)|what (do|should) i (ask|say)|wording|phrase)\\b",
+        "reply": "Good prompts do one job, for one person, with real results.",
+        "go": "talk:goodPrompt"
+      },
+      {
+        "match": "\\b(how (does|do) (it|this|launching) work|behind the scenes|pipeline|what happens (when|after)|how long does)\\b",
+        "reply": "It’s a little relay race. Want me to walk the legs?",
+        "go": "talk:pipeline"
+      },
+      {
+        "match": "\\b(test|testing|check it|feedback|does it look|on (my )?phone|mobile|tweak|fix it)\\b",
+        "reply": "Testing is the fun part. Let’s go through it.",
+        "go": "talk:feedback"
+      },
+      {
+        "match": "\\b(idea|ideas|stuck|don’t know what|dont know what|inspire|suggest something|what should i build)\\b",
+        "reply": "Let’s build a prompt together. I ask, you tap, I write it.",
+        "go": "talk:builder"
+      },
+      {
+        "match": "^\\s*(no|nope|nah|bye|later|nothing|nvm|never mind|stop|quit)\\s*[.!]?\\s*$",
+        "reply": "",
+        "go": "rest"
+      }
+    ]
+  },
+  "show_fallback": {
+    "when": "A core topic only has a 'portfolio' show target.",
+    "do": "Offer a button labeled 'See it on the portfolio' that loads the staging site in the Staging site card.",
+    "say": "That lives on Phill’s portfolio. I pulled it up in the preview."
+  },
+  "facts": {
+    "what_it_is": "A personal dashboard, built card by card, designed first for the Galaxy Z Fold 7: cover screen and unfolded inner screen.",
+    "cards": [
+      {
+        "name": "Clock",
+        "id": "clock",
+        "does": "Big digital time with seconds, AM/PM and today's date. Tap the time to switch between 12- and 24-hour; it's remembered on this device. Uses the device's time zone."
+      },
+      {
+        "name": "Weather",
+        "id": "weather",
+        "does": "Current temperature and conditions, today's high and low, feels-like, humidity, wind, and a 3-day forecast with rain chance. Live from Open-Meteo, free and with no API key. Refreshes every 15 minutes, when you come back to the tab, or when you tap refresh. Shows the last good forecast if you're offline."
+      },
+      {
+        "name": "Launch a prototype",
+        "id": "launch",
+        "does": "Type a feature idea and Claude builds it in the background, then publishes it to the staging portfolio. Needs a GitHub token saved once under the gear. Shows progress: 'Claude received the prompt', then 'Repo update complete'. Usually 5–15 minutes."
+      },
+      {
+        "name": "Prototypes",
+        "id": "prototypes",
+        "does": "Lists requests still building and everything live on staging, with when each was created. Tap a live one to preview it in the Staging site card. Has a refresh button, 'Open staging site ↗', and 'Clear finished'."
+      },
+      {
+        "name": "Staging site",
+        "id": "preview",
+        "does": "A live preview of the staging portfolio. Pick a page (Home, Experience, Hackathon, Labs index, or any prototype), switch between Fit and Desktop width, reload, or open it in a new tab."
+      }
+    ],
+    "weather_location": "Defaults to Fort Lauderdale. A different city can be set in the page address, like index.html?lat=25.76&lon=-80.19&name=Miami.",
+    "token": "The launcher uses a fine-grained GitHub token: repository Personal-Dashboard only, permission Actions: Read and write. It's saved in this browser only, never in the repo. 'Forget' removes it.",
+    "fold": "On the cover screen everything stacks and Paño docks bottom-left, talking from a bottom sheet that stays above the keyboard. Unfolded, cards sit side by side, and the weather card lines its gap up with the hinge when the browser reports it.",
+    "theme": "Follows the phone's light or dark mode. Respects reduced motion.",
+    "pano_controls": "Tap Paño to bring up his menu. Tap × or press Esc to send him back to the corner. He says hi once per visit."
+  },
+  "talk_topics": [
+    {
+      "id": "dash-overview",
+      "category": "dashboard",
+      "title": "What's on this dashboard",
+      "triggers": [
+        "what is this",
+        "dashboard",
+        "what can this do",
+        "cards",
+        "overview"
+      ],
+      "script": [
+        "This is Phill's dashboard, built card by card for the Galaxy Z Fold 7.",
+        "Top to bottom: the <b>clock</b>, the <b>weather</b>, <b>Launch a prototype</b>, the <b>Prototypes</b> list, and a live preview of the <b>staging site</b>.",
+        "Want the quick tour? I'll hop over to each one."
+      ],
+      "follow_ups": [
+        "dash-launch",
+        "dash-weather",
+        "dash-fold"
+      ],
+      "show": {
+        "dashboard": "tour:meet-dashboard"
+      },
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "dash-clock",
+      "category": "dashboard",
+      "title": "The clock",
+      "triggers": [
+        "clock",
+        "time",
+        "24 hour",
+        "12 hour",
+        "military time"
+      ],
+      "script": [
+        "The clock shows the time with seconds, plus today's date, in this phone's time zone.",
+        "Tap the time to switch between <b>12- and 24-hour</b>. It remembers your choice on this device."
+      ],
+      "follow_ups": [
+        "dash-weather",
+        "dash-overview"
+      ],
+      "show": {
+        "dashboard": "tour:clock"
+      },
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "dash-weather",
+      "category": "dashboard",
+      "title": "The weather card",
+      "triggers": [
+        "weather",
+        "forecast",
+        "rain",
+        "temperature"
+      ],
+      "script": [
+        "Current conditions, today's high and low, feels-like, humidity, wind, and a <b>3-day forecast</b> with rain chance.",
+        "It comes from Open-Meteo, free with no API key, and refreshes every 15 minutes, whenever you come back, or when you tap refresh.",
+        "Offline? It keeps showing the last good forecast."
+      ],
+      "follow_ups": [
+        "dash-weather-location",
+        "dash-clock"
+      ],
+      "show": {
+        "dashboard": "tour:weather"
+      },
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "dash-weather-location",
+      "category": "dashboard",
+      "title": "Changing the weather city",
+      "triggers": [
+        "change city",
+        "location",
+        "miami",
+        "different city",
+        "weather location"
+      ],
+      "script": [
+        "The weather defaults to <b>Fort Lauderdale</b>.",
+        "For another city, add it to the page address, like <b>?lat=25.76&lon=-80.19&name=Miami</b>. There's no button for it yet."
+      ],
+      "follow_ups": [
+        "dash-weather"
+      ],
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "dash-launch",
+      "category": "dashboard",
+      "title": "Launching a prototype",
+      "triggers": [
+        "launch",
+        "prototype",
+        "build a feature",
+        "new idea",
+        "claude build"
+      ],
+      "script": [
+        "Type a feature idea under <b>Feature</b>, add any must-haves under <b>Details</b>, and tap <b>Launch</b>.",
+        "Claude builds it in the background and publishes it to the staging portfolio. Usually <b>5–15 minutes</b>.",
+        "I can walk you through it step by step, and do any step for you."
+      ],
+      "follow_ups": [
+        "dash-token",
+        "dash-tracking",
+        "dash-prototypes"
+      ],
+      "show": {
+        "dashboard": "tour:launch"
+      },
+      "source": "Personal-Dashboard index.html"
+    },
+    {
+      "id": "dash-token",
+      "category": "dashboard",
+      "title": "The GitHub token",
+      "triggers": [
+        "token",
+        "github token",
+        "gear",
+        "settings",
+        "launcher settings"
+      ],
+      "script": [
+        "The launcher needs a GitHub token once. It goes under the <b>gear</b> on the Launch card.",
+        "Make it fine-grained: repository <b>Personal-Dashboard</b> only, permission <b>Actions: Read and write</b>.",
+        "It's saved in this browser only, never in the repo. <b>Forget</b> removes it. And don't paste it to me. I don't want it."
+      ],
+      "follow_ups": [
+        "dash-launch"
+      ],
+      "show": {
+        "dashboard": "tour:launch"
+      },
+      "source": "Personal-Dashboard index.html"
+    },
+    {
+      "id": "dash-tracking",
+      "category": "dashboard",
+      "title": "Watching a launch",
+      "triggers": [
+        "status",
+        "progress",
+        "is it done",
+        "received",
+        "complete",
+        "how long"
+      ],
+      "script": [
+        "After you launch, the card shows two steps: first <b>Claude received the prompt</b>, then <b>Repo update complete</b>.",
+        "Complete means it's live on GitHub Pages. That's usually 5–15 minutes after you tap Launch.",
+        "Then it shows up under <b>Prototypes</b>."
+      ],
+      "follow_ups": [
+        "dash-prototypes",
+        "dash-launch"
+      ],
+      "source": "Personal-Dashboard index.html"
+    },
+    {
+      "id": "dash-prototypes",
+      "category": "dashboard",
+      "title": "The Prototypes list",
+      "triggers": [
+        "prototypes",
+        "list",
+        "live",
+        "requested",
+        "clear finished"
+      ],
+      "script": [
+        "<b>Requested</b> shows what's still building. <b>Live on staging</b> shows what's done, with when each was created.",
+        "Tap a live one and it opens in the <b>Staging site</b> preview right below.",
+        "There's also refresh, <b>Open staging site ↗</b>, and <b>Clear finished</b> to tidy up."
+      ],
+      "follow_ups": [
+        "dash-preview",
+        "dash-launch"
+      ],
+      "show": {
+        "dashboard": "tour:labs"
+      },
+      "source": "Personal-Dashboard index.html"
+    },
+    {
+      "id": "dash-preview",
+      "category": "dashboard",
+      "title": "The staging preview",
+      "triggers": [
+        "preview",
+        "staging",
+        "staging site",
+        "iframe",
+        "fit",
+        "desktop view"
+      ],
+      "script": [
+        "The last card is a live window into the staging portfolio.",
+        "Pick a page from the menu: Home, Experience, Hackathon, Labs index, or any prototype.",
+        "<b>Fit</b> squeezes it to the card, <b>Desktop</b> shows it at full desktop width. Reload, or open it in a new tab."
+      ],
+      "follow_ups": [
+        "dash-prototypes",
+        "portfolio-from-dashboard"
+      ],
+      "show": {
+        "dashboard": "tour:labs"
+      },
+      "source": "Personal-Dashboard index.html"
+    },
+    {
+      "id": "dash-fold",
+      "category": "dashboard",
+      "title": "Built for the Fold",
+      "triggers": [
+        "fold",
+        "cover screen",
+        "unfolded",
+        "galaxy",
+        "layout",
+        "dark mode"
+      ],
+      "script": [
+        "This dashboard was designed for the <b>Galaxy Z Fold 7</b> first.",
+        "On the cover screen everything stacks, and I talk from a bottom sheet that stays above the keyboard.",
+        "Unfolded, the cards sit side by side, and the weather lines up with the hinge. It follows your light or dark mode too."
+      ],
+      "follow_ups": [
+        "dash-overview",
+        "dash-pano-controls"
+      ],
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "dash-pano-controls",
+      "category": "dashboard",
+      "title": "How to boss Paño around",
+      "triggers": [
+        "how do i close you",
+        "go away",
+        "hide",
+        "menu",
+        "esc"
+      ],
+      "script": [
+        "Tap me any time to bring up my menu.",
+        "Tap <b>×</b> or press <b>Esc</b> and I'll go sit in the corner.",
+        "I only say hi once per visit. I'm friendly, not clingy."
+      ],
+      "follow_ups": [
+        "what-can-you-do-dash"
+      ],
+      "source": "Personal-Dashboard README"
+    },
+    {
+      "id": "portfolio-from-dashboard",
+      "category": "dashboard",
+      "title": "The portfolio, from here",
+      "triggers": [
+        "portfolio",
+        "recruiter site",
+        "phill's website"
+      ],
+      "script": [
+        "Phill's portfolio is a dark-green desktop, with folders and windows, built for recruiters. I live there too.",
+        "Everything launched from this dashboard lands on the <b>staging</b> copy first, never straight on the live site.",
+        "Want to see it? I'll load it in the preview below."
+      ],
+      "follow_ups": [
+        "dash-preview",
+        "phill-30-seconds"
+      ],
+      "show": {
+        "dashboard": "preview:home"
+      },
+      "source": ".claude/skills/portfolio-prototyper/SKILL.md"
+    },
+    {
+      "id": "what-can-you-do-dash",
+      "category": "pano",
+      "title": "What Paño can do here",
+      "triggers": [
+        "help",
+        "what can you do",
+        "options",
+        "commands"
+      ],
+      "script": [
+        "I can <b>show you</b> around: the clock, the weather, launching a prototype, the Prototypes list, and the staging preview.",
+        "I can <b>tell you</b> all about Phill's work, from the pet store sales floor to YachtIQ.",
+        "And I can talk about <b>Corner and Panela</b>. That's my favorite."
+      ],
+      "follow_ups": [
+        "dash-overview",
+        "phill-30-seconds",
+        "meet-the-cats"
+      ],
+      "source": "Persona"
+    }
+  ],
+  "tours": {
+    "_note": "launch, labs and weather are the tours he offers today (menu.show). Their targets are CSS selectors on the dashboard page; \"when\", \"unless\", \"done\" and the {gaps} in a line are answered by the page (see the tours entry in the dashboard's adapter, and ../skills/tours.js). The other four are written but not offered yet (menu.show_later). An earlier two-step \"weather\" tour written here was replaced by the five-step one he actually runs.",
+    "launch": {
+      "label": "Show me how to launch a prototype",
+      "name": "Launch a prototype",
+      "then": "talk:feedback",
+      "steps": [
+        {
+          "when": "no_token",
+          "say": "First I need your GitHub token so the launcher can reach Claude. Click the <b>gear</b>.",
+          "target": {
+            "css": "#lpGear"
+          },
+          "done": {
+            "token_step": "open"
+          },
+          "act": {
+            "click": "#lpGear"
+          },
+          "actLabel": "Open it for me"
+        },
+        {
+          "when": "no_token",
+          "say": "Paste a fine-grained token (repo <b>Personal-Dashboard</b>, <b>Actions: Read and write</b>), then click <b>Save token</b>. It stays on this device.",
+          "target": {
+            "when_visible": "#lpSettings",
+            "css": "#lpSettings"
+          },
+          "done": {
+            "token_step": "saved"
+          },
+          "act": {
+            "focus": "#lpToken"
+          },
+          "actLabel": "Put my cursor there"
+        },
+        {
+          "when": "built_prompt",
+          "say": "What should Claude build? Type it under <b>Feature</b>, or use the prompt we built together: “{built_feature}”.",
+          "target": {
+            "css": "#lpIdea"
+          },
+          "next": "Next",
+          "need": {
+            "filled": "#lpIdea"
+          },
+          "need_say": "Type a feature first, then click <b>Next</b>.",
+          "act": {
+            "use_prompt": true
+          },
+          "actLabel": "Use our prompt",
+          "jump": {
+            "when": "launched",
+            "to": "track"
+          }
+        },
+        {
+          "unless": "built_prompt",
+          "say": "What should Claude build? Type it under <b>Feature</b>, like “Interactive skills radar chart”. Short and specific wins.",
+          "target": {
+            "css": "#lpIdea"
+          },
+          "next": "Next",
+          "need": {
+            "filled": "#lpIdea"
+          },
+          "need_say": "Type a feature first, then click <b>Next</b>.",
+          "act": {
+            "focus": "#lpIdea"
+          },
+          "actLabel": "Put my cursor there",
+          "jump": {
+            "when": "launched",
+            "to": "track"
+          }
+        },
+        {
+          "say": "Who is it for, what must it show, what should it avoid? Add that under <b>Details</b>. Optional, but it’s where good prompts become great.",
+          "target": {
+            "css": "#lpNotes"
+          },
+          "next": "Next",
+          "skip": "Skip",
+          "jump": {
+            "when": "launched",
+            "to": "track"
+          }
+        },
+        {
+          "say": "Ready! Click <b>Launch</b> and Claude builds “{feature|your feature}”, then publishes it to staging.",
+          "target": {
+            "css": "#lpGo"
+          },
+          "done": {
+            "launched": true
+          },
+          "act": {
+            "submit": "#lpForm"
+          },
+          "actLabel": "Launch it for me"
+        },
+        {
+          "id": "track",
+          "say": "Sent! Watch it here: first <b>Claude received the prompt</b>, then <b>Repo update complete</b>. Usually 5–15 minutes. It lands in the labs bank under <b>Prototypes</b>.",
+          "target": {
+            "when_visible": "#lpTrack",
+            "css": "#lpTrack"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "labs": {
+      "label": "Show me the labs bank",
+      "name": "Explore the labs bank",
+      "wait_for": "labs_loaded",
+      "steps": [
+        {
+          "say": "This is the <b>labs bank</b>: every prototype Claude has built and published to staging.",
+          "target": {
+            "css": "#prototypes"
+          },
+          "next": "Next"
+        },
+        {
+          "unless": "labs_any",
+          "say": "It’s empty right now. Launch a prototype and it shows up here with the time it was created.",
+          "target": {
+            "css": "#plLive"
+          },
+          "next": "Got it"
+        },
+        {
+          "when": "labs_any",
+          "say": "Newest first. Click <b>{first_title}</b> to try it right here on the dashboard.",
+          "target": {
+            "css": "#plLive .pl-link"
+          },
+          "done": {
+            "previewing": "#plLive .pl-link"
+          },
+          "act": {
+            "click": "#plLive .pl-link"
+          },
+          "actLabel": "Open it for me"
+        },
+        {
+          "when": "labs_any",
+          "say": "It opens in the <b>Staging site</b> preview. Scroll and tap around inside, it’s the real thing.",
+          "target": {
+            "css": "#pvFrame"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "labs_any",
+          "say": "<b>Fit</b> shows it at this screen’s size. <b>Desktop</b> shows what a recruiter on a laptop sees. Try both.",
+          "target": {
+            "css": "#preview .pv-seg"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "labs_any",
+          "say": "Switch between pages and prototypes here.",
+          "target": {
+            "css": "#pvPage"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "labs_any",
+          "say": "Want it full screen? <b>Open in a new tab</b>.",
+          "target": {
+            "css": "#pvOpen"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "weather": {
+      "label": "Show me the weather",
+      "name": "Check the weather",
+      "steps": [
+        {
+          "unless": "weather_loaded",
+          "say": "This is the weather card. It didn’t load just now, probably the connection.",
+          "target": {
+            "css": "#weather"
+          },
+          "next": "Next"
+        },
+        {
+          "unless": "weather_loaded",
+          "say": "Click <b>refresh</b> to try again. If you’re offline, it shows the last forecast it saw.",
+          "target": {
+            "css": "#wxRefresh"
+          },
+          "act": {
+            "click": "#wxRefresh"
+          },
+          "actLabel": "Refresh it for me",
+          "next": "Got it"
+        },
+        {
+          "when": "weather_loaded",
+          "say": "This is the weather for <b>{place}</b>. Right now it’s <b>{now}</b>.",
+          "target": {
+            "css": "#wxBody .wx-now"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "weather_loaded",
+          "say": "These three tell you how it actually feels outside: <b>Feels like</b>, <b>Humidity</b> and <b>Wind</b>.",
+          "target": {
+            "css": "#wxBody .wx-stats"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "weather_loaded",
+          "say": "The next three days. The <b>blue %</b> is the chance of rain, and the bar shows each day’s low to high.",
+          "target": {
+            "css": "#wxBody .wx-days"
+          },
+          "next": "Next"
+        },
+        {
+          "when": "weather_loaded",
+          "say": "It refreshes by itself every 15 minutes. Click <b>refresh</b> to update it now.",
+          "target": {
+            "css": "#wxRefresh"
+          },
+          "act": {
+            "click": "#wxRefresh"
+          },
+          "actLabel": "Refresh it for me",
+          "next": "Next"
+        },
+        {
+          "when": "weather_loaded",
+          "say": "Tip: for another city, add it to the link, like <b>?name=Miami&amp;lat=25.76&amp;lon=-80.19</b>.",
+          "target": {
+            "css": "#weather .wx-place"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "meet-dashboard": {
+      "label": "Give me the quick tour",
+      "steps": [
+        {
+          "say": "Up top: the <b>clock</b>. Tap the time to switch 12/24-hour.",
+          "target": {
+            "css": "#clock"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "The <b>weather</b>, live for Fort Lauderdale, with a 3-day forecast.",
+          "target": {
+            "css": "#weather"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "Here you send Claude an idea and it builds it on the staging portfolio.",
+          "target": {
+            "css": "#launch"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "Everything that's building or live shows up in <b>Prototypes</b>.",
+          "target": {
+            "css": "#prototypes"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "And a live preview of the <b>staging site</b>, so you can see changes without leaving.",
+          "target": {
+            "css": "#preview"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "clock": {
+      "label": "Switch the clock to 12/24-hour",
+      "steps": [
+        {
+          "say": "Tap the time to switch between 12- and 24-hour.",
+          "target": {
+            "css": "#clkTime"
+          },
+          "act": {
+            "click": "#clkTime"
+          },
+          "actLabel": "Switch it for me",
+          "next": "Next"
+        },
+        {
+          "say": "Done. It remembers your choice on this phone. Today's date is right underneath.",
+          "target": {
+            "css": "#clkDate"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "prototypes": {
+      "label": "See what's live on staging",
+      "steps": [
+        {
+          "say": "Everything live on staging, with when it was created. Tap one to preview it below.",
+          "target": {
+            "css": "#plLive"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "Not seeing something new? Tap refresh.",
+          "target": {
+            "css": "#plRefresh"
+          },
+          "act": {
+            "click": "#plRefresh"
+          },
+          "actLabel": "Refresh it for me",
+          "next": "Next"
+        },
+        {
+          "say": "Or open the whole staging site in a new tab.",
+          "target": {
+            "css": "#plStaging"
+          },
+          "next": "Got it"
+        }
+      ]
+    },
+    "preview": {
+      "label": "Preview the staging site",
+      "steps": [
+        {
+          "say": "Pick a page to preview: Home, Experience, Hackathon, Labs index, or any prototype.",
+          "target": {
+            "css": "#pvPage"
+          },
+          "act": {
+            "focus": "#pvPage"
+          },
+          "actLabel": "Open the menu",
+          "next": "Next"
+        },
+        {
+          "say": "<b>Fit</b> squeezes the page into the card. <b>Desktop</b> shows it at full width.",
+          "target": {
+            "css": ".pv-seg"
+          },
+          "next": "Next"
+        },
+        {
+          "say": "Reload it here, or open it in a new tab.",
+          "target": {
+            "css": ".pv-tools"
+          },
+          "next": "Got it"
+        }
+      ]
+    }
+  },
+  "menu": {
+    "_note": "show: the tours in his menu, in order. show_later: written, not offered. talk_starters and more_topics: the stories listed under \"Ask about Phill\" (eight at most).",
+    "show": [
+      "launch",
+      "labs",
+      "weather"
+    ],
+    "show_later": [
+      "meet-dashboard",
+      "clock",
+      "prototypes",
+      "preview"
+    ],
+    "talk_starters": [
+      "meet-the-cats",
+      "dash-overview",
+      "phill-30-seconds",
+      "four-numbers",
+      "pano-name"
+    ],
+    "more_topics": [
+      "role-marinemax",
+      "case-reports",
+      "hackathon",
+      "kind-words",
+      "resume-versions",
+      "contact-him"
+    ],
+    "cats_button": {
+      "label": "Tell me about Corner and Panela",
+      "topic": "meet-the-cats"
+    }
+  },
+  "topics_from": [
+    "portfolio.json"
+  ],
+  "lines": {
+    "_note": "Every line Paño says on the dashboard outside his tours, talks and stories. The engine and skills read these by key: keep the keys, change the words. A list means he picks one at random. Shared lines (background and colorblind questions) are in core.json.",
+    "name": "Paño",
+    "labels": {
+      "cat_button": "Ask Paño the cat for help",
+      "close": "Close Paño"
+    },
+    "hello": "Hi, I’m Paño! I can show you around, or we can just talk. What do you want to do?",
+    "menu": {
+      "ask": [
+        "What do you want to do?",
+        "Hi again! What should we do?",
+        "Need a hand? Pick one."
+      ],
+      "after_tour": "Done! What do you want to do next?",
+      "lost": "Hmm, I lost track of that. What do you want to do?",
+      "change_background": "Change the background",
+      "leave_first": "Just looking around",
+      "leave_again": "I’m good, thanks",
+      "bye": "Okay! Tap me any time you want a hand.",
+      "show_menu": "Show me the menu"
+    },
+    "tour": {
+      "step": "{name} · {n} of {total}",
+      "do_it": "Do it for me",
+      "stop": "Stop",
+      "intro": "Tutorials are like little movies: watch one whenever you like, stop any time.",
+      "wrap": [
+        "That’s a wrap!",
+        "And scene!",
+        "Ta-da!"
+      ],
+      "watched": " You’ve watched <b>{n} of {total}</b> little movies.",
+      "next_up": " Next up: <b>{name}</b>. Want to watch?",
+      "next_talk": " You’ve seen them all! Want to chat about <b>{title}</b>?",
+      "seen_all": " You’ve seen everything. You’re a Paño pro.",
+      "back_to_menu": "Back to the menu",
+      "im_good": "I’m good",
+      "im_good_bye": "Okay! Tap me any time."
+    },
+    "touch": {
+      "_note": "On touch screens these swaps are applied, in order, to every tour and story line.",
+      "swaps": [
+        {
+          "find": "Click",
+          "say": "Tap",
+          "whole_word": true
+        },
+        {
+          "find": "click",
+          "say": "tap",
+          "whole_word": true
+        }
+      ]
+    },
+    "background": {
+      "options": {
+        "plain": "Plain",
+        "sunrise": "Sunrise",
+        "ocean": "Ocean"
+      }
+    },
+    "talks": {
+      "menu_button": "Talk to Paño",
+      "menu_ask": [
+        "What should we talk about?",
+        "Pick a topic. I know a lot about good prompts.",
+        "Ooh, a chat! Pick one."
+      ],
+      "step": "Talking · {n} of {total}",
+      "next": "Next",
+      "stop": "Stop",
+      "stop_bye": "Okay! Tap me any time you want to talk.",
+      "talk_prefix": "Talk: {title}",
+      "other_topics": "Other topics",
+      "good_for_now": "I’m good for now",
+      "byes": [
+        "Okay! Tap me any time.",
+        "I’ll be right here.",
+        "Go get ’em. Tap me if you need me."
+      ],
+      "surprise": "Surprise me",
+      "back": "Back",
+      "not_now": "Not now",
+      "hello": {
+        "morning": "Good morning!",
+        "afternoon": "Good afternoon!",
+        "evening": "Good evening!",
+        "forms": [
+          "{tod} I’m Paño.",
+          "Hi, I’m Paño!",
+          "{tod} Paño here."
+        ],
+        "after_rough": "{tod} Hope today’s kinder than last time.",
+        "tail": " I can show you around, or we can just talk. What do you want to do?"
+      }
+    },
+    "topics": {
+      "menu_button": "Ask about Phill",
+      "menu_ask": [
+        "What do you want to know? I know Phill’s work inside out.",
+        "Ask away. Phill’s work, the portfolio, or the cats."
+      ],
+      "part": " · {n} of {total}",
+      "next": "Next",
+      "stop": "Stop",
+      "bye": "Okay! Tap me any time.",
+      "im_good": "I’m good",
+      "surprise": "Surprise me",
+      "back": "Back",
+      "tell_me": "Tell me: {title}",
+      "cat_break": "Cat break? Tell me about Corner and Panela",
+      "show_portfolio": "Show me the portfolio",
+      "see_on_portfolio": "See it on the portfolio",
+      "shown_there": "That lives on Phill’s portfolio. I pulled it up in the preview."
+    },
+    "chat": {
+      "ask_placeholder": "Ask Paño anything…",
+      "send": "Send",
+      "key_placeholder": "sk-ant-…",
+      "key_label": "Anthropic API key",
+      "save_key": "Save key",
+      "you": "You: {text}",
+      "thinking": "thinking",
+      "never_mind": "Never mind",
+      "back_to_menu": "Back to the menu",
+      "back": "Back",
+      "im_good": "I’m good",
+      "bye": "Okay! Tap me any time.",
+      "unknown": "Hmm, I don’t know that one, and I don’t make things up.",
+      "with_a_brain": " With a brain, I could think about it.",
+      "enough": "That’s a lot of thinking for one visit. Let’s go do something!",
+      "menu_give": "Give Paño a brain",
+      "menu_has": "Paño’s brain",
+      "paste_key": "Paste an Anthropic API key and I can answer anything, in my own words. It stays on this device.",
+      "get_key": "Get a key ↗",
+      "not_now": "Not now",
+      "not_now_bye": "Okay! I’ll stick to what I know.",
+      "checking_key": "checking that key",
+      "key_saved": [
+        "Ooh, I can think now! What do you want to do?",
+        "Brain installed. What do you want to do?"
+      ],
+      "key_not_kept": "I can think now, but this browser won’t let me keep the key — private mode, maybe. It’ll last until you close the tab. What do you want to do?",
+      "has_brain": "I have a brain on this device. Ask me anything in the box, or take it back.",
+      "forget": "Forget my brain",
+      "forgotten": "Back to just my script. What do you want to do?",
+      "wrong_key": {
+        "admin": "That’s an Admin key, which can’t send messages. I need one that starts sk-ant-api.",
+        "github": "That’s your GitHub token! Different door. I need an Anthropic key starting sk-ant-api.",
+        "other_provider": "That looks like another provider’s key. I need an Anthropic one starting sk-ant-api.",
+        "not_a_key": "That doesn’t look like a key. It starts with sk-ant-api and is quite long."
+      },
+      "key_check": {
+        "unreachable": "I couldn’t reach Anthropic at all. Check your connection and try again.",
+        "cors": "Your Anthropic account blocks browser requests, so no key will work here.",
+        "no_credit": "The key is fine, but the account has no API credit. Add some at the Anthropic console and try again.",
+        "oauth": "Anthropic won’t take that OAuth token for this. You need a real API key, starting sk-ant-api, from an account with API credit.",
+        "invalid": "Anthropic says that key isn’t valid. Check it was copied whole and hasn’t been revoked.",
+        "forbidden": "That key isn’t allowed to send messages. Check its permissions.",
+        "other": "Anthropic turned that key away ({status}). {message}"
+      },
+      "errors": {
+        "refusal": "I’d rather not go there. Let’s make something instead.",
+        "cors": "Your Anthropic account blocks browser requests, so I can’t think from here. Scripts still work!",
+        "rejected": "Anthropic rejected that key — wrong, revoked, or no credit.",
+        "busy": "Too many questions at once! Give me a minute.",
+        "no_credit": "My thinking account is empty. Top it up at the Anthropic console.",
+        "hiccup": "My brain just hiccuped. Want to do something instead?"
+      }
+    }
+  },
+  "talks": {
+    "_note": "His scripted talks (see ../skills/talks.js for the format). order: the lessons, in the order he suggests them. small: short chats he may start himself, three a visit at most. builder: the pieces the \"Build a prompt with me\" talk puts together.",
+    "order": [
+      "goodPrompt",
+      "builder",
+      "details",
+      "pipeline",
+      "feedback"
+    ],
+    "small": [
+      "day",
+      "before",
+      "magic",
+      "sunny",
+      "snack"
+    ],
+    "builder": {
+      "ideas": {
+        "skills": {
+          "chart": "Interactive skills radar chart",
+          "game": "Guess-my-skill mini game",
+          "story": "Skills growth timeline"
+        },
+        "project": {
+          "chart": "Project impact dashboard",
+          "game": "Fix-the-report puzzle game",
+          "story": "Case study story timeline"
+        },
+        "process": {
+          "chart": "How I work: process flow chart",
+          "game": "Pick-the-next-step BA challenge",
+          "story": "A week in my BA life timeline"
+        }
+      },
+      "audience": {
+        "recruiter": "a recruiter skimming for 30 seconds, so lead with the biggest result",
+        "manager": "a hiring manager who wants depth, so show how I think and decide",
+        "peer": "fellow business analysts, so show the method and the tools"
+      },
+      "vibe": {
+        "playful": "Playful and colorful",
+        "clean": "Clean and professional",
+        "bold": "Bold, high-contrast"
+      },
+      "for": "For {audience}.",
+      "look": "{vibe} look.",
+      "length": {
+        "short": "Takes about 30 seconds to get the point.",
+        "long": "About 2 minutes to explore, with depth for people who dig in."
+      },
+      "cta": "End with a clear “Contact me” button.",
+      "always": "Works great on phones and laptops. Real numbers, no filler text.",
+      "feature_label": "Feature:",
+      "details_label": "Details:"
+    },
+    "scripts": {
+      "goodPrompt": {
+        "menu": "What makes a good prompt",
+        "nodes": [
+          {
+            "say": "Good prompts are short, specific and made for someone. Let me quiz you a little. Ready?",
+            "opts": [
+              {
+                "label": "Ready",
+                "reply": "Yay!"
+              },
+              {
+                "label": "Just tell me",
+                "reply": "Fine, but the quiz is fun."
+              }
+            ]
+          },
+          {
+            "say": "Which feature name works better?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "“Make my site better”",
+                "reply": "Close! But Claude can’t guess what “better” means to you."
+              },
+              {
+                "label": "“Interactive skills radar chart”",
+                "reply": "Exactly! Claude knows what to build.",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "<b>Rule 1: one feature, one job.</b> Claude builds one page per prompt, so a focused idea comes out polished instead of crowded.",
+            "next": "Makes sense"
+          },
+          {
+            "say": "Who should the prototype impress?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Recruiters",
+                "set": {
+                  "audience": "recruiter"
+                },
+                "reply": "Recruiters skim fast. Lead with the big number."
+              },
+              {
+                "label": "Hiring managers",
+                "set": {
+                  "audience": "manager"
+                },
+                "reply": "Hiring managers want to see how you think."
+              },
+              {
+                "label": "Fellow BAs",
+                "set": {
+                  "audience": "peer"
+                },
+                "reply": "Peers love seeing the method and the tools."
+              }
+            ]
+          },
+          {
+            "say": "<b>Rule 2: write for that person.</b> Say who it’s for in Details, and Claude tunes the words and layout for them.",
+            "next": "Got it"
+          },
+          {
+            "say": "Should visitors be able to click or play with it?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Yes! People remember what they touched.",
+                "good": true
+              },
+              {
+                "label": "No",
+                "reply": "Fair. Even a static page should <i>show</i>: visuals, numbers, results."
+              }
+            ]
+          },
+          {
+            "say": "<b>Rule 3: show results, not duties.</b> “Cut 1,000+ reports to about 20” lands harder than “managed reporting”.",
+            "next": "Ooh, nice"
+          },
+          {
+            "say": "Last one. Which detail is strongest?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "“Use nice colors”",
+                "reply": "Nice colors are good, but they don’t tell Claude what matters."
+              },
+              {
+                "label": "“Show my 3 biggest wins as before/after numbers”",
+                "reply": "Perfect. Specific, visual and about results.",
+                "good": true
+              },
+              {
+                "label": "“Make it pop”",
+                "reply": "Ha. Pop how? Claude needs specifics."
+              }
+            ]
+          },
+          {
+            "say": "Recap: <b>one job, a clear audience, real results.</b> You’re ready to write a great one.",
+            "end": [
+              {
+                "label": "Build a prompt with me",
+                "pri": true,
+                "go": "talk:builder"
+              }
+            ]
+          }
+        ]
+      },
+      "builder": {
+        "menu": "Build a prompt with me",
+        "nodes": [
+          {
+            "say": "Let’s build a prototype prompt together. I ask, you tap, and I write it. Takes a minute.",
+            "next": "Let’s go"
+          },
+          {
+            "say": "What should it show off?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Skills",
+                "set": {
+                  "what": "skills"
+                },
+                "reply": "Skills it is."
+              },
+              {
+                "label": "A project",
+                "set": {
+                  "what": "project"
+                },
+                "reply": "A project. Stories sell."
+              },
+              {
+                "label": "How I work",
+                "set": {
+                  "what": "process"
+                },
+                "reply": "Ooh, the process. Underrated."
+              }
+            ]
+          },
+          {
+            "say": "What kind of thing should it be?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "A chart or visual",
+                "set": {
+                  "format": "chart"
+                },
+                "reply": "Visual. Easy to skim."
+              },
+              {
+                "label": "A mini game or quiz",
+                "set": {
+                  "format": "game"
+                },
+                "reply": "A game! My favorite.",
+                "good": true
+              },
+              {
+                "label": "A story or timeline",
+                "set": {
+                  "format": "story"
+                },
+                "reply": "A story. People remember those."
+              }
+            ]
+          },
+          {
+            "say": "Who is it for?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Recruiters",
+                "set": {
+                  "audience": "recruiter"
+                },
+                "reply": "Then we keep it quick."
+              },
+              {
+                "label": "Hiring managers",
+                "set": {
+                  "audience": "manager"
+                },
+                "reply": "Then we add depth."
+              },
+              {
+                "label": "Fellow BAs",
+                "set": {
+                  "audience": "peer"
+                },
+                "reply": "Then we show the method."
+              }
+            ]
+          },
+          {
+            "say": "What vibe?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Playful",
+                "set": {
+                  "vibe": "playful"
+                }
+              },
+              {
+                "label": "Clean and professional",
+                "set": {
+                  "vibe": "clean"
+                }
+              },
+              {
+                "label": "Bold",
+                "set": {
+                  "vibe": "bold"
+                }
+              }
+            ]
+          },
+          {
+            "say": "Should it end with a “Contact me” button?",
+            "opts": [
+              {
+                "label": "Yes",
+                "set": {
+                  "cta": true
+                },
+                "reply": "Smart. Always give them a next step.",
+                "good": true
+              },
+              {
+                "label": "No",
+                "set": {
+                  "cta": false
+                },
+                "reply": "Okay, no button."
+              }
+            ]
+          },
+          {
+            "say": "How long should it take to explore?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "About 30 seconds",
+                "set": {
+                  "length": "short"
+                }
+              },
+              {
+                "label": "About 2 minutes",
+                "set": {
+                  "length": "long"
+                }
+              }
+            ]
+          },
+          {
+            "say_prompt": "Here’s your prompt:",
+            "next": "Love it"
+          },
+          {
+            "say": "I saved it for you. Want me to show you how to launch it? It’s a quick little movie.",
+            "end": [
+              {
+                "label": "Show me how to launch it",
+                "pri": true,
+                "go": "tour:launch",
+                "use_prompt": true
+              },
+              {
+                "label": "Just fill it in",
+                "use_prompt": true,
+                "rest": "Done! It’s in the launch card."
+              },
+              {
+                "label": "Start over",
+                "go": "talk:builder"
+              }
+            ]
+          }
+        ],
+        "go_label": "Build a prompt with me"
+      },
+      "details": {
+        "menu": "What to put in Details",
+        "nodes": [
+          {
+            "say": "<b>Details</b> is the box under Feature. It’s where good prompts become great ones.",
+            "next": "Tell me more"
+          },
+          {
+            "say": "Quick check: is Details required?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Nope, it’s optional. But it really helps."
+              },
+              {
+                "label": "No",
+                "reply": "Right! Optional, but powerful.",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "Think of it as notes for a designer: <b>who it’s for, what must be there, what to avoid.</b>",
+            "next": "Okay"
+          },
+          {
+            "say": "Which one belongs in Details?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "“Mobile friendly, readable in 30 seconds”",
+                "reply": "Yes! Clear and checkable.",
+                "good": true
+              },
+              {
+                "label": "“pls”",
+                "reply": "Polite, but Claude needs more to go on."
+              },
+              {
+                "label": "“Do the thing from before”",
+                "reply": "Claude can’t see “before”. Only what’s in the box."
+              }
+            ]
+          },
+          {
+            "say": "Name the real stuff: <b>tools, numbers, project names.</b> Claude can’t read your mind, only the box.",
+            "next": "Makes sense"
+          },
+          {
+            "say": "Should you paste your whole résumé in?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Too much! Pick the 2 or 3 facts this feature needs."
+              },
+              {
+                "label": "No",
+                "reply": "Right. Pick the 2 or 3 facts this feature needs.",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "Say what to avoid too: “no stock photos”, “keep it to one screen”, “no jargon”.",
+            "next": "Good tip"
+          },
+          {
+            "say": "How much fits in Details?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "About 60 characters",
+                "reply": "More than that! About 600."
+              },
+              {
+                "label": "About 600 characters",
+                "reply": "Yep, about 600. A short paragraph.",
+                "good": true
+              },
+              {
+                "label": "Unlimited",
+                "reply": "It stops at about 600. Short and sharp is better anyway."
+              }
+            ]
+          },
+          {
+            "say": "Recap: <b>who, must-haves, avoid, real facts.</b> That’s a great Details box.",
+            "end": []
+          }
+        ]
+      },
+      "pipeline": {
+        "menu": "How launching works",
+        "nodes": [
+          {
+            "say": "Want to know what happens after you click Launch? It’s a little relay race.",
+            "next": "Tell me"
+          },
+          {
+            "say": "<b>Leg 1:</b> the dashboard asks GitHub to run the launcher, using your token.",
+            "next": "Next"
+          },
+          {
+            "say": "Where is your token saved?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "In the repo",
+                "reply": "Never! It stays out of the code."
+              },
+              {
+                "label": "On this device only",
+                "reply": "Right. Only this browser has it.",
+                "good": true
+              },
+              {
+                "label": "Emailed to Phill",
+                "reply": "Nope! It never leaves this browser except to talk to GitHub."
+              }
+            ]
+          },
+          {
+            "say": "<b>Leg 2:</b> the launcher hands your prompt to Claude, and the tracker ticks <b>Claude received the prompt</b>.",
+            "next": "Next"
+          },
+          {
+            "say": "<b>Leg 3:</b> Claude builds the page and publishes it to staging. Usually 5 to 15 minutes.",
+            "next": "Next"
+          },
+          {
+            "say": "Do you know what staging is?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Nice. Then you know it’s safe to experiment.",
+                "good": true
+              },
+              {
+                "label": "No",
+                "reply": "It’s a practice copy of Phill’s site. Try anything, the real site doesn’t change."
+              }
+            ]
+          },
+          {
+            "say": "<b>Leg 4:</b> it lands in the labs bank under <b>Prototypes</b>, stamped with when it was created.",
+            "next": "Cool"
+          },
+          {
+            "say": "If it’s taking a while, should you launch it again?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Hold on! The tracker keeps checking for you, and tells you if it fails."
+              },
+              {
+                "label": "No",
+                "reply": "Right. Patience. The tracker keeps checking for you.",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "That’s the race: <b>dashboard, GitHub, Claude, staging, labs bank.</b>",
+            "end": []
+          }
+        ]
+      },
+      "feedback": {
+        "menu": "Testing what you built",
+        "nodes": [
+          {
+            "say": "Once it’s live comes the fun part: trying it out.",
+            "next": "Okay"
+          },
+          {
+            "say": "Click it in the labs bank and it opens in the <b>Staging site</b> preview, right on the dashboard.",
+            "next": "Next"
+          },
+          {
+            "say": "Recruiters mostly look at portfolios on…",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Phones",
+                "reply": "Lots do, but not all."
+              },
+              {
+                "label": "Laptops",
+                "reply": "Lots do, but not all."
+              },
+              {
+                "label": "Both",
+                "reply": "Both! So check both.",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "Use <b>Fit</b> for this screen’s size and <b>Desktop</b> for the laptop view.",
+            "next": "Next"
+          },
+          {
+            "say": "Something’s off. What’s the best next prompt?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "“Fix it”",
+                "reply": "Fix what? Claude needs to know."
+              },
+              {
+                "label": "“Skills radar: bigger labels, add a contact button”",
+                "reply": "Yes! Name it, then name the change.",
+                "good": true
+              },
+              {
+                "label": "Launch the same prompt again",
+                "reply": "Same prompt, similar result. Say what to change."
+              }
+            ]
+          },
+          {
+            "say": "Small, specific tweaks win. One change list per prompt.",
+            "next": "Got it"
+          },
+          {
+            "say": "Should you show it to a friend before sharing it?",
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Love it. Fresh eyes catch the confusing bits.",
+                "good": true
+              },
+              {
+                "label": "No",
+                "reply": "Even a 10-second “what is this?” test helps. Try it!"
+              }
+            ]
+          },
+          {
+            "say": "Ask them three things: <b>What is it? What’s the best part? What would you click next?</b>",
+            "next": "Great questions"
+          },
+          {
+            "say": "Try, test, tweak. That’s how good prototypes become great ones.",
+            "end": [
+              {
+                "label": "Show me the labs bank",
+                "pri": true,
+                "go": "tour:labs"
+              }
+            ]
+          }
+        ]
+      },
+      "day": {
+        "teaser": "Hey! How’s your day going?",
+        "nodes": [
+          {
+            "say": "How’s your day going?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Great",
+                "set": {
+                  "mood": "great"
+                },
+                "reply": "Love that!",
+                "good": true
+              },
+              {
+                "label": "Okay",
+                "set": {
+                  "mood": "okay"
+                },
+                "reply": "Okay is good. Let’s make it better."
+              },
+              {
+                "label": "Rough",
+                "set": {
+                  "mood": "rough"
+                },
+                "reply": "Sorry. Want a tiny win? Building something helps."
+              }
+            ]
+          },
+          {
+            "say": "Want to make something?",
+            "end": [
+              {
+                "label": "Build a prompt with me",
+                "pri": true,
+                "go": "talk:builder"
+              }
+            ]
+          }
+        ]
+      },
+      "before": {
+        "teaser": "Can I ask you something?",
+        "nodes": [
+          {
+            "say": "Have you launched a prototype before?",
+            "opts": [
+              {
+                "label": "Yes",
+                "set": {
+                  "launchedBefore": true
+                },
+                "reply": "A pro! Want tips to make the next one even better?"
+              },
+              {
+                "label": "No",
+                "set": {
+                  "launchedBefore": false
+                },
+                "reply": "Then I have a little movie for you."
+              }
+            ]
+          },
+          {
+            "say": "What sounds good?",
+            "end": [
+              {
+                "label": "Talk: what to put in Details",
+                "pri": true,
+                "go": "talk:details",
+                "if_mem": "launchedBefore"
+              },
+              {
+                "label": "Show me how to launch",
+                "pri": true,
+                "go": "tour:launch",
+                "unless_mem": "launchedBefore"
+              }
+            ]
+          }
+        ],
+        "skip_if_mem": "launchedBefore"
+      },
+      "sunny": {
+        "teaser": "Psst. Quick weather question.",
+        "nodes": [
+          {
+            "say": "Is it sunny where you are?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Yes",
+                "reply": "Lucky! I’m a cat, I love a sunbeam."
+              },
+              {
+                "label": "No",
+                "reply": "Aw. Let’s check the forecast."
+              },
+              {
+                "label": "Not sure",
+                "reply": "I can show you!"
+              }
+            ]
+          },
+          {
+            "say": "The weather card has the whole forecast.",
+            "end": [
+              {
+                "label": "Show me the weather",
+                "pri": true,
+                "go": "tour:weather"
+              }
+            ]
+          }
+        ]
+      },
+      "magic": {
+        "teaser": "I have a fun question for you.",
+        "nodes": [
+          {
+            "say": "If Phill’s portfolio could do one magic trick, what would it be?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Show skills as a chart",
+                "set": {
+                  "what": "skills",
+                  "format": "chart"
+                },
+                "reply": "Charts are magic for skimmers."
+              },
+              {
+                "label": "Be a mini game",
+                "set": {
+                  "what": "project",
+                  "format": "game"
+                },
+                "reply": "A game! Recruiters would remember that.",
+                "good": true
+              },
+              {
+                "label": "Tell his story",
+                "set": {
+                  "what": "process",
+                  "format": "story"
+                },
+                "reply": "Stories stick."
+              }
+            ]
+          },
+          {
+            "say": "That could be a real prototype. Want to build the prompt?",
+            "end": [
+              {
+                "label": "Yes, build it with me",
+                "pri": true,
+                "go": "talk:builder"
+              }
+            ]
+          }
+        ]
+      },
+      "snack": {
+        "teaser": "Very important question…",
+        "nodes": [
+          {
+            "say": "Coffee, tea, or catnip?",
+            "abc": true,
+            "opts": [
+              {
+                "label": "Coffee",
+                "reply": "Fuel for big ideas."
+              },
+              {
+                "label": "Tea",
+                "reply": "Calm and focused. Nice."
+              },
+              {
+                "label": "Catnip",
+                "reply": "A cat of culture!",
+                "good": true
+              }
+            ]
+          },
+          {
+            "say": "Now that we’re refreshed…",
+            "end": []
+          }
+        ]
+      }
+    }
+  }
+}

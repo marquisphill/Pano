@@ -175,7 +175,7 @@
     {
       "id": "resume-versions",
       "category": "this-site",
-      "title": "Five versions of the résumé",
+      "title": "The résumé",
       "triggers": [
         "resume",
         "cv",
@@ -184,16 +184,16 @@
         "which resume"
       ],
       "script": [
-        "There are <b>five versions</b> of Phill's résumé, each built for a different role.",
-        "Product Owner, Senior Business Analyst, Digital Product Manager, Ecommerce & Digital Transformation, plus the full 2026 version.",
-        "Pick the one closest to the job you're hiring for. I can open them for you."
+        "Phill keeps <b>one résumé</b>: two pages, the latest version.",
+        "Open <b>Résumé.pdf</b> on the desktop to read it right there. <b>Download</b> saves a copy.",
+        "Or feed it to me. I'm not picky."
       ],
       "follow_ups": [
         "contact-him",
         "four-numbers"
       ],
       "show": "tour:resume",
-      "source": "index.html PDFS"
+      "source": "index.html RESUME"
     },
     {
       "id": "contact-him",
@@ -259,7 +259,7 @@
           }
         },
         {
-          "say": "Five versions, each built for a different role. <b>Preview</b> opens one, <b>Download</b> saves it.",
+          "say": "Here it is. Scroll to read it. <b>Download</b> saves a copy, or you can feed it to me.",
           "target": {
             "css": "#layer .rlist"
           },
@@ -498,22 +498,34 @@
       "label": "See the hackathon win",
       "steps": [
         {
-          "say": "The hackathon is filed under <b>Projects</b>. Click the folder.",
+          "say": "The hackathon is filed under <b>AI Lab</b>. Click the folder.",
           "target": {
-            "icon": "folder:projects"
+            "icon": "folder:ailab"
           },
           "done": {
-            "explorer": "projects"
+            "explorer": "ailab"
           },
           "act": {
-            "open": "folder:projects"
+            "open": "folder:ailab"
           }
         },
         {
-          "say": "Open <b>Hackathon photos</b>. There are five.",
+          "say": "Open <b>Hackathon app</b>.",
           "target": {
-            "file": "Hackathon photos",
-            "in": "projects"
+            "file": "Hackathon app",
+            "in": "ailab"
+          },
+          "done": {
+            "window": "doc:hackathon"
+          },
+          "act": {
+            "open": "doc:hackathon"
+          }
+        },
+        {
+          "say": "That's the team, chipmunk edition. Click <b>See the photos</b>. There are five.",
+          "target": {
+            "css": "#layer .hbtn[data-open=\"photo:0\"]"
           },
           "done": {
             "window": "photos"
