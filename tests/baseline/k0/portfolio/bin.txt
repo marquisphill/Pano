@@ -1,0 +1,20 @@
+desk 1 held over bin talk dragging wary | bin: dicon binhot
+desk 2 spat out {'cls': 'talk meh', 'x': 214, 'y': 24, 'say': None}
+desk 3 licking + line {'cls': 'meh lick', 'x': 214, 'y': 24, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+desk 4 after lick {'cls': '', 'x': 214, 'y': 24, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+desk 5 later {'cls': 'head', 'x': 568, 'y': 6, 'say': None}
+desk 6 head dropped on bin {'cls': 'meh lick', 'x': 214, 'y': 24, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+desk 7 tapped mid-sulk  
+desk 8 dropped elsewhere calm None
+desk 9 over covered bin dragging
+desk 9 dropped None
+desk errors []
+phone 1 held over bin talk dragging wary | bin: dicon binhot
+phone 2 spat out {'cls': 'talk meh', 'x': 320, 'y': 671, 'say': None}
+phone 3 licking + line {'cls': 'meh lick', 'x': 320, 'y': 671, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+phone 4 after lick {'cls': '', 'x': 320, 'y': 671, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+phone 5 later {'cls': 'head', 'x': 135, 'y': 6, 'say': None}
+phone 6 head dropped on bin {'cls': 'meh lick', 'x': 320, 'y': 671, 'say': 'Phill’s cat How dare you try to recycle me, human.'}
+phone 7 tapped mid-sulk  
+phone 8 dropped elsewhere calm None
+phone errors []

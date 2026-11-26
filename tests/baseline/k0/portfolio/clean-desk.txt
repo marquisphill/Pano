@@ -1,0 +1,8 @@
+desk windows open: 4
+desk bubble: Phill’s cat
+You have a lot of windows open. Can I clean them up?
+desk focused: Skills – Control Panel
+desk left: ['Experience', 'Résumé.pdf – Choose a version', 'Contact – Phill', 'Skills – Control Panel'] | tasks: 4
+desk bubble after: All organized! Click any title bar to bring that window forward.
+desk asks again: False
+desk errors: []

@@ -1,0 +1,6 @@
+phone {"cards": ["launch", "prototypes", "preview"], "launchOff": true, "tokenFieldEmpty": true, "noSideScroll": true, "launchRefused": true, "onlyDevKeysWritten": true, "noGithubOrClaudeCalls": true}
+phone errors []
+fold {"cards": ["launch", "prototypes", "preview"], "launchOff": true, "tokenFieldEmpty": true, "noSideScroll": true, "launchRefused": true, "onlyDevKeysWritten": true, "noGithubOrClaudeCalls": true}
+fold errors []
+desk {"cards": ["launch", "prototypes", "preview"], "launchOff": true, "tokenFieldEmpty": true, "noSideScroll": true, "launchRefused": true, "onlyDevKeysWritten": true, "noGithubOrClaudeCalls": true}
+desk errors []

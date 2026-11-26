@@ -1,0 +1,37 @@
+phone View his résumé step1 [92, 78] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 2
+His résumé is right here on the desktop. Tap Rés
+phone View his résumé step2 [388, 633] ['win:Résumé.pdf – Choos', 'win:Résumé.pdf – Choos', 'win:Résumé.pdf – Choos', 'win:Résumé.pdf – Choos', 'win:Résumé.pdf – Choos'] Step 2 of 2
+Here it is. Scroll to read it. Download saves a 
+phone View his résumé end@2 Phill’s cat
+Done! What would you like to do next?
+phone Read his history step1 [92, 78] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+Ten years of history are filed in Experience. Ta
+phone Read his history step2 [120, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Newest first. This is where he is now. Tap a fil
+phone Read his history step3 [388, 675] ['win:MarineMax – YachtI', 'win:MarineMax – YachtI', 'win:MarineMax – YachtI', 'win:MarineMax – YachtI', 'win:MarineMax – YachtI'] Step 3 of 3
+Scroll to read. The buttons at the bottom lead t
+phone Read his history end@3 Phill’s cat
+Done! What would you like to do next?
+phone See what he built step1 [92, 78] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+The case studies live in Projects. Tap the folde
+phone See what he built step2 [120, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Start with this one: 1,000+ legacy reports cut t
+phone See what he built step3 [388, 675] ['win:Report Consolidati', 'win:Report Consolidati', 'win:Report Consolidati', 'win:Report Consolidati', 'win:Report Consolidati'] Step 3 of 3
+The diagram shows how it worked. Tap any step to
+phone See what he built end@3 Phill’s cat
+Done! What would you like to do next?
+phone Explore his skills step1 [92, 78] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+Open Skills to see what he can do.
+phone Explore his skills step2 [360, 669] ['win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P'] Step 2 of 3
+Six areas, and that’s me in every picture. Pick 
+phone Explore his skills step3 [264, 40] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+Red tags are the key things he does. Use Next to
+phone Explore his skills end@3 Phill’s cat
+Done! What would you like to do next?
+phone Get in touch step1 [92, 78] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 2
+Want to reach Phill? Tap Contact.
+phone Get in touch step2 [109, 28] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 2
+Email is the fastest way. This button starts one
+phone Get in touch end@2 Phill’s cat
+Done! What would you like to do next?
+phone errors []

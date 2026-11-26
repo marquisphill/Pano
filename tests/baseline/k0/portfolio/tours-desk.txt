@@ -1,0 +1,37 @@
+desk View his résumé step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 2
+His résumé is right here on the desktop. Click R
+desk View his résumé step2 [622, 376] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 2
+Here it is. Scroll to read it. Download saves a 
+desk View his résumé end@2 Phill’s cat
+Done! What would you like to do next?
+desk Read his history step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+Ten years of history are filed in Experience. Cl
+desk Read his history step2 [116, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Newest first. This is where he is now. Double-cl
+desk Read his history step3 [682, 551] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+Scroll to read. The buttons at the bottom lead t
+desk Read his history end@3 Phill’s cat
+Done! What would you like to do next?
+desk See what he built step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+The case studies live in Projects. Click the fol
+desk See what he built step2 [116, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Start with this one: 1,000+ legacy reports cut t
+desk See what he built step3 [962, 651] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+The diagram shows how it worked. Click any step 
+desk See what he built end@3 Phill’s cat
+Done! What would you like to do next?
+desk Explore his skills step1 None None None
+desk Explore his skills click-race ElementHandle.click: Element is not atta
+desk Explore his skills step2 [926, 517] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Six areas, and that’s me in every picture. Pick 
+desk Explore his skills step3 [264, 40] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+Red tags are the key things he does. Use Next to
+desk Explore his skills end@3 Phill’s cat
+Done! What would you like to do next?
+desk Get in touch step1 None None None
+desk Get in touch click-race ElementHandle.click: Element is not atta
+desk Get in touch step2 [109, 28] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 2
+Email is the fastest way. This button starts one
+desk Get in touch end@2 Phill’s cat
+Done! What would you like to do next?
+desk errors []

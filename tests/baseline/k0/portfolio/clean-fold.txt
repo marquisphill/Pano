@@ -1,0 +1,54 @@
+Traceback (most recent call last):
+  File "clean.py", line 14, in <module>
+    (ic.dblclick() if W>640 else pg.evaluate("k=>document.querySelector(`.dicon[data-open=\"${k}\"]`).click()",k)); pg.wait_for_timeout(900)
+     ~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/playwright/sync_api/_generated.py", line 2438, in dblclick
+    self._sync(
+    ~~~~~~~~~~^
+        self._impl_obj.dblclick(
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        )
+        ^
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/playwright/_impl/_element_handle.py", line 161, in dblclick
+    await self._channel.send(
+        "dblclick", self._frame._timeout, locals_to_params(locals())
+    )
+  File "/usr/local/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: ElementHandle.dblclick: Timeout 30000ms exceeded.
+Call log:
+  - attempting dblclick action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <nav class="side" aria-label="Folders">…</nav> from <div id="layer">…</div> subtree intercepts pointer events
+    - retrying dblclick action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <nav class="side" aria-label="Folders">…</nav> from <div id="layer">…</div> subtree intercepts pointer events
+    - retrying dblclick action
+      - waiting 100ms
+    54 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <nav class="side" aria-label="Folders">…</nav> from <div id="layer">…</div> subtree intercepts pointer events
+     - retrying dblclick action
+       - waiting 500ms
+

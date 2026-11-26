@@ -1,0 +1,9 @@
+desk brdskill {'title': 'BRD Knowledgebase Pipeline.docx – Reader', 'sheet': True, 'w': 980, 'flowDir': 'row', 'pageW': 900, 'hscroll': 0} step b3 in view True
+desk reports {'title': 'Report Consolidation Pipeline.docx – Reader', 'sheet': True, 'w': 980, 'flowDir': 'row', 'pageW': 900, 'hscroll': 0} step r3 in view True
+desk errors []
+fold brdskill {'title': 'BRD Knowledgebase Pipeline.docx – Reader', 'sheet': True, 'w': 827, 'flowDir': 'row', 'pageW': 773, 'hscroll': 0} step b3 in view True
+fold reports {'title': 'Report Consolidation Pipeline.docx – Reader', 'sheet': True, 'w': 827, 'flowDir': 'row', 'pageW': 773, 'hscroll': 0} step r3 in view True
+fold errors []
+phone brdskill {'title': 'BRD Knowledgebase Pipeline.docx – Reader', 'sheet': True, 'w': 390, 'flowDir': 'column', 'pageW': 372, 'hscroll': 0} step b3 in view True
+phone reports {'title': 'Report Consolidation Pipeline.docx – Reader', 'sheet': True, 'w': 390, 'flowDir': 'column', 'pageW': 372, 'hscroll': 0} step r3 in view True
+phone errors []

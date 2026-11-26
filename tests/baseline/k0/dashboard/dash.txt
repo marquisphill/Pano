@@ -1,0 +1,247 @@
+site Dashboard-DEV
+files 1 the page no longer carries his body, engine or chat True
+files 2 the page carries none of his lines True []
+files 3 his engine and skills carry none of his lines True []
+files 4 every line the engine and these skills ask for is in the brain True []
+files 5 the three new skills are their own files and say what they need True
+files 6 every tour and talk the menu or a button names exists True
+files 7 the page adapter has one line for each skill True
+files 8 every name the page saves under starts with dev- True
+phone 1 his files came from /Pano/latest/ True []
+phone 2 tours, background, talks, topics and chat are on; windows and bin are off True
+phone 3 he says hello with the line in the brain True
+phone 4 his menu is tours, background, talk, ask, brain, leave True 
+phone 5 he and his bubble are on screen True
+phone 6 the ask box is showing and the key box is not True
+phone 7 his bubble wears the page colors True
+phone 8 no sideways scroll True
+phone 9 only dev- names are saved True [['pd-pano-key', 'pd-gh-token', 'dev-pd-preview', 'dev-pd-proto-requests-v2'], ['dev-pd-pano-greeted', '__t']]
+phone 10 the real key and token are ignored, and nothing was sent to GitHub or Claude True
+phone errors []
+fold 1 his files came from /Pano/latest/ True []
+fold 2 tours, background, talks, topics and chat are on; windows and bin are off True
+fold 3 he says hello with the line in the brain True
+fold 4 his menu is tours, background, talk, ask, brain, leave True 
+fold 5 he and his bubble are on screen True
+fold 6 the ask box is showing and the key box is not True
+fold 7 his bubble wears the page colors True
+fold 8 no sideways scroll True
+fold 9 only dev- names are saved True [['pd-pano-key', 'pd-gh-token', 'dev-pd-preview', 'dev-pd-proto-requests-v2'], ['dev-pd-pano-greeted', '__t']]
+fold 10 the real key and token are ignored, and nothing was sent to GitHub or Claude True
+fold errors []
+desk 1 his files came from /Pano/latest/ True []
+desk 2 tours, background, talks, topics and chat are on; windows and bin are off True
+desk 3 he says hello with the line in the brain True
+desk 4 his menu is tours, background, talk, ask, brain, leave True 
+desk 5 he and his bubble are on screen True
+desk 6 the ask box is showing and the key box is not True
+desk 7 his bubble wears the page colors True
+desk 8 no sideways scroll True
+desk 9 only dev- names are saved True [['pd-pano-key', 'pd-gh-token', 'dev-pd-preview', 'dev-pd-proto-requests-v2'], ['dev-pd-pano-greeted', '__t']]
+desk 10 the real key and token are ignored, and nothing was sent to GitHub or Claude True
+desk errors []
+phone head 1 left alone he tucks away to a head at the top middle True 10.8
+phone head 2 the head can be dragged, and dragging does not open his menu True
+phone head 3 after a reload he is still a head, under this site's own name True
+phone head 4 tapping the head brings him back with his menu True
+phone head errors []
+desk head 1 left alone he tucks away to a head at the top middle True 11.0
+desk head 2 the head can be dragged, and dragging does not open his menu True
+desk head 3 after a reload he is still a head, under this site's own name True
+desk head 4 tapping the head brings him back with his menu True
+desk head 5 the whole cat can be dragged and his bubble follows True
+desk head errors []
+phone wall 1 he offers this page's three backgrounds True
+phone wall 2 then asks about colorblindness True
+phone wall 3 the new background is on and saved True
+phone wall 4 he offers the four colorblind modes True
+phone wall 5 the mode is applied to the whole page and saved True
+phone wall 6 and he passes on Phill's note True
+phone wall 7 both are still there after a reload True
+phone wall errors []
+desk wall 1 he offers this page's three backgrounds True
+desk wall 2 then asks about colorblindness True
+desk wall 3 the new background is on and saved True
+desk wall 4 he offers the four colorblind modes True
+desk wall 5 the mode is applied to the whole page and saved True
+desk wall 6 and he passes on Phill's note True
+desk wall 7 both are still there after a reload True
+desk wall errors []
+phone tour 1 weather, card not loaded: two steps True [(1, 2), (2, 2)]
+phone tour 2 he wraps up and counts what was watched True
+phone tour 3 the watched tour is ticked in his menu True
+phone tour 4 weather, card loaded: he reads the place and the temperature off the page True Check the weather · 1 of 5
+This is the weather for Fort Lauderdale. Right now it’s 81° and
+phone tour 5 what he points at is on screen, ringed, and not under his bubble True {'in': True, 'ring': True, 'clear': True}
+phone tour 6 the ask box is put away during a tour True
+phone tour 7 it runs all five steps True [(1, 5), (2, 5), (3, 5), (4, 5), (5, 5)]
+phone weather errors []
+phone tour 8 labs: six steps when the list has prototypes True Explore the labs bank · 1 of 6
+This is the labs bank: every 
+phone tour 9 he names the newest prototype True
+phone tour 10 opening it in the preview counts as done, and he moves to step 3 True
+phone tour 11 it runs to the end True [(3, 6), (4, 6), (5, 6), (6, 6)]
+phone labs errors []
+phone tour 12 launch with no token starts at the gear, six steps True
+phone tour 13 opening the settings moves him to the token box True
+phone tour 14 Stop ends it with his goodbye True
+phone launch no token errors []
+phone tour 15 launch with a token: four steps, starting at Feature True
+phone tour 16 Next waits until a feature is typed True
+phone tour 17 then Details, which can be skipped True
+phone tour 18 the Launch step repeats what was typed, safely True
+phone tour 19 Launch is off on DEV: the form refuses and nothing is sent to GitHub True
+phone launch errors []
+fold tour 1 weather, card not loaded: two steps True [(1, 2), (2, 2)]
+fold tour 2 he wraps up and counts what was watched True
+fold tour 3 the watched tour is ticked in his menu True
+fold tour 4 weather, card loaded: he reads the place and the temperature off the page True Check the weather · 1 of 5
+This is the weather for Fort Lauderdale. Right now it’s 81° and
+fold tour 5 what he points at is on screen, ringed, and not under his bubble True {'in': True, 'ring': True, 'clear': True}
+fold tour 6 the ask box is put away during a tour True
+fold tour 7 it runs all five steps True [(1, 5), (2, 5), (3, 5), (4, 5), (5, 5)]
+fold weather errors []
+fold tour 8 labs: six steps when the list has prototypes True Explore the labs bank · 1 of 6
+This is the labs bank: every 
+fold tour 9 he names the newest prototype True
+fold tour 10 opening it in the preview counts as done, and he moves to step 3 True
+fold tour 11 it runs to the end True [(3, 6), (4, 6), (5, 6), (6, 6)]
+fold labs errors []
+fold tour 12 launch with no token starts at the gear, six steps True
+fold tour 13 opening the settings moves him to the token box True
+fold tour 14 Stop ends it with his goodbye True
+fold launch no token errors []
+fold tour 15 launch with a token: four steps, starting at Feature True
+fold tour 16 Next waits until a feature is typed True
+fold tour 17 then Details, which can be skipped True
+fold tour 18 the Launch step repeats what was typed, safely True
+fold tour 19 Launch is off on DEV: the form refuses and nothing is sent to GitHub True
+fold launch errors []
+desk tour 1 weather, card not loaded: two steps True [(1, 2), (2, 2)]
+desk tour 2 he wraps up and counts what was watched True
+desk tour 3 the watched tour is ticked in his menu True
+desk tour 4 weather, card loaded: he reads the place and the temperature off the page True Check the weather · 1 of 5
+This is the weather for Fort Lauderdale. Right now it’s 81° and
+desk tour 5 what he points at is on screen, ringed, and not under his bubble True {'in': True, 'ring': True, 'clear': True}
+desk tour 6 the ask box is put away during a tour True
+desk tour 7 it runs all five steps True [(1, 5), (2, 5), (3, 5), (4, 5), (5, 5)]
+desk weather errors []
+desk tour 8 labs: six steps when the list has prototypes True Explore the labs bank · 1 of 6
+This is the labs bank: every 
+desk tour 9 he names the newest prototype True
+desk tour 10 opening it in the preview counts as done, and he moves to step 3 True
+desk tour 11 it runs to the end True [(3, 6), (4, 6), (5, 6), (6, 6)]
+desk labs errors []
+desk tour 12 launch with no token starts at the gear, six steps True
+desk tour 13 opening the settings moves him to the token box True
+desk tour 14 Stop ends it with his goodbye True
+desk launch no token errors []
+desk tour 15 launch with a token: four steps, starting at Feature True
+desk tour 16 Next waits until a feature is typed True
+desk tour 17 then Details, which can be skipped True
+desk tour 18 the Launch step repeats what was typed, safely True
+desk tour 19 Launch is off on DEV: the form refuses and nothing is sent to GitHub True
+desk launch errors []
+phone talk 1 "Talk to Paño" lists the five lessons True
+phone talk 2 the prompt builder starts True
+phone talk 3 after six taps he has written a prompt from the answers True
+phone talk 4 the last bubble offers to launch it, fill it in, or start over True
+phone talk 5 "Just fill it in" puts the prompt in the launch card True
+phone talk 6 he remembers the prompt and that this talk was heard True
+phone talk 7 the heard talk is ticked True
+phone talk 8 answers are lettered and his reply comes first in the next bubble True
+phone talk 9 he can start a little chat of his own True
+phone talks errors []
+desk talk 1 "Talk to Paño" lists the five lessons True
+desk talk 2 the prompt builder starts True
+desk talk 3 after six taps he has written a prompt from the answers True
+desk talk 4 the last bubble offers to launch it, fill it in, or start over True
+desk talk 5 "Just fill it in" puts the prompt in the launch card True
+desk talk 6 he remembers the prompt and that this talk was heard True
+desk talk 7 the heard talk is ticked True
+desk talk 8 answers are lettered and his reply comes first in the next bubble True
+desk talk 9 he can start a little chat of his own True
+desk talks errors []
+phone topic 1 "Ask about Phill" lists his stories from the brain True
+phone topic 2 a story is told a bubble at a time True
+phone topic 3 it ends with where to see it and what to hear next True
+phone topic 4 "See it on the portfolio" opens that part of the staging site in the preview card True
+phone topic 5 a typed question that matches a story is answered from the brain, with no call to Claude True
+phone topics errors []
+desk topic 1 "Ask about Phill" lists his stories from the brain True
+desk topic 2 a story is told a bubble at a time True
+desk topic 3 it ends with where to see it and what to hear next True
+desk topic 4 "See it on the portfolio" opens that part of the staging site in the preview card True
+desk topic 5 a typed question that matches a story is answered from the brain, with no call to Claude True
+desk topics errors []
+phone chat 1 a quick reply comes from his script True
+phone chat 2 with no key he says he does not know, and offers to be given a brain True
+phone chat 3 he asks for a key: the key box shows and the ask box is put away True
+phone chat 4 a GitHub token is turned away before anything is sent True
+phone chat 5 a key Anthropic rejects is not saved True
+phone chat 6 a key that checks out is saved on this device under this copy's own name only True
+phone chat 7 a question he cannot place goes to Claude with the visitor's key True
+phone chat 8 the request is the one in the brain: model, effort, a JSON reply True
+phone chat 9 Claude is told who he is, what he knows, and where an answer may send you True
+phone chat 10 no key or token is written into what Claude is sent True
+phone chat 11 he says the reply and offers where it points True
+phone chat 12 that button starts the tour True
+phone chat 13 the next question carries the last exchange True
+phone chat 14 a refusal is handled in his own words True
+phone chat 15 a reply that is not JSON is still said True
+phone chat 16 too many requests: he asks for a minute True
+phone chat 17 a key that stops working is forgotten and he asks again True
+phone chat 18 every request went to api.anthropic.com and nowhere else True
+phone chat errors []
+desk chat 1 a quick reply comes from his script True
+desk chat 2 with no key he says he does not know, and offers to be given a brain True
+desk chat 3 he asks for a key: the key box shows and the ask box is put away True
+desk chat 4 a GitHub token is turned away before anything is sent True
+desk chat 5 a key Anthropic rejects is not saved True
+desk chat 6 a key that checks out is saved on this device under this copy's own name only True
+desk chat 7 a question he cannot place goes to Claude with the visitor's key True
+desk chat 8 the request is the one in the brain: model, effort, a JSON reply True
+desk chat 9 Claude is told who he is, what he knows, and where an answer may send you True
+desk chat 10 no key or token is written into what Claude is sent True
+desk chat 11 he says the reply and offers where it points True
+desk chat 12 that button starts the tour True
+desk chat 13 the next question carries the last exchange True
+desk chat 14 a refusal is handled in his own words True
+desk chat 15 a reply that is not JSON is still said True
+desk chat 16 too many requests: he asks for a minute True
+desk chat 17 a key that stops working is forgotten and he asks again True
+desk chat 18 every request went to api.anthropic.com and nowhere else True
+desk chat errors []
+key 1 with a saved key his menu says so True
+key 2 the ask box stays while he explains True
+key 3 "Forget my brain" removes the key True
+key errors []
+idle 1 with his menu left open he waits about 20s True 20.8
+idle errors []
+idle 2 he never walks off while the visitor is typing to him True
+idle typing errors []
+no chat 1 without the chat entry there is no ask box, no key box and no brain button True
+no chat 2 and the chat file is never fetched True
+no chat errors []
+no talks 1 no "Talk to Paño", and his hello falls back to the plain line True
+no talks 2 a tour still wraps up True
+no talks errors []
+no topics 1 no "Ask about Phill" True
+no topics 2 and a typed question about the cats gets the honest "I don't know" True
+no topics errors []
+no background 1 no background button True
+no background errors []
+no tours 1 without the page's readers he offers none of these tours True
+no tours errors []
+nopano 1 no cat, and the cards are all there True
+nopano errors []
+nobrain 1 without his brain he stays hidden True
+nobrain errors []
+later meet-dashboard phone steps shown 5 of 5 | finished True | errors []
+later meet-dashboard desk steps shown 5 of 5 | finished True | errors []
+later clock phone steps shown 2 of 2 | finished True | errors []
+later clock desk steps shown 2 of 2 | finished True | errors []
+later prototypes phone steps shown 3 of 3 | finished True | errors []
+later prototypes desk steps shown 3 of 3 | finished True | errors []
+later preview phone steps shown 3 of 3 | finished True | errors []
+later preview desk steps shown 3 of 3 | finished True | errors []

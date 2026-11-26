@@ -137,4 +137,10 @@ Added during the build:
 
 Update this at the end of every phase: date, what was done, decisions, anything left open.
 
-- **2026-11-26. K0 started.** Branch `claude/pano-kit-builder-othul3` (from `main` at `01978af`). This file and `CLAUDE.md` written.
+- **2026-11-26. K0 done.**
+  - **Branch** `claude/pano-kit-builder-othul3`, from `main` at `01978af`. Push access to `Pano` works. Nothing merged into `main`.
+  - **Written:** this file, `CLAUDE.md` (what every session must do), and a link to this file in `README.md`.
+  - **Found:** the live sites are on `v2/`, not `v1/` as the kickoff prompt said. Both folders stay frozen, and the kit's release becomes `v3/` (added under Decisions). Both DEV repos still exist and load `latest/`.
+  - **Baseline**, saved in `tests/baseline/k0/` (its README explains each line). Local copies of `Portfolio-DEV` (`06df063`) and `Dashboard-DEV` (`7fb4c14`) served with a frozen copy of `01978af`. Dashboard: `dash.py` 205 of 205, `devdash.py` all True, no page errors. Portfolio: `lifted` 20 of 20, `skills` 29 of 29, and the rest matches the known quirks in `tests/README.md` (the `clean-fold` timeout, `sweep`'s blocked outside addresses). One expected miss: `brain.py`'s `later hackathon-photos` stops at step 3 of 4, because `v2` moved that tour to the portfolio's new layout and `Portfolio-DEV`'s page still has the old one. It is not offered in his menu.
+  - **For K1, from a first look at the code:** the engine and the four early skills read about 40 lines (`menu.*`, `tour.*`, `background.*`, `cleanup.*`, `bin.refuse`, `labels.*`, `touch.swaps`, `name`, `hello`); `base.json` needs each of them. His colors are 6 values in `MARKUP` (fur `#ff4d4f`, darker fur `#c93436` and `#b92c2e`, mouth `#3a0608`, tongue `#ff8a8c`, eyes `#07100b`) plus the wavy whiskers in `pano.css`. Lines that say his name today are typed out ("Phill’s cat", "Ask Paño the cat for help"); `base.json` can use a `{name}` gap instead, while Phill's brains keep their own words. Phill's `core.json` currently extends nothing, so the chain would be `portfolio.json` → `core.json` → `base.json`, with today's lines still winning.
+  - **Next: K1** (neutral engine). Make the "before" copy from `01978af` (or the latest `main` if it has moved), and run it side by side with the working copy on both DEV sites.

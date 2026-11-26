@@ -1,0 +1,30 @@
+desk menu ['View his résumé', 'Read his history', 'See what he built', 'Explore his skills', 'Get in touch', 'Change the background', 'Just looking around']
+desk Q1 Phill’s cat Which background would you like? ['Misty mountains (default)', 'All green', 'All black', 'Never mind']
+desk Q2 Phill’s cat Are you colorblind? ['Yes', 'No']
+desk Q3 Phill’s cat Which colorblind mode should I apply to the site? ['Red-weak (protanopia)', 'Green-weak (deuteranopia)', 'Blue-yellow (tritanopia)', 'No color (monochrome)']
+desk says Phill’s cat Okay, I am changing the background now for you.
+wall.py:6: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  px=list(im.getdata()); return round(sum(max(p)-min(p) for p in px)/len(px),1)
+desk grey phase saturation 0.0 (before: 13.5 ) wall still mountain
+desk mid-wipe saturation top 99.9 bottom 111.2
+desk done {'wall': 'green', 'cb': 'deutan', 'filter': 'url("#cb-deutan")', 'bg': 'rgb(20, 99, 58)', 'say': 'Phill’s cat Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.', 'leftovers': 0} ['Thanks, Paño']
+desk after reload green deutan
+desk No path {'wall': 'mountain', 'cb': None, 'filter': 'none', 'bg': 'rgb(3, 6, 4)', 'say': 'Done! Enjoy the new view.', 'leftovers': 0}
+desk Red-weak -> protan url("#cb-protan") black 0
+desk Blue-yellow -> tritan url("#cb-tritan") black 0
+desk No color -> mono grayscale(1) contrast(1.2) black 0
+desk errors []
+phone menu ['View his résumé', 'Read his history', 'See what he built', 'Explore his skills', 'Get in touch', 'Change the background', 'Just looking around']
+phone Q1 Phill’s cat Which background would you like? ['Misty mountains (default)', 'All green', 'All black', 'Never mind']
+phone Q2 Phill’s cat Are you colorblind? ['Yes', 'No']
+phone Q3 Phill’s cat Which colorblind mode should I apply to the site? ['Red-weak (protanopia)', 'Green-weak (deuteranopia)', 'Blue-yellow (tritanopia)', 'No color (monochrome)']
+phone says Phill’s cat Okay, I am changing the background now for you.
+phone grey phase saturation 0.0 (before: 16.5 ) wall still mountain
+phone mid-wipe saturation top 110.3 bottom 11.7
+phone done {'wall': 'green', 'cb': 'deutan', 'filter': 'url("#cb-deutan")', 'bg': 'rgb(20, 99, 58)', 'say': 'Phill’s cat Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.', 'leftovers': 0} ['Thanks, Paño']
+phone after reload green deutan
+phone No path {'wall': 'mountain', 'cb': None, 'filter': 'none', 'bg': 'rgb(3, 6, 4)', 'say': 'Done! Enjoy the new view.', 'leftovers': 0}
+phone Red-weak -> protan url("#cb-protan") black 0
+phone Blue-yellow -> tritan url("#cb-tritan") black 0
+phone No color -> mono grayscale(1) contrast(1.2) black 0
+phone errors []

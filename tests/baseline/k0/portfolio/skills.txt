@@ -1,0 +1,40 @@
+files 1 each skill is its own file and says what it needs True
+files 2 the engine carries none of the skills True
+files 3 the engine lists the same skills True
+files 4 the page adapter has one line for each skill True
+phone 1 the four skill files came from /Pano/latest/skills/ True
+phone 2 all four skills are on True
+phone 3 his menu is tours, then background, then leave True
+phone 4 with two windows open the windows skill adds its buttons True
+phone errors []
+fold 1 the four skill files came from /Pano/latest/skills/ True
+fold 2 all four skills are on True
+fold 3 his menu is tours, then background, then leave True
+fold 4 with two windows open the windows skill adds its buttons True
+fold errors []
+desk 1 the four skill files came from /Pano/latest/skills/ True
+desk 2 all four skills are on True
+desk 3 his menu is tours, then background, then leave True
+desk 4 with two windows open the windows skill adds its buttons True
+desk errors []
+saved 1 the saved background is set as the page finishes loading True
+saved errors []
+no tours 1 skill is on but offers no tour (this page cannot read the steps) True
+no tours errors []
+no background 1 skill is off and says why True
+no background 2 his menu has no background button True
+no background 3 a tour still runs True
+no background errors []
+no windows 1 four windows open and he makes no clean-up offer True
+no windows 2 his menu has no window buttons True
+no windows 3 closing a window still works True
+no windows errors []
+bin 1 with the bin entry he refuses to be recycled True
+bin errors []
+no bin 1 without it he can be dropped there and nothing happens True
+no bin 2 the other three skills are on True
+no bin errors []
+blocked 1 he still appears, without the background skill True
+blocked errors []
+late 1 added after the page loaded, he still gets all four skills and his menu True
+late errors []

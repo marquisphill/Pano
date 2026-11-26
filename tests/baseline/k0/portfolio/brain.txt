@@ -1,0 +1,41 @@
+files 1 every line the engine asks for is in the brain True []
+files 2 the engine carries none of his lines True
+files 3 every tour in the menu exists True
+phone 1 his brain came from /Pano/latest/brain/portfolio.json True
+phone 2 the page file carries none of his lines True
+phone 3 he greets with the line in the brain True
+phone 4 his menu is the one in the brain True
+phone 5 his labels for screen readers are set True
+phone errors []
+fold 1 his brain came from /Pano/latest/brain/portfolio.json True
+fold 2 the page file carries none of his lines True
+fold 3 he greets with the line in the brain True
+fold 4 his menu is the one in the brain True
+fold 5 his labels for screen readers are set True
+fold errors []
+desk 1 his brain came from /Pano/latest/brain/portfolio.json True
+desk 2 the page file carries none of his lines True
+desk 3 he greets with the line in the brain True
+desk 4 his menu is the one in the brain True
+desk 5 his labels for screen readers are set True
+desk errors []
+edit 1 the greeting changed True
+edit 2 the menu changed True
+edit 3 the tour step changed True
+edit 4 a button changed True
+edit errors []
+nobrain 1 he stays hidden, bubble too, and four windows open True
+nobrain 2 Escape still closes the top window True
+nobrain errors []
+later availability phone steps shown 3 of 3 | finished True | errors []
+later availability desk steps shown 3 of 3 | finished True | errors []
+later announcement phone steps shown 4 of 4 | finished True | errors []
+later announcement desk steps shown 4 of 4 | finished True | errors []
+later hackathon-photos phone steps shown 3 of 4 | finished False | errors []
+later hackathon-photos desk steps shown 3 of 4 | finished False | errors []
+later kind-words phone steps shown 3 of 3 | finished True | errors []
+later kind-words desk steps shown 3 of 3 | finished True | errors []
+later ai-lab phone steps shown 3 of 3 | finished True | errors []
+later ai-lab desk steps shown 3 of 3 | finished True | errors []
+later recycle-bin phone steps shown 3 of 3 | finished True | errors []
+later recycle-bin desk steps shown 3 of 3 | finished True | errors []

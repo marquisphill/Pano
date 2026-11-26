@@ -1,0 +1,24 @@
+phone 1 pano.js and pano.css came from /Pano/latest/ True
+phone 2 the page file no longer carries his body or engine True
+phone 3 his elements are in the page, in order, before the taskbar True
+phone 4 he is on screen and styled True
+phone 5 he greets with his menu True
+phone 6 Pano.init is the only thing he adds to the page True
+phone errors []
+fold 1 pano.js and pano.css came from /Pano/latest/ True
+fold 2 the page file no longer carries his body or engine True
+fold 3 his elements are in the page, in order, before the taskbar True
+fold 4 he is on screen and styled True
+fold 5 he greets with his menu True
+fold 6 Pano.init is the only thing he adds to the page True
+fold errors []
+desk 1 pano.js and pano.css came from /Pano/latest/ True
+desk 2 the page file no longer carries his body or engine True
+desk 3 his elements are in the page, in order, before the taskbar True
+desk 4 he is on screen and styled True
+desk 5 he greets with his menu True
+desk 6 Pano.init is the only thing he adds to the page True
+desk errors []
+nopano 1 no cat, and windows still open True
+nopano 2 Escape still closes the top window True
+nopano errors []

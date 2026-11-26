@@ -1,0 +1,38 @@
+desk 1 after skills tour step: stage scroll [0, 0, 0] [['Skills – Contr', True, True, True, [124, 10, 1000, 700]]]
+desk 1b after step link: stage scroll [0, 0, 0]
+desk 2 corner resize [980, 720] -> [779, 569]
+desk 2 left-edge resize width 779 -> 688 right edge fixed True
+desk 2 cannot grow under taskbar True
+desk 2 after wild drag [['Report Consoli', True, True, True, [592, 0, 688, 746]]]
+desk 3 offer ['Organize them', 'Close them', 'No thanks']
+desk 3 menu ['View his résumé', 'Read his history', 'See what he built', 'Explore his skills', 'Get in touch', 'Change the background', 'Organize windows', 'Close all windows', 'Just looking around']
+desk 3 organized all buttons reachable: True
+     ['AI Lab', True, True, True, [134, 12, 860, 580]]
+     ['Report Consoli', True, True, True, [172, 50, 860, 580]]
+     ['Contact – Phil', True, True, True, [210, 88, 860, 580]]
+     ['Skills – Contr', True, True, True, [248, 126, 860, 580]]
+     ['Résumé.pdf – C', True, True, True, [286, 164, 860, 580]]
+desk 3 clicked back window ->active True
+desk 4 after close all ['AI Lab'] kept was front: AI Lab
+desk 4 menu with one window []
+desk 5 after browser shrink [['AI Lab', True, True, True, [0, 12, 700, 376]], ['Skills – Contr', True, True, True, [0, 48, 700, 376]]]
+desk errors []
+short 1 after skills tour step: stage scroll [0, 0, 0] [['Skills – Contr', True, True, True, [124, 10, 1000, 452]]]
+short 1b after step link: stage scroll [0, 0, 0]
+short 2 corner resize [980, 452] -> [779, 301]
+short 2 left-edge resize width 779 -> 688 right edge fixed True
+short 2 cannot grow under taskbar True
+short 2 after wild drag [['Report Consoli', True, True, True, [592, 0, 688, 466]]]
+short 3 offer ['Organize them', 'Close them', 'No thanks']
+short 3 menu ['View his résumé', 'Read his history', 'See what he built', 'Explore his skills', 'Get in touch', 'Change the background', 'Organize windows', 'Close all windows', 'Just looking around']
+short 3 organized all buttons reachable: True
+     ['AI Lab', True, True, True, [134, 12, 860, 300]]
+     ['Report Consoli', True, True, True, [172, 50, 860, 300]]
+     ['Contact – Phil', True, True, True, [210, 88, 860, 300]]
+     ['Skills – Contr', True, True, True, [248, 126, 860, 300]]
+     ['Résumé.pdf – C', True, True, True, [286, 164, 860, 300]]
+short 3 clicked back window ->active True
+short 4 after close all ['AI Lab'] kept was front: AI Lab
+short 4 menu with one window ['Get in touch', 'Change the background', 'Just looking around']
+short 5 after browser shrink [['AI Lab', False, False, False, [0, 12, 700, 300]], ['Skills – Contr', True, True, True, [0, 16, 700, 376]]]
+short errors []

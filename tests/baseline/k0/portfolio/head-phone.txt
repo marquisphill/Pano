@@ -1,0 +1,14 @@
+phone 1 start {'x': 320, 'y': 671, 'w': 54, 'h': 65, 'head': False, 'z': '9065'} gap right 16 gap bottom 64 greeting True
+phone 2 after close {'x': 320, 'y': 671, 'w': 54, 'h': 65, 'head': False, 'z': '9065'}
+phone 3 after 10s idle {'x': 135, 'y': 6, 'w': 120, 'h': 90, 'head': True, 'z': '2147483000'} centered? True
+phone 4 head on top of window True
+phone 5 dragged head {'x': 20, 'y': 66, 'w': 120, 'h': 90, 'head': True, 'z': '2147483000'} menu opened by drag? False
+phone 6 stays after idle True
+phone 7 tap head {'x': 320, 'y': 671, 'w': 54, 'h': 65, 'head': False, 'z': '9065'} menu: Phill’s cat
+What would you like to do?
+phone 8 dragged full cat {'x': 336, 'y': 735, 'w': 54, 'h': 65, 'head': False, 'z': '9065'} menu still True
+phone 9 tour Step 1 of 2
+Want to reach Phill? Tap Con False
+phone 10 back to head after tour True at dragged spot False
+phone 11 reload keeps head True
+phone errors []

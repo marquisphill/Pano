@@ -1,0 +1,37 @@
+fold View his résumé step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 2
+His résumé is right here on the desktop. Click R
+fold View his résumé step2 [622, 376] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 2
+Here it is. Scroll to read it. Download saves a 
+fold View his résumé end@2 Phill’s cat
+Done! What would you like to do next?
+fold Read his history step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+Ten years of history are filed in Experience. Cl
+fold Read his history step2 [116, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Newest first. This is where he is now. Double-cl
+fold Read his history step3 [682, 551] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+Scroll to read. The buttons at the bottom lead t
+fold Read his history end@3 Phill’s cat
+Done! What would you like to do next?
+fold See what he built step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+The case studies live in Projects. Click the fol
+fold See what he built step2 [116, 99] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 3
+Start with this one: 1,000+ legacy reports cut t
+fold See what he built step3 [809, 651] ['ok', 'ok', 'bubble', 'ok', 'ok'] Step 3 of 3
+The diagram shows how it worked. Click any step 
+fold See what he built end@3 Phill’s cat
+Done! What would you like to do next?
+fold Explore his skills step1 [84, 92] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 1 of 3
+Open Skills to see what he can do.
+fold Explore his skills step2 [753, 612] ['win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P', 'win:Skills – Control P'] Step 2 of 3
+Six areas, and that’s me in every picture. Pick 
+fold Explore his skills step3 [264, 40] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 3 of 3
+Red tags are the key things he does. Use Next to
+fold Explore his skills end@3 Phill’s cat
+Done! What would you like to do next?
+fold Get in touch step1 None None None
+fold Get in touch click-race ElementHandle.click: Element is not atta
+fold Get in touch step2 [109, 28] ['ok', 'ok', 'ok', 'ok', 'ok'] Step 2 of 2
+Email is the fastest way. This button starts one
+fold Get in touch end@2 Phill’s cat
+Done! What would you like to do next?
+fold errors []

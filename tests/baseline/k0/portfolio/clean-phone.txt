@@ -1,0 +1,8 @@
+phone windows open: 4
+phone bubble: Phill’s cat
+You have a lot of windows open. Can I clean them up?
+phone focused: Skills – Control Panel
+phone left: ['Skills – Control Panel'] | tasks: 1
+phone bubble after: All clean! I kept the one you were looking at.
+phone asks again: True
+phone errors: []

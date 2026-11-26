@@ -1,0 +1,18 @@
+1280 A close chat -> 5.0 s
+1280 B menu left unanswered -> 11.3 s after tap
+1280 C tour step ignored -> 9.2 s after choosing
+1280 D active in tour window for 16s, still guiding: True
+1280 D then idle -> 9.5 s
+1280 F after "Just looking around" -> 5.0 s
+1280 E after dragging him -> 4.8 s
+1280 G pointer on bubble 13s, still there: True
+1280 G after leaving -> 10.0 s
+1280 H cleanup question shown True -> tucks away after 10.2 s more
+390 A close chat -> 5.0 s
+390 B menu left unanswered -> 11.5 s after tap
+390 C tour step ignored -> 8.8 s after choosing
+390 D active in tour window for 16s, still guiding: True
+390 D then idle -> 10.8 s
+390 F after "Just looking around" -> 5.0 s
+390 E after dragging him -> 4.8 s
+390 H cleanup question shown True -> tucks away after 10.0 s more
