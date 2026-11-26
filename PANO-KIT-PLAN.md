@@ -82,6 +82,7 @@ their-site/
 - A test for both.
 
 **K3. The kit** (medium), in `kit/`
+- **First, the engine change for multi-page sites (Phill chose this, 2026-11-26):** a tour may say which pages it is offered on, e.g. `"pages": ["contact.html"]`. Left out, it is offered on every page. On other pages it stays out of his menu, and `Pano.check()` skips its targets there (a note says it is for another page). Suggested matching: each entry is a page address relative to the brain file (like `extends`), compared with the current page's path, with `/` and `/index.html` the same and query and hash ignored. Add it to `skills/tours.js`, `kit/brain.schema.json`, `tests/kitcheck.py` (a second kite-shop page) and the brain README. It is an engine change, so run the before/after suites on both DEV sites.
 - `README.md` for people: what Paño is, plus the one-line prompt. The prompt says to read `kit/SETUP.md` from `github.com/marquisphill/pano`, and to clone the repo if web pages can't be opened (Claude cloud sessions often can't reach `github.io`).
 - `SETUP.md` for their AI:
   - Ask: what the site is and who visits; the 3 things Paño should help visitors do; his name and colors; his tone; whether to offer the background changer; anything he must never say.
@@ -140,6 +141,7 @@ Added during the build:
 - **His colors** are `--pano-fur`, `--pano-leg`, `--pano-paw`, `--pano-eyes`, `--pano-mouth`, `--pano-tongue`, plus `--pano-close` for the bubble's close button. The defaults are today's colors. (K1)
 - **A brain with no `menu.show` offers all its tours**, in the order written. A background with no words in `options` is shown by its name. (K1)
 - **`Pano.check()` sorts what it finds into problems and notes.** Problems break something, and the kit's setup must clear them all: a missing, blank or misspelt line; a misspelt step or tour field; a tour left out of his menu (with the step and why); a step with no way to move on; `menu.show` naming a missing tour; a selector that matches nothing; a background with no page style; an unknown colorblind mode; a brain that won't load. Notes may be fine: a target hidden right now, a target missing after an earlier step that does something (it may add it), a field nothing reads, a background with no words. (K2)
+- **Multi-page sites: each tour can name its pages** (`"pages"`), and is offered only there; left out, every page. Phill chose this over one brain per page (2026-11-26). Built in K3.
 - **The schema is for kit brains only.** `kit/brain.schema.json` allows only steps the engine reads by itself (`css`, `css_visible`, `click`, `focus`, `submit`, `need.filled`), and lists exactly `base.json`'s lines. Phill's own brains use more and don't fit it, on purpose. (K2)
 
 ## Status log
@@ -182,4 +184,5 @@ Update this at the end of every phase: date, what was done, decisions, anything 
   - **Found, for K3 and K4:**
     - **Multi-page sites.** A tour runs on one page. If every page loads the same brain, tours whose targets live on other pages will show as problems there, and would fail if run. K3's setup needs an answer: one brain per page (each extending a shared one), or tours that only point at what every page has (like the nav). The engine has no per-page tour list yet.
     - The kit's brain template should give words for each background (`lines.background.options`), or the check leaves notes.
-  - **Next: K3** (the kit in `kit/`): `README.md`, `SETUP.md`, `BRAIN.md`, `templates/` and a fictional `example/` site. Start by deciding the multi-page answer above.
+  - **Phill's answer on multi-page sites (after K2):** each tour can name the pages it is offered on. Recorded under Decisions and as K3's first step.
+  - **Next: K3, in a fresh chat** (Phill asked for one). The kit work is on branch `claude/pano-kit-builder-othul3`, not merged, so start from that branch, not `main`. First the `pages` engine change, then `kit/`: `README.md`, `SETUP.md`, `BRAIN.md`, `templates/` and a fictional `example/` site.
