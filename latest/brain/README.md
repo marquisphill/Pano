@@ -97,6 +97,7 @@ A step can also depend on the page as it is right now. The dashboard's tours use
 | on the tour: `"wait_for": "labs_loaded"` | Wait for the page before starting. |
 | on the tour: `"name"` | The short name in the step label and the wrap-up. `label` is the menu button. |
 | on the tour: `"then": "talk:feedback"` | Something to offer when it ends. |
+| on the tour: `"pages": ["../contact.html"]` | Offer it only on these pages (since the kit's K3). Each is a page address relative to the brain file, like `extends`; `/` and `/index.html` are the same page, `.html` may be left off, and the query and hash are ignored. Left out, every page. On other pages it stays out of his menu, and `Pano.check()` leaves its targets alone but checks each address is there. Phill's tours don't use it: each of his sites is one page with its own brain. |
 
 | Descriptor | Portfolio helper | Dashboard |
 | --- | --- | --- |

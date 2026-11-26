@@ -3,7 +3,7 @@
 Paño is the red cartoon cat who guides visitors around Phill's portfolio and personal dashboard. This repo is becoming his single home: his body, his brain and his skills, loaded by both sites.
 
 - **The plan and current status:** [PANO-PLAN.md](PANO-PLAN.md)
-- **The kit (Paño on anyone's site), in progress:** [PANO-KIT-PLAN.md](PANO-KIT-PLAN.md)
+- **The kit (Paño on anyone's site), in progress:** [PANO-KIT-PLAN.md](PANO-KIT-PLAN.md) has the plan; [kit/](kit/) has the kit itself (start with [kit/README.md](kit/README.md)).
 - **Tests:** [tests/](tests/)
 
 - **His body and engine:** [latest/pano.js](latest/pano.js) and [latest/pano.css](latest/pano.css). The top of `pano.js` explains how a page loads him.

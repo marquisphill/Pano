@@ -9,6 +9,8 @@ For every page that loads Paño, at a phone size and a desktop size, it:
     on screen, and move on, and the tour must finish,
   - lists page errors and files that failed to load,
   - and, on desktop, checks that each background the page styles can be seen.
+It also looks for a TODO left in the site's pano/ files, and for a page that loads a copy of Paño's engine
+instead of the hosted one.
 It ends with "All good" or the number of things to fix. Nothing in the site is changed.
 
   pip install playwright             (then, unless Chromium is already installed: python -m playwright install chromium)
@@ -168,6 +170,15 @@ def main():
     R.line(f'Paño\'s files: {HOSTED}' + (f' (answered from {engine}{", since that address could not be reached" if auto else ""})' if engine else ''))
     tours_walked = set()
 
+    # the site's own Paño files: no TODO left from the templates
+    for name in ('brain.json', 'setup.js', 'colors.css'):
+        path = os.path.join(site, 'pano', name)
+        if os.path.isfile(path):
+            for n, text in enumerate(open(path, encoding='utf-8', errors='replace'), 1):
+                if 'TODO' in text:
+                    R.bad(f'pano/{name} line {n} still has a TODO from the template')
+                    break
+
     with sync_playwright() as p:
         browser = p.chromium.launch()
 
@@ -182,7 +193,8 @@ def main():
             pg = c.new_page()
             errs, failed = [], []
             pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.on('console', lambda m: errs.append('console: ' + m.text) if m.type == 'error' else None)
+            # (a file that fails to load is listed once, from its response, not again from the console)
+            pg.on('console', lambda m: errs.append('console: ' + m.text) if m.type == 'error' and not m.text.startswith('Failed to load resource') else None)
             pg.on('response', lambda r: failed.append(f'{r.status} {r.url}') if r.status >= 400 else None)
             pg.on('requestfailed', lambda r: failed.append(f'{r.failure} {r.url}'))
             pg.goto(url, wait_until='load')
@@ -258,7 +270,8 @@ def main():
                 pg, errs, failed = open_page(c, url)
                 if not wait(pg, "()=>window.Pano&&Pano.here", ms=10000):
                     if not pg.evaluate("()=>!!window.Pano"):
-                        R.bad('Paño\'s files did not load (pano.js). Is the <script> for pano.js on this page, with the right address?')
+                        R.bad('Paño\'s files did not load (pano.js). Is the <script> for pano.js on this page, with the address in kit/templates/adapter.html?'
+                              + ('' if engine else ' If the browser here can\'t reach marquisphill.github.io, run again with --engine <a clone of the Pano repo>.'))
                     else:
                         R.bad('Pano.init() did not run. Is pano/setup.js loaded right after pano.js, with the right path from this page?')
                     for f in failed:
@@ -266,8 +279,10 @@ def main():
                     c.close()
                     continue
                 greeted = wait(pg, GREETED)
+                src = pg.evaluate("()=>(document.querySelector('script[src*=\"pano.js\"]')||{}).src||''")
+                if src and not src.startswith(HOSTED):
+                    R.bad(f'this page loads Paño\'s engine from {src}. Load it from {HOSTED} (the address in kit/templates/adapter.html), never from a copy in the site.')
                 if not pg.evaluate("()=>typeof Pano.check==='function'"):
-                    src = pg.evaluate("()=>(document.querySelector('script[src*=\"pano.js\"]')||{}).src||''")
                     R.bad(f'the Paño files this page loads ({src}) are older than the kit: they have no Pano.check(). Use the address in kit/templates/adapter.html, or run with --engine <a clone of the Pano repo>.')
                     c.close()
                     continue
@@ -333,8 +348,9 @@ def main():
                     errs += terr
                 for e in dict.fromkeys(errs):
                     R.bad('page error: ' + e[:200])
+                known = ' '.join(x['say'] for x in r['problems'])     # page addresses Pano.check() already reported
                 for f in dict.fromkeys(failed):
-                    if not f.endswith('/favicon.ico'):
+                    if not f.endswith('/favicon.ico') and f.split(' ')[-1] not in known:
                         R.bad('did not load: ' + f)
                 c.close()
         browser.close()

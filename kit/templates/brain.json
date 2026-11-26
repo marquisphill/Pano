@@ -1,5 +1,6 @@
 {
-  "_about": "Paño's brain for TODO-site. Made from kit/templates/brain.json (github.com/marquisphill/Pano). Every line he says that is not written here comes from base.json, in plain, friendly English. kit/BRAIN.md lists every field. Keys starting with _ are notes for people; he ignores them. Replace every TODO, then run Pano.check() in the browser console.",
+  "_about": "Paño's brain for TODO-site. Made from kit/templates/brain.json (github.com/marquisphill/Pano). Every line he says that is not written here comes from base.json, in plain, friendly English. kit/BRAIN.md lists every field. Keys starting with _ are notes for people; he ignores them.",
+  "_todo": "Fill in every TODO below, then delete this note. kit/check_site.py reports any TODO left in the file.",
   "extends": "base",
   "lines": {
     "name": "Paño",
