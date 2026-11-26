@@ -147,3 +147,4 @@ Dashboard tours:
 - Keep `id`s stable and unique across `core.json` and both profiles.
 - A line that the engine asks for must stay in `lines`. `tests/brain.py` checks none is missing.
 - Validate after editing: `for f in latest/brain/*.json; do python3 -m json.tool "$f" > /dev/null || echo "bad: $f"; done`
+- Then open the site and run `Pano.check()` in the browser console. It lists problems (a missing, blank or misspelt line; a tour left out of his menu, with the step and the reason; something a tour points at that is not on the page) and notes (a target hidden right now; a field nothing reads). On the DEV sites today it finds no problems, only notes: Phill's unused `greetings`, `returning_greetings` and `idle_nudges`, fields only the talking skills read, and tour steps whose targets only appear part-way through a tour (once a window opens, a panel shows or the weather loads).

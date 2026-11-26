@@ -139,6 +139,8 @@ Added during the build:
 - **`phill_note` is now `background.note`.** Phill's `core.json` was updated; the old key is not read any more (`v1/` and `v2/` keep their own copies). With no note, he just says `background.done`. (K1)
 - **His colors** are `--pano-fur`, `--pano-leg`, `--pano-paw`, `--pano-eyes`, `--pano-mouth`, `--pano-tongue`, plus `--pano-close` for the bubble's close button. The defaults are today's colors. (K1)
 - **A brain with no `menu.show` offers all its tours**, in the order written. A background with no words in `options` is shown by its name. (K1)
+- **`Pano.check()` sorts what it finds into problems and notes.** Problems break something, and the kit's setup must clear them all: a missing, blank or misspelt line; a misspelt step or tour field; a tour left out of his menu (with the step and why); a step with no way to move on; `menu.show` naming a missing tour; a selector that matches nothing; a background with no page style; an unknown colorblind mode; a brain that won't load. Notes may be fine: a target hidden right now, a target missing after an earlier step that does something (it may add it), a field nothing reads, a background with no words. (K2)
+- **The schema is for kit brains only.** `kit/brain.schema.json` allows only steps the engine reads by itself (`css`, `css_visible`, `click`, `focus`, `submit`, `need.filled`), and lists exactly `base.json`'s lines. Phill's own brains use more and don't fit it, on purpose. (K2)
 
 ## Status log
 

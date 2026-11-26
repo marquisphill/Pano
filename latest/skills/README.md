@@ -43,7 +43,7 @@ chat: { keys: { key: 'dev-pd-pano-key' } }
 
 Tours work a little differently, because a tour can be made of steps any page can read. The tours skill is always on, and it checks each tour: if this page cannot read every step of a tour, that tour is left out of his menu. On the portfolio every tour points at an icon or a window, so without the `tours` entry he offers none.
 
-To see what is on, open the page's console and run `Pano.here.skills()`. It lists each skill, whether it is on, and if not, why.
+To see what is on, open the page's console and run `Pano.here.skills()`. It lists each skill, whether it is on, and if not, why. `Pano.check()` goes further: it lists what is wrong with the page's brain and adapter (see `../brain/README.md`).
 
 ## What a skill file looks like
 
@@ -77,6 +77,7 @@ What `start()` may return. All are optional:
 | `keepsHimHere()` | True while he should not tuck away to his head spot. |
 | `dragMove()`, `drop()` | Called while he is dragged and when he is let go. `drop()` returns a function to take over from there, or nothing. |
 | `calm()` | Called when he goes back to normal. Clear any mood the skill put him in. |
+| `check({ bad, note })` | Called by `Pano.check()`. Report what is wrong with this skill's part of the brain or adapter: `bad(kind, where, say)` for a problem, `note(kind, where, say)` for something worth a look. `tours.js` and `background.js` have one. |
 
 ## Adding a skill
 
