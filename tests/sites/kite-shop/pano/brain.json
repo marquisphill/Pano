@@ -1,0 +1,13 @@
+{
+  "extends": "base",
+  "lines": { "name": "Biscuit" },
+  "tours": {
+    "contact": {
+      "label": "How do I get in touch?",
+      "steps": [
+        { "say": "Scroll down to <b>Contact</b>. This is the form.", "target": { "css": "#contact-form" }, "next": "Next" },
+        { "say": "Type your email here, then press <b>Send</b>.", "target": { "css": "#contact-email" }, "act": { "focus": "#contact-email" }, "actLabel": "Take me there", "next": "Got it" }
+      ]
+    }
+  }
+}

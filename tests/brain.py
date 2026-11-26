@@ -19,7 +19,9 @@ def merge(a, b):
     return {k: merge(a[k], b[k]) if k in a and k in b else (b[k] if k in b else a[k]) for k in {**a, **b}}
 
 
-lines = merge(core.get('lines', {}), brain['lines'])   # what he ends up with: shared lines under the portfolio's own
+# since the kit's K1, core.json says "extends": "base", so base.json's neutral lines sit under both
+base = json.loads(get('/Pano/latest/base.json')) if core.get('extends') == 'base' else {}
+lines = merge(merge(base.get('lines', {}), core.get('lines', {})), brain['lines'])   # what he ends up with: base, then shared, then the portfolio's own
 # his engine and his skills (phase 3 split the skills into their own files)
 engine = ''.join(get('/Pano/latest/' + f) for f in ['pano.js', 'skills/tours.js', 'skills/background.js', 'skills/windows.js', 'skills/bin.js'])
 PAGE_OWN = ['Tap a file to open it.']   # the portfolio's file explorer says this itself, in its own hint

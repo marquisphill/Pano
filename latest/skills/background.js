@@ -11,7 +11,9 @@
    The reveal layers (.wallnext, .grayveil, .wipeline) and the four colorblind filters
    (html[data-cb="protan|deutan|tritan|mono"]) are the same on any page, so he brings them himself,
    unless the page already carries its own (it has an element with id "cb-protan").
-   His words for each name are in his brain under lines.background. */
+   His words for each name are in his brain under lines.background (options for the backgrounds, modes for the
+   colorblind modes; a background with no words there is shown by its name). lines.background.note is an extra
+   line he says after a colorblind mode is applied; with none, he just says lines.background.done. */
 Pano.skill('background', {
   needs: ['background'],
   start(p, host) {
@@ -52,7 +54,7 @@ html[data-cb="mono"]{filter:grayscale(1) contrast(1.2)}
       if (!p.mine(token)) return;
       const B = p.L.background;
       p.say(named() + B.ask, [
-        ...WALLS.map(k => ({ label: B.options[k] + (k === PLAIN ? B.default_mark : ''), fn: () => CB_MODES.length ? askColorblind(k) : applyLook(k, null) })),
+        ...WALLS.map(k => ({ label: ((B.options || {})[k] || k) + (k === PLAIN ? B.default_mark : ''), fn: () => CB_MODES.length ? askColorblind(k) : applyLook(k, null) })),
         { label: B.never_mind, quiet: true, fn: () => p.rest() }
       ]);
     }
@@ -63,7 +65,7 @@ html[data-cb="mono"]{filter:grayscale(1) contrast(1.2)}
       ]);
     }
     function askMode(wall) {
-      p.say(named() + p.L.background.ask_mode, CB_MODES.map(m => ({ label: p.L.background.modes[m], fn: () => applyLook(wall, m) })));
+      p.say(named() + p.L.background.ask_mode, CB_MODES.map(m => ({ label: (p.L.background.modes || {})[m] || m, fn: () => applyLook(wall, m) })));
     }
     async function applyLook(wall, mode) {
       if (recoloring) return;
@@ -98,9 +100,9 @@ html[data-cb="mono"]{filter:grayscale(1) contrast(1.2)}
       }
       recoloring = false;
       if (!p.mine(token)) return;
-      if (mode) {
+      if (mode && p.L.background.note) {   // an extra line after a colorblind mode, if his brain has one
         p.cheer();
-        p.say(named() + p.L.background.phill_note, [
+        p.say(named() + p.L.background.note, [
           { label: p.L.background.thanks, quiet: true, fn: () => p.rest() }
         ]);
       } else p.rest(p.L.background.done);

@@ -1,8 +1,10 @@
 {
   "schema_version": "2.0",
-  "updated": "2026-11-23",
+  "updated": "2026-11-26",
+  "extends": "base",
   "about": "Paño's shared brain. Both sites load this file, then their own profile: portfolio.json on the portfolio, dashboard.json on the dashboard. The profile sets who Paño is talking to, what he can show, and any site-only topics.",
   "load_order": [
+    "base (../base.json, neutral wording for every line)",
     "core.json",
     "<site profile>"
   ],
@@ -1249,7 +1251,7 @@
     }
   ],
   "lines": {
-    "_note": "Lines both sites say. Each site's own file (portfolio.json, dashboard.json) has its own \"lines\"; the two are merged and the site's version wins where both have a key. Under background, each site adds \"options\": its own names for its backgrounds.",
+    "_note": "Lines both sites say. Each site's own file (portfolio.json, dashboard.json) has its own \"lines\"; the two are merged and the site's version wins where both have a key. Under both sits ../base.json (this file says \"extends\": \"base\"), so any line neither file has falls back to its neutral wording. Under background, each site adds \"options\": its own names for its backgrounds.",
     "menu": {
       "show_menu": "Show me the menu"
     },
@@ -1271,7 +1273,7 @@
         "mono": "No color (monochrome)"
       },
       "changing": "Okay, I am changing the background now for you.",
-      "phill_note": "Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.",
+      "note": "Phill is color blind and thought that was neat and funny. He wants you to know that the world is beautiful, even if you can’t see all the greens and reds.",
       "thanks": "Thanks, Paño",
       "done": "Done! Enjoy the new view."
     }

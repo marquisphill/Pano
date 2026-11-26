@@ -1,0 +1,82 @@
+{
+  "_note": "Paño's base brain: neutral wording for every line his engine (pano.js) and his four everyday skills (tours, background, windows, bin) say. Any brain can build on it with \"extends\": \"base\". Its own lines win, key by key, so a site only writes the lines it wants to change. {cat_name} is filled in with lines.name. In tour.step, {n}, {total} and {name} (the tour's name) are filled in by the engine. Only <b> and <span> tags are used.",
+  "site": "base",
+  "lines": {
+    "name": "Paño",
+    "labels": {
+      "cat_button": "Ask {cat_name} the cat for help",
+      "close": "Close {cat_name}"
+    },
+    "hello": "Hi, I’m {cat_name}! I can show you around. What would you like to do?",
+    "menu": {
+      "ask": "What would you like to do?",
+      "after_tour": "Done! What would you like to do next?",
+      "lost": "Hmm, I lost track of that. What would you like to do?",
+      "change_background": "Change the background",
+      "organize": "Organize windows",
+      "close_all": "Close all windows",
+      "leave_first": "Just looking around",
+      "leave_again": "I’m good, thanks",
+      "bye": "Okay! I’m right here if you need a hand.",
+      "show_menu": "Show me the menu"
+    },
+    "tour": {
+      "step": "Step {n} of {total}",
+      "do_it": "Do it for me",
+      "stop": "Stop the tour",
+      "seen_mark": "✓ ",
+      "_memory_note": "The lines below are only said where the page gives him a memory (adapter entry \"memory\").",
+      "intro": "Each tour is short, and you can stop any time.",
+      "wrap": ["That’s it!", "All done!", "Ta-da!"],
+      "watched": " You’ve watched <b>{n} of {total}</b> tours.",
+      "next_up": " Next up: <b>{name}</b>. Want to see it?",
+      "next_talk": " You’ve seen them all! Want to chat about <b>{title}</b>?",
+      "seen_all": " You’ve seen everything.",
+      "back_to_menu": "Back to the menu",
+      "im_good": "I’m good",
+      "im_good_bye": "Okay! I’m right here if you need me."
+    },
+    "touch": {
+      "_note": "On touch screens these swaps are applied, in order, to every tour line. whole_word swaps the word wherever it stands alone.",
+      "swaps": [
+        { "find": "Click", "say": "Tap", "whole_word": true },
+        { "find": "click", "say": "tap", "whole_word": true }
+      ]
+    },
+    "background": {
+      "_note": "options: the site's own words for each of its backgrounds, keyed by the names in its adapter. modes: the colorblind modes. note: an extra line he says after a colorblind mode is applied; leave it empty to skip it.",
+      "ask": "Which background would you like?",
+      "options": {},
+      "default_mark": " (default)",
+      "never_mind": "Never mind",
+      "ask_colorblind": "Are you colorblind?",
+      "yes": "Yes",
+      "no": "No",
+      "ask_mode": "Which colorblind mode should I apply to the site?",
+      "modes": {
+        "protan": "Red-weak (protanopia)",
+        "deutan": "Green-weak (deuteranopia)",
+        "tritan": "Blue-yellow (tritanopia)",
+        "mono": "No color (monochrome)"
+      },
+      "changing": "Okay, I am changing the background now for you.",
+      "note": "",
+      "thanks": "Thanks, {cat_name}",
+      "done": "Done! Enjoy the new view."
+    },
+    "cleanup": {
+      "offer": "You have a lot of windows open. Can I tidy them up?",
+      "organize": "Organize them",
+      "close": "Close them",
+      "yes": "Yes",
+      "no": "No thanks",
+      "declined": "Okay! They’re all yours.",
+      "nothing": "Nothing to organize yet.",
+      "organized": "All organized!",
+      "cleaned": "All clean! I kept the one you were looking at."
+    },
+    "bin": {
+      "refuse": "Excuse me. I am not recyclable."
+    }
+  }
+}

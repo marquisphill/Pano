@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Hollow Pine Kites (a made-up shop for testing Paño)</title>
+<link rel="stylesheet" href="/Pano/latest/pano.css">
+<style>
+  /* A plain scrolling page with no window system: what most sites look like. Fictional. */
+  body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#1d2a24;background:#f6f3ec}
+  #backdrop{position:fixed;inset:0;z-index:-1;background:#f6f3ec}
+  #backdrop[data-wall="dusk"],.wallnext[data-wall="dusk"]{background:linear-gradient(#2b2d55,#c56a6a)}
+  #backdrop[data-wall="meadow"],.wallnext[data-wall="meadow"]{background:linear-gradient(#bfe3c0,#6aa56d)}
+  header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#fff}
+  nav a{margin-left:14px;color:inherit}
+  section{max-width:760px;margin:0 auto;padding:48px 20px;min-height:70vh}
+  .card{background:#fff;border-radius:12px;padding:20px;margin:16px 0}
+  label{display:block;margin:10px 0 4px}
+  input,textarea{width:100%;box-sizing:border-box;padding:10px;font:inherit}
+  footer{padding:40px 20px;text-align:center}
+</style>
+</head>
+<body>
+<div id="backdrop"></div>
+<header><strong>Hollow Pine Kites</strong><nav><a href="#kites">Kites</a><a href="#classes">Classes</a><a href="#contact">Contact</a></nav></header>
+<section id="hero"><h1>Kites for windy afternoons</h1><p>A made-up shop. Nothing here is for sale.</p></section>
+<section id="kites"><h2>Our kites</h2>
+  <div class="card" id="kite-delta"><h3>The Delta</h3><p>Easy to fly in light wind.</p></div>
+  <div class="card" id="kite-box"><h3>The Box</h3><p>Steady in strong wind.</p></div>
+</section>
+<section id="classes"><h2>Flying classes</h2><div class="card" id="class-times"><p>Saturdays at the park, 10 am.</p></div></section>
+<section id="contact"><h2>Contact</h2>
+  <form id="contact-form" class="card" onsubmit="event.preventDefault();document.getElementById('sent').hidden=false">
+    <label for="contact-email">Email</label><input id="contact-email" type="email">
+    <label for="contact-msg">Message</label><textarea id="contact-msg" rows="3"></textarea>
+    <p><button id="contact-send" type="submit">Send</button></p>
+    <p id="sent" hidden>Thanks! (Nothing was sent.)</p>
+  </form>
+</section>
+<footer>Hollow Pine Kites is fictional.</footer>
+<script src="/Pano/latest/pano.js"></script>
+<script>
+  Pano.init({
+    brain: 'pano/brain.json',
+    layout: { bar: { wide: 0, narrow: 0 }, scrolls: true },
+    keys: { greeted: 'kite-greeted', head: 'kite-head' },
+    background: { desk: document.getElementById('backdrop'), walls: ['plain', 'dusk', 'meadow'], modes: ['protan', 'deutan', 'tritan', 'mono'], keys: { wall: 'kite-wall', cb: 'kite-cb' } }
+  });
+</script>
+</body>
+</html>

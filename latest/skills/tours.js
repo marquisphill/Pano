@@ -132,7 +132,9 @@ Pano.skill('tours', {
           RAW[key] = t;
           TOURS[key] = t.steps.map(build);
         }
-        GOALS = ((B.menu && B.menu.show) || []).filter(k => TOURS[k]).map(k => [B.tours[k].label, k]);
+        // his menu offers the tours in menu.show, in that order; a brain with no menu.show offers all its tours
+        const show = B.menu && Array.isArray(B.menu.show) ? B.menu.show : Object.keys(B.tours || {});
+        GOALS = show.filter(k => TOURS[k]).map(k => [B.tours[k].label, k]);
       },
       menu: () => GOALS.map(([label, k]) => p.remembers
         ? { label: (watched(k) ? p.L.tour.seen_mark : '') + label, pri: k === nextKey(), fn: () => begin(k) }

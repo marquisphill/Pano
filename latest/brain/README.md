@@ -12,11 +12,13 @@ Both DEV sites read this folder. Each names its own file (`portfolio.json` or `d
 | --- | --- |
 | `lines` | Every line he says outside the tours: his name, hello, menu buttons, the background and colorblind questions, the window clean-up, the Recycle Bin complaint, and the touch-screen wording. |
 | `tours` | The guided tours, step by step. |
-| `menu.show` | Which tours his menu offers, in order. `menu.show_later` holds tours that are written and tested but not offered yet; move an id into `show` to offer it. |
+| `menu.show` | Which tours his menu offers, in order. `menu.show_later` holds tours that are written and tested but not offered yet; move an id into `show` to offer it. A brain with no `menu.show` offers all its tours, in the order written. |
 
 To change something he says, edit the JSON and push. No code changes. `tests/brain.py` proves it.
 
 **Shared lines.** `core.json` has its own `lines`: the ones both sites say (the background and colorblind questions, the tick for things already seen). The two are merged key by key, and the site's own file wins where both have a key.
+
+**Base lines (since the kit's K1, 2026-11-26).** `../base.json` has neutral wording for every line the engine and the four everyday skills say. `core.json` says `"extends": "base"`, so the chain is `portfolio.json` (or `dashboard.json`) → `core.json` → `base.json`, merged key by key, the nearer file winning. A line none of Phill's files has falls back to base; every line they do have wins, so nothing he says changed. Any brain can extend base directly: that is how a site using the kit starts (`PANO-KIT-PLAN.md`). `"base"` (or `"base.json"`) always means the base file beside `pano.js`; any other `extends` is an address relative to the file that names it. Only `lines` are passed down a chain; `tours`, `menu` and the rest are each file's own.
 
 On the dashboard he also uses: `talks` (his scripted lessons and little chats), `talk_topics` from `core.json`, `dashboard.json` and `portfolio.json` (his stories; `"topics_from": ["portfolio.json"]` is what brings the portfolio's in), `claude_chat` (everything about the Claude chat), `facts`, `cat_preference`, `sign_offs`, `fallbacks` and `show_fallback`. `tests/dash.py` checks that none of his dashboard lines are left in code.
 
@@ -24,11 +26,12 @@ On the portfolio, the greetings, nudges, sign-offs, fallbacks and talk topics ar
 
 | File | Loaded by | What's in it |
 | --- | --- | --- |
+| `../base.json` | every page (both sites, through `core.json`) | Neutral wording for every line the engine and the four everyday skills use. No facts, no tours. |
 | `core.json` | both sites | Persona, guardrails, facts (Phill's background, contact, Corner and Panela), 41 shared talk topics, the lines both sites share |
 | `portfolio.json` | portfolio | Recruiter audience, his live lines, greetings, 6 portfolio-only topics, 11 tours (5 offered), menu. Scripts only, no Claude chat |
 | `dashboard.json` | dashboard | "The user" audience, his live lines, dashboard facts, 13 dashboard topics, 7 tours (3 offered), 10 talks, menu, cat preference, the Claude chat settings |
 
-The engine loads the site's file, then `core.json`. Topics from both are merged by `id`, and ids never collide. The site's values (lines, greetings, fallbacks, menu) win over core where both exist.
+The engine loads the site's file, then `core.json`, then `base.json`. Topics from both are merged by `id`, and ids never collide. The site's values (lines, greetings, fallbacks, menu) win over core where both exist.
 
 A page names its brain in its adapter: `Pano.init({ brain: 'portfolio', ... })` loads `brain/portfolio.json` from beside `pano.js`, so the DEV portfolio gets `https://marquisphill.github.io/Pano/latest/brain/portfolio.json`. Paño stays hidden until his brain has arrived. If either file cannot be fetched he does not appear and the rest of the page works as normal.
 
@@ -135,7 +138,7 @@ Dashboard tours:
 
 ## His lines
 
-`portfolio.json → lines` is grouped by where he says them: `menu`, `tour`, `background`, `cleanup`, `bin`, plus `name`, `hello`, `labels` (for screen readers) and `touch`. `dashboard.json → lines` has the same groups (without `cleanup` and `bin`) plus `talks`, `topics` and `chat`. Where a line is a list, he picks one at random. Keep the key names; change the words. In `tour.step`, `{n}` and `{total}` are filled in for you. `touch.swaps` lists the wording he swaps on touch screens ("Click" becomes "Tap"). Under `background`, the keys in `options` and `modes` are the page's own names for the backgrounds and colorblind modes; only the words after them are his.
+`portfolio.json → lines` is grouped by where he says them: `menu`, `tour`, `background`, `cleanup`, `bin`, plus `name`, `hello`, `labels` (for screen readers) and `touch`. `../base.json` has every one of these, so it is the full list. `dashboard.json → lines` has the same groups (without `cleanup` and `bin`) plus `talks`, `topics` and `chat`. Where a line is a list, he picks one at random. Keep the key names; change the words. In `tour.step`, `{n}` and `{total}` are filled in for you. `touch.swaps` lists the wording he swaps on touch screens ("Click" becomes "Tap"). Under `background`, the keys in `options` and `modes` are the page's own names for the backgrounds and colorblind modes; only the words after them are his. A background with no words in `options` is shown by its name. `background.note` (called `phill_note` until the kit's K1) is the extra line after a colorblind mode is applied; Phill's is in `core.json`, and a brain without one just says `background.done`. `{cat_name}` in any line or tour step is replaced with `lines.name`.
 
 ## Rules for editing
 

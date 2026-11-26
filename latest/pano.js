@@ -13,8 +13,12 @@
    the tour runner, his menu, head mode, idle timing and dragging. Two things live elsewhere:
 
    What he says. His lines, his tours and his menu come from his brain: brain/<site>.json next
-   to this file (see brain/README.md). The adapter names the brain to load. He stays hidden
-   until it has arrived; if it never does, the page carries on without him.
+   to this file for Phill's sites, or any site's own brain file built on base.json, the neutral
+   lines beside this file (see brain/README.md). The adapter names the brain to load. He stays
+   hidden until it has arrived; if it never does, the page carries on without him.
+
+   How he looks. pano.css draws his bubble and ring; a page can restyle both, and recolor him,
+   with --pano-* variables (listed at the top of pano.css).
 
    What he can do. Each ability is a skill: one file in skills/ (see skills/README.md). A skill
    declares what it needs from the page, as names of adapter entries. If the adapter has them,
@@ -25,29 +29,29 @@
     <clipPath id="gEyeL" clipPathUnits="userSpaceOnUse"><ellipse cx="-6" cy="0" rx="3.1" ry="4.1"/></clipPath>
     <clipPath id="gEyeR" clipPathUnits="userSpaceOnUse"><ellipse cx="6" cy="0" rx="3.1" ry="4.1"/></clipPath>
   </defs>
-  <g class="gtail"><path d="M46 111 C 16 113, 4 88, 12 64 C 17 50, 30 48, 28 60" fill="none" stroke="#ff4d4f" stroke-width="10" stroke-linecap="round"/></g>
-  <path class="gtorso" d="M29 50 C 18 70, 16 96, 20 114 L60 114 C 64 96, 62 70, 51 50 Z" fill="#ff4d4f"/>
-  <path class="gleg" d="M34 86 C 33 98, 33 106, 34 113" fill="none" stroke="#c93436" stroke-width="2" stroke-linecap="round"/>
+  <g class="gtail"><path d="M46 111 C 16 113, 4 88, 12 64 C 17 50, 30 48, 28 60" fill="none" stroke-width="10" stroke-linecap="round" style="stroke:var(--pano-fur,#ff4d4f)"/></g>
+  <path class="gtorso" d="M29 50 C 18 70, 16 96, 20 114 L60 114 C 64 96, 62 70, 51 50 Z" style="fill:var(--pano-fur,#ff4d4f)"/>
+  <path class="gleg" d="M34 86 C 33 98, 33 106, 34 113" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:var(--pano-leg,#c93436)"/>
   <g class="ghead"><g transform="translate(41 38) rotate(6)">
-    <path d="M-16 -29 L-7 -15 Q 0 -17.5 7 -15 L16 -29 L17 -6 C 18 4, 12 13, 0 15 C -12 13, -18 4, -17 -6 Z" fill="#ff4d4f"/>
-    <g class="geyes"><ellipse cx="-6" cy="0" rx="2.8" ry="3.8" fill="#07100b"/><ellipse cx="6" cy="0" rx="2.8" ry="3.8" fill="#07100b"/></g>
-    <g clip-path="url(#gEyeL)"><g class="glid"><rect x="-10" y="-12" width="8" height="12" fill="#ff4d4f"/><path d="M-10 0 H-2" stroke="#07100b" stroke-width="1.3"/></g></g>
-    <g clip-path="url(#gEyeR)"><g class="glid"><rect x="2" y="-12" width="8" height="12" fill="#ff4d4f"/><path d="M2 0 H10" stroke="#07100b" stroke-width="1.3"/></g></g>
-    <path class="gwhisk" d="M-15 6 L-31 3 M-14.5 9.5 L-31 11.5 M15 6 L31 3 M14.5 9.5 L31 11.5" stroke="#ff4d4f" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M-16 -29 L-7 -15 Q 0 -17.5 7 -15 L16 -29 L17 -6 C 18 4, 12 13, 0 15 C -12 13, -18 4, -17 -6 Z" style="fill:var(--pano-fur,#ff4d4f)"/>
+    <g class="geyes"><ellipse cx="-6" cy="0" rx="2.8" ry="3.8" style="fill:var(--pano-eyes,#07100b)"/><ellipse cx="6" cy="0" rx="2.8" ry="3.8" style="fill:var(--pano-eyes,#07100b)"/></g>
+    <g clip-path="url(#gEyeL)"><g class="glid"><rect x="-10" y="-12" width="8" height="12" style="fill:var(--pano-fur,#ff4d4f)"/><path d="M-10 0 H-2" stroke-width="1.3" style="stroke:var(--pano-eyes,#07100b)"/></g></g>
+    <g clip-path="url(#gEyeR)"><g class="glid"><rect x="2" y="-12" width="8" height="12" style="fill:var(--pano-fur,#ff4d4f)"/><path d="M2 0 H10" stroke-width="1.3" style="stroke:var(--pano-eyes,#07100b)"/></g></g>
+    <path class="gwhisk" d="M-15 6 L-31 3 M-14.5 9.5 L-31 11.5 M15 6 L31 3 M14.5 9.5 L31 11.5" stroke-width="1.6" stroke-linecap="round" style="stroke:var(--pano-fur,#ff4d4f)"/>
     <g class="gwavy"><path class="wl" d="M-15 6 q-2.67 -2.4 -5.33 -1 t-5.33 -1 t-5.34 -1"/><path class="wl" d="M-14.5 9.5 q-2.75 -1.8 -5.5 .67 t-5.5 .67 t-5.5 .66"/><path class="wr" d="M15 6 q2.67 -2.4 5.33 -1 t5.33 -1 t5.34 -1"/><path class="wr" d="M14.5 9.5 q2.75 -1.8 5.5 .67 t5.5 .67 t5.5 .66"/></g>
-    <g class="gmouth"><ellipse cx="0" cy="8.5" rx="6" ry="4.6" fill="#3a0608"/><ellipse cx="0" cy="10.6" rx="3.4" ry="1.8" fill="#ff8a8c"/></g>
-    <path class="gflat" d="M-3 9.5 H3" stroke="#3a0608" stroke-width="1.4" stroke-linecap="round"/>
-    <ellipse class="gtongue" cx="0" cy="10.5" rx="2.2" ry="3" fill="#ff8a8c"/>
+    <g class="gmouth"><ellipse cx="0" cy="8.5" rx="6" ry="4.6" style="fill:var(--pano-mouth,#3a0608)"/><ellipse cx="0" cy="10.6" rx="3.4" ry="1.8" style="fill:var(--pano-tongue,#ff8a8c)"/></g>
+    <path class="gflat" d="M-3 9.5 H3" stroke-width="1.4" stroke-linecap="round" style="stroke:var(--pano-mouth,#3a0608)"/>
+    <ellipse class="gtongue" cx="0" cy="10.5" rx="2.2" ry="3" style="fill:var(--pano-tongue,#ff8a8c)"/>
   </g></g>
   <g class="gpaw"><g class="gpp">
-    <path d="M31 80 C 27 70, 28 62, 32 56" fill="none" stroke="#b92c2e" stroke-width="10" stroke-linecap="round"/>
-    <path d="M31 80 C 27 70, 28 62, 32 56" fill="none" stroke="#ff4d4f" stroke-width="7.4" stroke-linecap="round"/>
-    <ellipse cx="32.5" cy="53.5" rx="5.2" ry="4.2" fill="#ff4d4f" stroke="#b92c2e" stroke-width="1.3"/>
-    <path d="M30.6 50.6 v1.6 M32.6 50 v1.8 M34.6 50.6 v1.6" stroke="#b92c2e" stroke-width=".9" stroke-linecap="round"/>
+    <path d="M31 80 C 27 70, 28 62, 32 56" fill="none" stroke-width="10" stroke-linecap="round" style="stroke:var(--pano-paw,#b92c2e)"/>
+    <path d="M31 80 C 27 70, 28 62, 32 56" fill="none" stroke-width="7.4" stroke-linecap="round" style="stroke:var(--pano-fur,#ff4d4f)"/>
+    <ellipse cx="32.5" cy="53.5" rx="5.2" ry="4.2" stroke-width="1.3" style="fill:var(--pano-fur,#ff4d4f);stroke:var(--pano-paw,#b92c2e)"/>
+    <path d="M30.6 50.6 v1.6 M32.6 50 v1.8 M34.6 50.6 v1.6" stroke-width=".9" stroke-linecap="round" style="stroke:var(--pano-paw,#b92c2e)"/>
   </g></g>
 </svg></span></button>
 <div class="gbubble" id="gbubble" hidden role="dialog">
-  <button class="gx" id="gx"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#8fa898" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <button class="gx" id="gx"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke-width="1.8" stroke-linecap="round" style="stroke:var(--pano-close,#8fa898)"/></svg></button>
   <p class="gsay" id="gsay" aria-live="polite"></p>
   <div class="gacts" id="gacts"></div>
 </div>
@@ -94,7 +98,10 @@
      About the page in general:
        brain                   (needed) which brain to load: a site name ('portfolio' loads
                                brain/portfolio.json from beside this file) or the address of a brain file.
-                               If that file says "extends": "core.json", the shared file is loaded too.
+                               A brain file may say "extends": another brain file, whose lines sit under its
+                               own; that one may extend another. "base" is base.json beside this file: neutral
+                               wording for every line he needs, so a brain need only write what it changes.
+                               {cat_name} in a line or a tour is his name (lines.name).
        ga(name, params)        report an analytics event
        canGreet()              false when he should not say hello on arrival
        toast, hideToast()      a page notification he must never cover
@@ -418,7 +425,17 @@
     let L = {}, BRAIN = null;
     const fill = (t, vals) => String(t).replace(/\{(\w+)\}/g, (m, k) => k in vals ? vals[k] : m);
     const named = () => `<span class="gname">${L.name}</span>`;
+    // {cat_name} anywhere in his lines or tours is his name (lines.name)
+    const withName = (v, name) => typeof v === 'string' ? v.split('{cat_name}').join(name)
+      : Array.isArray(v) ? v.map(x => withName(x, name))
+      : isObj(v) ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, withName(x, name)]))
+      : v;
     function useBrain(B) {
+      const name = B.lines && B.lines.name;
+      if (typeof name === 'string' && JSON.stringify([B.lines, B.tours]).includes('{cat_name}')) {
+        B.lines = withName(B.lines, name);
+        if (B.tours) B.tours = withName(B.tours, name);
+      }
       BRAIN = B;
       L = B.lines || {};
       each('brain', B);
@@ -427,8 +444,11 @@
       $('#gx').setAttribute('aria-label', L.labels.close);
     }
     const brainURL = !host.brain ? '' : /[\/.]/.test(host.brain) ? new URL(host.brain, location.href).href : HOME + 'brain/' + host.brain + '.json';
-    // A site's file may say "extends": "core.json". Then the shared file is loaded too: its lines sit under the
-    // site's own (the site's win), and the whole file is kept as B.core for what both sites know.
+    // A brain file may say "extends": another brain file. Its lines sit under this file's own (this file's win, key
+    // by key), and that file may extend another in turn: Phill's portfolio.json → core.json → base. "base" (or
+    // "base.json") is base.json beside this file: neutral wording for every line he needs. Any other name is an
+    // address, relative to the file that names it. Only lines are passed down; tours, menu and the rest are each
+    // file's own. The file a site's brain extends is kept whole as B.core, for what Phill's two sites share.
     // "topics_from": [...] names other brain files whose stories he also knows here (kept as B.more).
     const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(r.status + ' for ' + u); return r.json(); });
     const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
@@ -436,15 +456,23 @@
       if (!isObj(a) || !isObj(b)) return b === undefined ? a : b;
       const o = { ...a }; for (const k in b) o[k] = merge(a[k], b[k]); return o;
     };
+    const brainAt = (f, from) => f === 'base' || f === 'base.json' ? HOME + 'base.json' : new URL(f, from).href;
+    // a file and everything under it: { file, lines } with the lines of the whole chain merged
+    async function loadChain(url, below) {
+      if (below.includes(url) || below.length > 6) throw new Error('brain files extend each other in a loop: ' + [...below, url].join(' → '));
+      const file = await getJSON(url);
+      if (!file.extends) return { file, lines: file.lines || {} };
+      const up = await loadChain(brainAt(file.extends, url), [...below, url]);
+      return { file, lines: merge(up.lines, file.lines || {}) };
+    }
     async function loadBrain() {
       const site = await getJSON(brainURL);
-      const beside = f => new URL(f, brainURL).href;
       const more = {};
-      const [core] = await Promise.all([
-        site.extends ? getJSON(beside(site.extends)) : null,
-        ...(site.topics_from || []).map(f => getJSON(beside(f)).then(j => { more[j.site || f] = j; }).catch(() => {}))
+      const [up] = await Promise.all([
+        site.extends ? loadChain(brainAt(site.extends, brainURL), [brainURL]) : null,
+        ...(site.topics_from || []).map(f => getJSON(new URL(f, brainURL).href).then(j => { more[j.site || f] = j; }).catch(() => {}))
       ]);
-      return { ...site, lines: core ? merge(core.lines || {}, site.lines || {}) : site.lines, core, more };
+      return { ...site, lines: up ? merge(up.lines, site.lines || {}) : site.lines, core: up ? up.file : null, more };
     }
     const brainReady = !brainURL ? Promise.resolve(false) : loadBrain()
       .then(B => { useBrain(B); return true; })

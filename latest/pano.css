@@ -11,6 +11,11 @@
      --pano-btn-h, --pano-btn-pad, --pano-btn-radius, --pano-btn-font, --pano-btn-align
      --pano-radius, --pano-font, --pano-ring-radius
      --pano-shadow, --pano-bubble-shadow
+   His own colors, with his red as the default:
+     --pano-fur                                    his fur
+     --pano-leg, --pano-paw                        darker shades of it: the line between his legs; his licking paw's outline
+     --pano-eyes, --pano-mouth, --pano-tongue
+     --pano-close                                  the bubble's close button
    His engine sets --pano-bar (space kept clear at the bottom on phones) and --pano-kb (keyboard height). */
 
 /* ---------- the cat guide ---------- */
@@ -60,7 +65,7 @@
 .gwavy{display:none}
 .gcat.head .gtail,.gcat.head .gtorso,.gcat.head .gwhisk{display:none}
 .gcat.head .gwavy{display:inline}
-.gwavy path{fill:none;stroke:#ff4d4f;stroke-width:1.6;stroke-linecap:round;transform-box:fill-box;animation:gwig 1.1s ease-in-out infinite alternate}
+.gwavy path{fill:none;stroke:var(--pano-fur,#ff4d4f);stroke-width:1.6;stroke-linecap:round;transform-box:fill-box;animation:gwig 1.1s ease-in-out infinite alternate}
 .gwavy .wl{transform-origin:100% 50%}.gwavy .wr{transform-origin:0 50%}
 .gwavy path:nth-child(2){animation-delay:-.35s}.gwavy path:nth-child(3){animation-delay:-.6s}.gwavy path:nth-child(4){animation-delay:-.9s}
 @keyframes gwig{0%{transform:rotate(-7deg) scaleY(1)}50%{transform:rotate(1deg) scaleY(-1)}100%{transform:rotate(7deg) scaleY(1)}}
@@ -70,14 +75,14 @@
 .gbubble.below::after{bottom:auto;top:-8px;transform:translateX(-50%) rotate(225deg)}
 .gbubble.beside::after{display:none}
 .gsay{margin:0 24px 10px 0}
-.gname{display:block;color:var(--pano-name,var(--red-ink));font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
-.gstep{display:block;color:var(--pano-step,var(--ink-soft));font-size:11.5px;margin-bottom:2px}
+.gname{display:block;color:var(--pano-name,var(--red-ink,#ff6b6d));font-size:12px;font-weight:600;letter-spacing:.04em;margin-bottom:2px}
+.gstep{display:block;color:var(--pano-step,var(--ink-soft,#8fa898));font-size:11.5px;margin-bottom:2px}
 .gacts{display:flex;flex-wrap:wrap;gap:6px}
 .gacts:empty{display:none}
 .gbtn{font:inherit;min-height:var(--pano-btn-h,34px);padding:var(--pano-btn-pad,0 12px);border-radius:var(--pano-btn-radius,999px);background:var(--pano-btn,#15241b);border:1px solid var(--pano-btn-line,#22402e);color:var(--pano-ink,#e6f2ea);font-size:var(--pano-btn-font,13px);text-align:var(--pano-btn-align,center);cursor:pointer}
 .gbtn:hover,.gbtn:focus-visible{border-color:var(--pano-accent,#3ddc84);background:var(--pano-btn-hover,#1a3324)}
 .gbtn.pri{background:var(--pano-accent,#3ddc84);border-color:var(--pano-accent,#3ddc84);color:var(--pano-accent-ink,#04140b);font-weight:600}
-.gbtn.quiet{background:none;border-color:transparent;color:var(--pano-soft,var(--ink-soft))}
+.gbtn.quiet{background:none;border-color:transparent;color:var(--pano-soft,var(--ink-soft,#8fa898))}
 .gbtn.quiet:hover{color:var(--pano-ink,#e6f2ea)}
 .gx{position:absolute;right:6px;top:6px;width:30px;height:30px;padding:0;border:0;background:none;border-radius:50%;display:grid;place-items:center;cursor:pointer}
 .gx:hover{background:var(--pano-btn,#15241b)}
@@ -88,9 +93,9 @@
 @media (prefers-reduced-motion:reduce){.gtail,.geyes,.gring,.gcat.talk .ghead,.gwavy path,.gcat.lick .gtongue,.gcat.lick .gpp,.gthink i{animation:none}}
 
 /* ---------- what his talking skills add to the bubble (talks, topics, chat) ---------- */
-.gre{display:block;color:var(--pano-soft,var(--ink-soft));font-style:italic;margin-bottom:6px}
-.gyou{display:block;color:var(--pano-soft,var(--ink-soft));margin-bottom:6px;overflow-wrap:anywhere}
-.gthink{display:block;color:var(--pano-soft,var(--ink-soft));font-style:italic}
+.gre{display:block;color:var(--pano-soft,var(--ink-soft,#8fa898));font-style:italic;margin-bottom:6px}
+.gyou{display:block;color:var(--pano-soft,var(--ink-soft,#8fa898));margin-bottom:6px;overflow-wrap:anywhere}
+.gthink{display:block;color:var(--pano-soft,var(--ink-soft,#8fa898));font-style:italic}
 .gthink i{font-style:normal;animation:gdot 1.1s infinite}
 .gthink i:nth-child(2){animation-delay:.16s}
 .gthink i:nth-child(3){animation-delay:.32s}

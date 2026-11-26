@@ -36,11 +36,21 @@ diff -r /tmp/pano-before /tmp/pano-after --exclude=shots --exclude=.scripts
 
 That is how to prove a change did nothing visible: serve the old site on one port and the new one on another, run both, and compare.
 
-Sites that load a numbered version (staging and production load `/Pano/v1/`) need the version as a third argument, so the checks that look at his files read that folder:
+Sites that load a numbered version (staging and production load `/Pano/v2/` since 2026-11-26) need the version as a third argument, so the checks that look at his files read that folder:
 
 ```bash
-tests/run_all.sh /tmp/pano-after 8773 v1
+tests/run_all.sh /tmp/pano-after 8773 v2
 ```
+
+`serve.py` takes a third argument: the Pano folder to mount at `/Pano/` (this repo if left out). To get a "before" copy of the engine, unpack an older commit and serve the same site from it on another port:
+
+```bash
+git archive <commit> | tar -x -C /tmp/pano-before-repo
+python3 tests/serve.py path/to/site 8774 /tmp/pano-before-repo &
+/tmp/pano-before-repo/tests/run_all.sh /tmp/pano-before 8774      # the old copy's own tests
+```
+
+`baseline/` keeps what the suites printed at the start of the kit build, for telling old quirks from new breakage.
 
 `run_dash.sh` takes the same third argument.
 
@@ -77,6 +87,7 @@ tests/run_dash.sh /tmp/pano-dash               # runs devdash.py and dash.py, an
 | `skills.py` | Each ability is its own file in `latest/skills/`. A skill is offered only when the page's adapter has what it needs: the test takes each adapter entry out in turn and checks that skill goes and the rest still work. Also: a saved background shows with no flash, a skill file that cannot be fetched, and Paño added to a page that has already loaded. | `skills.py` |
 | `same.py` | Two copies of a site show Paño the same: computed styles, bubble, whole-page screenshot and saved settings, in nine poses (greeting, a tour step, the background and colorblind questions, mid-change, Phill's note, after it, head mode) at three sizes. Written for phase 5 (staging before and after moving to `/Pano/v1/`). | `same.py <old port> <new port>` |
 | `carry.py` | Real dashboard only (phase 5): what a visitor already has saved still works. The same saved data (a key-shaped Console key, a fake GitHub token, a sent launch, a watched tour, a heard talk, 24-hour clock) is planted in the old page and the new one, and each is asked whether it recognises it. | Old dashboard on one port, new on another: `carry.py <old port> <new port>` |
+| `kitbase.py` | The kit (K1 in `PANO-KIT-PLAN.md`): Paño on a plain, fictional scrolling site (`sites/kite-shop/`) whose brain is only `"extends": "base"`, a name and one tour of css steps. He greets with base's wording and his own name, his menu and labels are right, the tour scrolls, rings and finishes at phone and desktop sizes, nothing he says is blank, the page can recolor him with `--pano-*` variables, the background works with no words for its options and no note, a three-file chain works, a chain that loops keeps him hidden, and `menu.show` is optional. | Serves the site itself: `kitbase.py [port]` (8790 by default). About a minute. |
 | `devdash.py` | Dashboard DEV copy only: it uses its own storage names, ignores the real token and key, and Launch is off. | Serve `Dashboard-DEV` on 8773, then `devdash.py`. |
 | `dash.py` | The dashboard on the shared Paño (phase 4). His files come from `/Pano/latest/` and the page carries none of his code or lines. Head mode and dragging. Background and colorblind modes. The three tours, including the steps that depend on the page (token saved or not, weather loaded or not). Talks and the prompt builder. His stories. The Claude chat, with a faked reply: wrong keys, a rejected key, a saved key, what is sent to Claude, errors. Each adapter entry taken out in turn. The four tours written but not offered. | Serve `Dashboard-DEV` on 8773, then `dash.py`. About 12 minutes. |
 

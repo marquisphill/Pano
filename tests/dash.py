@@ -215,7 +215,7 @@ with sync_playwright() as p:
         print(tag, 'wall 4 he offers the four colorblind modes', s.menu() == [B['modes'][m] for m in ['protan', 'deutan', 'tritan', 'mono']])
         s.tap(B['modes']['protan'], 7000)
         print(tag, 'wall 5 the mode is applied to the whole page and saved', s.pg.evaluate(N("()=>document.documentElement.dataset.cb==='protan' && getComputedStyle(document.documentElement).filter.includes('cb-protan') && localStorage.getItem('dev-pd-cb')==='protan' && document.getElementById('wall').dataset.wall==='ocean'")))
-        print(tag, 'wall 6 and he passes on Phill\'s note', B['phill_note'] in s.say() and not s.pg.evaluate("()=>!!document.querySelector('.grayveil,.wipeline,.wallnext')"))
+        print(tag, 'wall 6 and he passes on Phill\'s note', B['note'] in s.say() and not s.pg.evaluate("()=>!!document.querySelector('.grayveil,.wipeline,.wallnext')"))
         s.pg.screenshot(path=f'/tmp/pano-qa/dash-{tag}-wall.png')
         s.pg.reload(); s.wait(2000)
         print(tag, 'wall 7 both are still there after a reload', s.pg.evaluate("()=>document.documentElement.dataset.cb==='protan' && document.getElementById('wall').dataset.wall==='ocean'"))

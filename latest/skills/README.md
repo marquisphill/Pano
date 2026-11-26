@@ -82,7 +82,7 @@ What `start()` may return. All are optional:
 
 1. Write `skills/<name>.js` in the shape above.
 2. Add its name near the top of `pano.js`: to `EARLY` if every page should load it, or to `LATE` if it should be fetched only where a page's adapter has an entry with the same name. The order there is the order in his menu.
-3. Put his words in the brain under `lines`, not in the code.
+3. Put his words in the brain under `lines`, not in the code. Add neutral wording for each new line to `../base.json` too, so every brain has it (every brain ends its `extends` chain in base).
 4. Add the adapter entry to each site that should have it.
 5. Add a test to `tests/skills.py` (portfolio) or `tests/dash.py` (dashboard).
 
