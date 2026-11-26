@@ -111,6 +111,8 @@
                                { bar: { wide, narrow }   space to keep clear at the bottom of the screen
                                  safeArea: true          also keep clear of the phone's gesture bar
                                  scrolls: true }         the page itself scrolls: he scrolls what he points at into view
+                                                         (on phones, adding blank room below the page while his
+                                                         bubble is up if the page ends too soon, e.g. for a footer)
        keys                    { greeted, head } names for what he remembers in this tab (each site should use its own)
        idle                    { quiet, waiting } milliseconds before he tucks away (4000 and 10000 if left out)
        memory                  { mem, seen } names for what he remembers between visits: what the visitor told
