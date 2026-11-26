@@ -1,0 +1,45 @@
+{
+  "_about": "Paño's brain for TODO-site. Made from kit/templates/brain.json (github.com/marquisphill/Pano). Every line he says that is not written here comes from base.json, in plain, friendly English. kit/BRAIN.md lists every field. Keys starting with _ are notes for people; he ignores them. Replace every TODO, then run Pano.check() in the browser console.",
+  "extends": "base",
+  "lines": {
+    "name": "Paño",
+    "hello": "TODO: his first words on arrival, in the site's tone. Say what he can help with. Example: Hi, I’m {cat_name}! I can show you around the shop. What would you like to do?",
+    "menu": {
+      "ask": "What would you like to do?",
+      "after_tour": "Done! What would you like to do next?",
+      "bye": "Okay! I’m right here if you need a hand."
+    },
+    "background": {
+      "_how": "Words for each background in setup.js's walls list, by name. Delete this group if the site has no background changer.",
+      "options": {
+        "plain": "The usual",
+        "sky": "Sky blue",
+        "peach": "Peach",
+        "mint": "Mint",
+        "paper": "Paper"
+      }
+    }
+  },
+  "tours": {
+    "_how": "One tour for each thing he helps visitors do. Each step points at one thing on the page (target.css, ideally an id) and says one short thing about it. Move on with \"next\" (a button) or \"done\" (something becomes visible). \"act\" adds a button that does it for them. \"pages\" lists the pages a tour is offered on, relative to this file: [\"../contact.html\"]. Left out, every page.",
+    "TODO-first": {
+      "label": "TODO: the button in his menu, as a visitor would ask it. Example: How do I book a class?",
+      "steps": [
+        { "say": "TODO: what he says while pointing at this.", "target": { "css": "#TODO-id" }, "next": "Next" },
+        { "say": "TODO: the last step. Example: Type your email here, then press <b>Send</b>.", "target": { "css": "#TODO-id" }, "act": { "focus": "#TODO-id" }, "actLabel": "Take me there", "next": "Got it" }
+      ]
+    },
+    "TODO-second": {
+      "label": "TODO",
+      "steps": [
+        { "say": "TODO", "target": { "css": "#TODO-id" }, "next": "Got it" }
+      ]
+    },
+    "TODO-third": {
+      "label": "TODO",
+      "steps": [
+        { "say": "TODO", "target": { "css": "#TODO-id" }, "next": "Got it" }
+      ]
+    }
+  }
+}

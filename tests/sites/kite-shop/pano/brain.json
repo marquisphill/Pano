@@ -4,9 +4,18 @@
   "tours": {
     "contact": {
       "label": "How do I get in touch?",
+      "pages": ["../index.html"],
       "steps": [
         { "say": "Scroll down to <b>Contact</b>. This is the form.", "target": { "css": "#contact-form" }, "next": "Next" },
         { "say": "Type your email here, then press <b>Send</b>.", "target": { "css": "#contact-email" }, "act": { "focus": "#contact-email" }, "actLabel": "Take me there", "next": "Got it" }
+      ]
+    },
+    "visit": {
+      "label": "When can I visit?",
+      "pages": ["../visit.html"],
+      "steps": [
+        { "say": "These are our opening hours.", "target": { "css": "#hours-card" }, "next": "Next" },
+        { "say": "To book a visit, type your name here.", "target": { "css": "#visit-name" }, "act": { "focus": "#visit-name" }, "actLabel": "Take me there", "next": "Got it" }
       ]
     }
   }

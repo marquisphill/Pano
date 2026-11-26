@@ -1,0 +1,23 @@
+<!--
+  Paño on this page. Made from kit/templates/adapter.html (github.com/marquisphill/Pano).
+  Every page he appears on gets these lines. Nothing else in the page changes.
+
+  1. In <head>, after the site's own stylesheets:
+-->
+<link rel="stylesheet" href="https://marquisphill.github.io/Pano/latest/pano.css">
+<link rel="stylesheet" href="pano/colors.css">
+
+<!--
+  2. Just before </body>, after the site's own scripts:
+-->
+<script src="https://marquisphill.github.io/Pano/latest/pano.js"></script>
+<script src="pano/setup.js"></script>
+
+<!--
+  Notes
+  - Paño's own files (pano.css, pano.js) are always loaded from the address above. Never copy them into the site.
+  - "pano/..." is relative to the page. A page in a folder (blog/post.html) needs "../pano/colors.css" and
+    "../pano/setup.js". setup.js finds the brain by itself, from any page.
+  - Leave out the colors.css line if the site keeps his default colors and has no background changer.
+  - If his files can't be loaded, the page works as before: setup.js does nothing without them.
+-->

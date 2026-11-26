@@ -1,0 +1,62 @@
+{
+  "_about": "Paño's brain for Pebblewick Pottery, the kit's example site (a made-up studio). Made from kit/templates/brain.json. Every line not written here comes from base.json. kit/BRAIN.md lists every field.",
+  "extends": "base",
+  "lines": {
+    "name": "Pip",
+    "hello": "Hi, I’m {cat_name}, the studio cat! I can show you around. What would you like to see?",
+    "menu": {
+      "ask": "What would you like to see?",
+      "after_tour": "There you go! Anything else?",
+      "leave_first": "Just browsing",
+      "leave_again": "That’s all, thanks",
+      "bye": "Okay! I’ll be by the kiln if you need me."
+    },
+    "background": {
+      "ask": "Which background would you like behind the pots?",
+      "done": "Done! Enjoy the new look.",
+      "options": {
+        "plain": "The usual cream",
+        "sky": "Sky blue",
+        "peach": "Peach",
+        "mint": "Mint",
+        "paper": "Dotted paper"
+      }
+    }
+  },
+  "tours": {
+    "make": {
+      "_why": "Only the home page has the gallery.",
+      "label": "What do you make?",
+      "pages": ["../index.html"],
+      "steps": [
+        { "say": "These are the three things we make most: mugs, bowls and planters.", "target": { "css": "#gallery-list" }, "next": "Next" },
+        { "say": "Everything is made in the room behind the shop. Come and watch on a Saturday!", "target": { "css": "#about" }, "next": "Got it" }
+      ]
+    },
+    "join-here": {
+      "_why": "Classes have their own page. On the home page, this tour points the way there; on classes.html, the tour below (with the same label) shows the form.",
+      "label": "How do I join a class?",
+      "pages": ["../index.html"],
+      "steps": [
+        { "say": "Classes are on their own page. Click <b>Classes</b> up here, then ask me again there and I’ll show you the sign-up form.", "target": { "css": "#nav-classes" }, "act": { "click": "#nav-classes" }, "actLabel": "Take me there", "next": "Got it" }
+      ]
+    },
+    "join": {
+      "label": "How do I join a class?",
+      "pages": ["../classes.html"],
+      "steps": [
+        { "say": "Here are this month’s classes. Pick the one you like.", "target": { "css": "#class-list" }, "next": "Next" },
+        { "say": "Then fill in your name and email here.", "target": { "css": "#signup-name" }, "act": { "focus": "#signup-name" }, "actLabel": "Take me there", "next": "Next" },
+        { "say": "Choose your class, and press <b>Sign me up</b>. We’ll write back within a day.", "target": { "css": "#signup-send" }, "next": "Got it" }
+      ]
+    },
+    "visit": {
+      "_why": "Every page has the footer, so this tour has no \"pages\".",
+      "label": "When can I visit?",
+      "steps": [
+        { "say": "We’re open Thursday to Sunday, 10 to 4. The address is here too.", "target": { "css": "#visit-hours" }, "next": "Next" },
+        { "say": "Or write to us here. We answer every email.", "target": { "css": "#visit-email" }, "next": "Got it" }
+      ]
+    }
+  }
+}

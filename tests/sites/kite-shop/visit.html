@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Visit Hollow Pine Kites (a made-up shop for testing Paño)</title>
+<link rel="stylesheet" href="/Pano/latest/pano.css">
+<style>
+  /* The kite shop's second page, for tours that name their pages ("pages"). Same brain, same adapter. Fictional. */
+  body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#1d2a24;background:#f6f3ec}
+  #backdrop{position:fixed;inset:0;z-index:-1;background:#f6f3ec}
+  #backdrop[data-wall="dusk"],.wallnext[data-wall="dusk"]{background:linear-gradient(#2b2d55,#c56a6a)}
+  #backdrop[data-wall="meadow"],.wallnext[data-wall="meadow"]{background:linear-gradient(#bfe3c0,#6aa56d)}
+  header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#fff}
+  nav a{margin-left:14px;color:inherit}
+  section{max-width:760px;margin:0 auto;padding:48px 20px;min-height:70vh}
+  .card{background:#fff;border-radius:12px;padding:20px;margin:16px 0}
+  label{display:block;margin:10px 0 4px}
+  input{width:100%;box-sizing:border-box;padding:10px;font:inherit}
+  footer{padding:40px 20px;text-align:center}
+</style>
+</head>
+<body>
+<div id="backdrop"></div>
+<header><strong>Hollow Pine Kites</strong><nav><a href="index.html#kites">Kites</a><a href="index.html#classes">Classes</a><a href="index.html#contact">Contact</a><a href="visit.html">Visit</a></nav></header>
+<section id="visit-hero"><h1>Visit the workshop</h1><p>Come and see the kites being made. A made-up place.</p></section>
+<section id="hours"><h2>Opening hours</h2><div class="card" id="hours-card"><p>Thursday to Sunday, 11 am to 5 pm.</p></div></section>
+<section id="book"><h2>Book a visit</h2>
+  <form id="visit-form" class="card" onsubmit="event.preventDefault();document.getElementById('booked').hidden=false">
+    <label for="visit-name">Your name</label><input id="visit-name">
+    <label for="visit-day">Which day?</label><input id="visit-day" type="date">
+    <p><button id="visit-send" type="submit">Book</button></p>
+    <p id="booked" hidden>Booked! (Not really.)</p>
+  </form>
+</section>
+<footer>Hollow Pine Kites is fictional.</footer>
+<script src="/Pano/latest/pano.js"></script>
+<script>
+  Pano.init({
+    brain: 'pano/brain.json',
+    layout: { bar: { wide: 0, narrow: 0 }, scrolls: true },
+    keys: { greeted: 'kite-greeted', head: 'kite-head' },
+    background: { desk: document.getElementById('backdrop'), walls: ['plain', 'dusk', 'meadow'], modes: ['protan', 'deutan', 'tritan', 'mono'], keys: { wall: 'kite-wall', cb: 'kite-cb' } }
+  });
+</script>
+</body>
+</html>

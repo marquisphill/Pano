@@ -1,0 +1,52 @@
+/* Paño's colors on this site, and the backgrounds he offers. Every page links it after pano.css.
+   Made from kit/templates/colors.css (github.com/marquisphill/Pano). Every value below is his default,
+   so delete any line you don't change. */
+
+:root {
+  /* His fur and face. For a new fur color, make --pano-leg and --pano-paw the same color about 20% darker,
+     --pano-name the same color a little lighter (it is his name above each bubble), and keep the eyes dark. */
+  --pano-fur: #ff4d4f;
+  --pano-leg: #c93436;
+  --pano-paw: #b92c2e;
+  --pano-eyes: #07100b;
+  --pano-mouth: #3a0608;
+  --pano-tongue: #ff8a8c;
+
+  /* His speech bubble. Keep --pano-ink easy to read on --pano-bubble (a contrast of at least 4.5 to 1),
+     and --pano-accent-ink on --pano-accent. */
+  --pano-bubble: #0f1b14;        /* bubble background */
+  --pano-line: #2a9a5f;          /* bubble border */
+  --pano-ink: #e6f2ea;           /* bubble text */
+  --pano-name: #ff6b6d;          /* his name above what he says */
+  --pano-soft: #8fa898;          /* quiet text and quiet buttons */
+  --pano-step: #8fa898;          /* "Step 1 of 3" */
+  --pano-accent: #3ddc84;        /* main buttons, the ring around what he points at, focus outlines */
+  --pano-accent-ink: #04140b;    /* text on main buttons */
+  --pano-glow: rgba(61, 220, 132, .55);   /* the ring's pulse: --pano-accent, half see-through... */
+  --pano-glow-0: rgba(61, 220, 132, 0);   /* ...fading to nothing */
+  --pano-btn: #15241b;           /* other buttons */
+  --pano-btn-line: #22402e;
+  --pano-btn-hover: #1a3324;
+  --pano-close: #8fa898;         /* the bubble's close button */
+  /* Also available: --pano-radius, --pano-font, --pano-btn-radius, --pano-ring-radius, --pano-shadow. */
+}
+
+/* ---- The background changer (delete this part if the site has none) ----
+   A layer behind the whole page. "plain" (no data-wall) leaves the site as it is. Each other name in
+   setup.js's "walls" needs a look here, on both selectors. These are soft, light looks for a site with
+   dark text; for a dark site with light text, use the dark set below instead (and rename them in setup.js
+   and in the brain's lines.background.options). */
+#pano-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+#pano-backdrop .wallnext[data-wall="plain"] { background: var(--pano-page, #fff); }   /* set --pano-page to the site's own page color */
+
+#pano-backdrop[data-wall="sky"],   #pano-backdrop .wallnext[data-wall="sky"]   { background: linear-gradient(180deg, #e8f4ff, #c7e2ff); }
+#pano-backdrop[data-wall="peach"], #pano-backdrop .wallnext[data-wall="peach"] { background: linear-gradient(180deg, #fff3e8, #ffd8c0); }
+#pano-backdrop[data-wall="mint"],  #pano-backdrop .wallnext[data-wall="mint"]  { background: linear-gradient(180deg, #ecfaf2, #c6eed8); }
+#pano-backdrop[data-wall="paper"], #pano-backdrop .wallnext[data-wall="paper"] { background: radial-gradient(#d8d2c4 1px, transparent 1.5px) 0 0 / 18px 18px, #faf7f0; }
+
+/* The dark set, for a site with light text on a dark page:
+#pano-backdrop[data-wall="dusk"],   #pano-backdrop .wallnext[data-wall="dusk"]   { background: linear-gradient(180deg, #1c2040, #3a2a4a); }
+#pano-backdrop[data-wall="forest"], #pano-backdrop .wallnext[data-wall="forest"] { background: linear-gradient(180deg, #0f2419, #1f3d2c); }
+#pano-backdrop[data-wall="ink"],    #pano-backdrop .wallnext[data-wall="ink"]    { background: #101317; }
+#pano-backdrop[data-wall="stars"],  #pano-backdrop .wallnext[data-wall="stars"]  { background: radial-gradient(rgba(255,255,255,.22) 1px, transparent 1.5px) 0 0 / 22px 22px, #0d1020; }
+*/

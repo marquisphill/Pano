@@ -1,0 +1,40 @@
+/* Paño's colors on this site, and the backgrounds he offers. Every page links it after pano.css.
+   Made from kit/templates/colors.css (github.com/marquisphill/Pano). Lines left at his defaults were deleted. */
+
+:root {
+  /* Pip is a clay-orange cat */
+  --pano-fur: #e07a3f;
+  --pano-leg: #b35f2f;
+  --pano-paw: #a6572b;
+  --pano-mouth: #3a1a08;
+  --pano-tongue: #ffad94;
+  --pano-shadow: rgba(60, 40, 20, .35);
+
+  /* a cream bubble, to suit a light site */
+  --pano-bubble: #fffaf3;
+  --pano-line: #d9c3a5;
+  --pano-ink: #2b2118;
+  --pano-name: #a2461f;
+  --pano-soft: #6b5a4a;
+  --pano-step: #6b5a4a;
+  --pano-accent: #a2461f;
+  --pano-accent-ink: #ffffff;
+  --pano-glow: rgba(162, 70, 31, .45);
+  --pano-glow-0: rgba(162, 70, 31, 0);
+  --pano-btn: #f4ebdf;
+  --pano-btn-line: #e2d3bf;
+  --pano-btn-hover: #efe2d1;
+  --pano-close: #6b5a4a;
+  --pano-bubble-shadow: 0 14px 36px rgba(60, 40, 20, .25);
+
+  --pano-page: #fbf6ee;          /* the site's own page color, for the wipe back to "plain" */
+}
+
+/* ---- The background changer ---- */
+#pano-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+#pano-backdrop .wallnext[data-wall="plain"] { background: var(--pano-page, #fff); }
+
+#pano-backdrop[data-wall="sky"],   #pano-backdrop .wallnext[data-wall="sky"]   { background: linear-gradient(180deg, #e8f4ff, #c7e2ff); }
+#pano-backdrop[data-wall="peach"], #pano-backdrop .wallnext[data-wall="peach"] { background: linear-gradient(180deg, #fff3e8, #ffd8c0); }
+#pano-backdrop[data-wall="mint"],  #pano-backdrop .wallnext[data-wall="mint"]  { background: linear-gradient(180deg, #ecfaf2, #c6eed8); }
+#pano-backdrop[data-wall="paper"], #pano-backdrop .wallnext[data-wall="paper"] { background: radial-gradient(#d8d2c4 1px, transparent 1.5px) 0 0 / 18px 18px, #faf7f0; }

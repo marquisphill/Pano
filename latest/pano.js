@@ -375,7 +375,29 @@
     function scrollNarrow(el) {
       const r = el.getBoundingClientRect(), avail = gbub.getBoundingClientRect().top - 12;
       if (r.top >= 12 && r.bottom <= avail) return Promise.resolve();
-      return scrollPage(scrollY + r.top - Math.max(12, (avail - r.height) / 2));
+      const y = scrollY + r.top - Math.max(12, (avail - r.height) / 2);
+      makeRoom(y);
+      return scrollPage(y);
+    }
+    // Near the end of a page there may be nothing left to scroll, and the bubble would cover what he points at
+    // (a footer, say). Then he adds blank room below the page, and takes it away again when he goes to rest.
+    let room = null;
+    function makeRoom(y) {
+      const short = Math.ceil(y - (document.documentElement.scrollHeight - innerHeight));
+      if (short <= 0) return;
+      if (!room) {
+        room = document.createElement('div'); room.className = 'groom'; room.setAttribute('aria-hidden', 'true');
+        room.style.cssText = 'display:block;height:0;margin:0;padding:0;pointer-events:none';
+        document.body.appendChild(room);
+      }
+      room.style.height = (room.offsetHeight + short) + 'px';
+    }
+    async function dropRoom() {
+      if (!room) return;
+      const r = room; room = null;
+      const end = document.documentElement.scrollHeight - r.offsetHeight - innerHeight;
+      if (scrollY > end) await scrollPage(end);      // scroll back up out of it first, so nothing jumps
+      r.remove();
     }
     if (LAY.scrolls) {
       // the page scrolls under him: during a step, hop back next to the thing being pointed at
@@ -602,7 +624,7 @@
       const token = ++stepToken;
       calmCat();
       tour = null; ringOff();
-      gbub.hidden = true;
+      gbub.hidden = true; dropRoom();
       await moveCat(homeSpot(), false);
       if (token !== stepToken) return;
       if (!msg) { armIdle(); return; }
@@ -617,7 +639,7 @@
       headMode = true; headHome = true; headMoved = false;
       calmCat();
       try { sessionStorage.setItem(KEYS.head, '1'); } catch (e) {}
-      ringOff(); gbub.hidden = true;
+      ringOff(); gbub.hidden = true; dropRoom();
       gcat.classList.add('head'); gsvg.setAttribute('viewBox', HEAD_VB); gsvg.classList.remove('flip');
       setCat(headSpot());
       if (pop && !reduce) gbodyEl.animate([{ transform: 'scale(.3)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: SPRING_WIN.duration, easing: SPRING_WIN.easing });
@@ -742,6 +764,7 @@
       $, ga, reduce, narrow, sleep, anim, fill, named, forTouch, SPRING_WIN, SPRING_MENU, EASE_OUT,
       pick: one, esc, waitFor,
       get brain() { return BRAIN; },                           // his whole brain (B.core is the shared file)
+      brainURL,                                                // the full address of the site's own brain file
       mem, saveMem, seen, markSeen, remembers: !!MEMK,         // what he remembers between visits (see memory above)
       skill: name => live.find(sk => sk.name === name) || null,
       goFor, comeHome, placeBubble, touch: touchPano,
@@ -861,7 +884,7 @@
           else if (!owner) note('unknown field', k, 'nothing in Paño reads it; is it misspelt? (Start it with _ to keep it as a note.)');
         }
         // each skill checks its own part: tours check their steps, the background its names and styles
-        for (const s of live) if (s.check) { try { s.check({ bad, note }); } catch (e) { note('check', s.name, 'could not be checked: ' + e.message); } }
+        for (const s of live) if (s.check) { try { await s.check({ bad, note }); } catch (e) { note('check', s.name, 'could not be checked: ' + e.message); } }
       }
       const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
       const short = u => u === BASE ? 'base' : u;

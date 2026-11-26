@@ -1,6 +1,7 @@
 # Kit check (K2 in PANO-KIT-PLAN.md): Pano.check() and kit/brain.schema.json.
 # Uses the fictional kite shop (tests/sites/kite-shop/) and breaks its brain or adapter one way at a time,
 # checking that Pano.check() names each mistake and where it is, and that the schema agrees.
+# Also (K3): tours that name their pages ("pages"), on the shop's two pages (index.html and visit.html).
 # Serves the site itself:
 #   python3 tests/kitcheck.py            (port 8791)
 #   python3 tests/kitcheck.py 8792
@@ -39,7 +40,7 @@ def has(found, kind, where, bit=''):
 with sync_playwright() as p:
     b = p.chromium.launch()
 
-    def run(brain_body=None, page=None):
+    def run(brain_body=None, page=None, url=U, menu=False):
         c = b.new_context(viewport={'width': 1280, 'height': 800})
         pg = c.new_page(); errs, logs = [], []
         pg.on('pageerror', lambda e: errs.append(str(e)))
@@ -49,8 +50,9 @@ with sync_playwright() as p:
             pg.route('**/pano/brain.json', lambda r: r.fulfill(status=200, content_type='application/json', body=body))
         if page is not None:
             pg.route('**/index.html', lambda r: r.fulfill(status=200, content_type='text/html; charset=utf-8', body=page))
-        pg.goto(U); pg.wait_for_timeout(1500)
+        pg.goto(url); pg.wait_for_timeout(2500 if menu else 1500)
         r = pg.evaluate("()=>Pano.check()")
+        if menu: r['menu'] = pg.evaluate("()=>Pano.here ? [...document.querySelectorAll('#gacts button')].map(b=>b.textContent) : []")
         c.close()
         return r, errs, logs
 
@@ -58,9 +60,9 @@ with sync_playwright() as p:
     r, e, logs = run(); errors += e
     report = next((t for t in logs if t.startswith('Paño check:')), '')
     print('check 1 the kite shop as it is: no problems', r['ok'] and r['problems'] == [], r['problems'])
-    print('check 2 its notes: no words for its three backgrounds', sorted(x['where'] for x in r['notes']) == ['lines.background.options.dusk', 'lines.background.options.meadow', 'lines.background.options.plain'], [x['where'] for x in r['notes']])
+    print('check 2 its notes: no words for its three backgrounds, and its visit tour is for another page', sorted(x['where'] for x in r['notes']) == ['lines.background.options.dusk', 'lines.background.options.meadow', 'lines.background.options.plain', 'tours.visit'], [x['where'] for x in r['notes']])
     print('check 3 it says which brain files it read', r['brain'] == [f'http://localhost:{PORT}/pano/brain.json', 'base'], r['brain'])
-    print('check 4 and prints a report in the console', report.startswith('Paño check: no problems, 3 notes. Brain: ') and 'Skills: tours on; background on; windows off' in report, report.split('\n')[0])
+    print('check 4 and prints a report in the console', report.startswith('Paño check: no problems, 4 notes. Brain: ') and 'Skills: tours on; background on; windows off' in report, report.split('\n')[0])
 
     cases = [
         ('lines 1 a misspelt line', brain(lambda B: B['lines'].update(menu={'aks': 'What now?'})), 'unknown line', 'lines.menu.aks', 'misspelt'),
@@ -93,7 +95,7 @@ with sync_playwright() as p:
     r, e, _ = run(brain(lambda B: B.update(description='Kite shop'))); errors += e
     print('note 2 a field nothing reads', r['ok'] and has(r['notes'], 'unknown field', 'description'))
     r, e, _ = run(brain(lambda B: B['lines'].update(background={'options': {'plain': 'Plain', 'dusk': 'Dusk', 'meadow': 'Meadow', 'sunsett': 'Sunset'}}))); errors += e
-    print('note 3 words for a background the page does not have', r['ok'] and has(r['notes'], 'background', 'lines.background.options.sunsett') and len(r['notes']) == 1, [x['where'] for x in r['notes']])
+    print('note 3 words for a background the page does not have', r['ok'] and has(r['notes'], 'background', 'lines.background.options.sunsett') and [x['where'] for x in r['notes'] if x['kind'] != 'other page'] == ['lines.background.options.sunsett'], [x['where'] for x in r['notes']])
     r, e, _ = run(brain(lambda B: B['tours']['contact']['steps'][1].update(target={'css': '#later-thing'}, act={'click': '#contact-send'}) or B['tours']['contact']['steps'].append({'say': 'And this.', 'target': {'css': '#added-later'}, 'next': 'OK'}))); errors += e
     print('note 4 after a step that does something, a missing target may come later', r['ok'] is False and has(r['problems'], 'target not found', 'tours.contact step 2', '#later-thing') and has(r['notes'], 'target not found', 'tours.contact step 3', '#added-later'))
 
@@ -106,6 +108,56 @@ with sync_playwright() as p:
     print('adapter 3 no brain named', has(r['problems'], 'brain', 'adapter', 'names no brain'))
     r, e, _ = run(page=PAGE.replace('Pano.init({', 'false && Pano.init({')); errors += e
     print('adapter 4 Pano.init() never ran', not r['ok'] and r['problems'][0]['say'] == 'Pano.init() has not run on this page')
+    # ---------- tours that name their pages ("pages"), on the shop's two pages ----------
+    V2 = f'http://localhost:{PORT}/visit.html'
+    CONTACT, VISIT = BRAIN['tours']['contact']['label'], BRAIN['tours']['visit']['label']
+    NAV = {'label': 'Where is everything?', 'steps': [{'say': 'Everything is up here.', 'target': {'css': 'header nav'}, 'next': 'OK'}]}
+    r, e, _ = run(menu=True); errors += e
+    print('pages 1 index.html: he offers the contact tour, not the visit tour, and says why in a note', r['ok'] and CONTACT in r['menu'] and VISIT not in r['menu'] and has(r['notes'], 'other page', 'tours.visit', '"../visit.html"'), r['menu'])
+    r, e, _ = run(url=V2, menu=True); errors += e
+    print('pages 2 visit.html: the visit tour, not the contact tour, and no problems', r['ok'] and VISIT in r['menu'] and CONTACT not in r['menu'] and has(r['notes'], 'other page', 'tours.contact', '"../index.html"'), r['menu'], r['problems'])
+    for label, url in [('pages 3 "/" is the same page as index.html', f'http://localhost:{PORT}/'), ('pages 4 a query and a hash are ignored', U + '?from=mail#contact')]:
+        r, e, _ = run(url=url, menu=True); errors += e
+        print(label, r['ok'] and CONTACT in r['menu'] and VISIT not in r['menu'], r['menu'])
+    # GitHub Pages serves visit.html at /visit too
+    c = b.new_context(viewport={'width': 1280, 'height': 800}); pg = c.new_page(); pg.on('pageerror', lambda e: errors.append(str(e)))
+    pg.route('**/visit', lambda r: r.fulfill(status=200, content_type='text/html; charset=utf-8', body=get('/visit.html')))
+    pg.goto(f'http://localhost:{PORT}/visit'); pg.wait_for_timeout(2500)
+    m = pg.evaluate("()=>[...document.querySelectorAll('#gacts button')].map(b=>b.textContent)")
+    print('pages 5 "visit.html" also matches the address /visit', VISIT in m and CONTACT not in m, m)
+    c.close()
+    both = brain(lambda B: B['tours'].update(nav=NAV, both=dict(NAV, label='Both pages', pages=['../index.html', '../visit.html'])))
+    r1, e1, _ = run(both, menu=True); r2, e2, _ = run(both, url=V2, menu=True); errors += e1 + e2
+    print('pages 6 a tour with no "pages" is offered on every page, and one naming both pages on both', all(x['ok'] and NAV['label'] in x['menu'] and 'Both pages' in x['menu'] for x in (r1, r2)), r1['menu'], r2['menu'])
+    r, e, _ = run(brain(lambda B: B['tours']['visit'].update(pages=['visit.html']))); errors += e
+    print('pages 7 an address that is not there (relative to the brain, so pano/visit.html) is a problem, with a hint', has(r['problems'], 'tour', 'tours.visit.pages', '404') and has(r['problems'], 'tour', 'tours.visit.pages', '"../visit.html"'), [x['say'][:110] for x in r['problems']])
+    r, e, _ = run(brain(lambda B: B['tours']['visit'].update(pages='../visit.html')), url=V2, menu=True); errors += e
+    print('pages 8 "pages" that is not a list is a problem, and the tour is not offered', has(r['problems'], 'tour', 'tours.visit.pages', 'list of page addresses') and VISIT not in r['menu'], r['menu'])
+    r, e, _ = run(brain(lambda B: B['tours']['visit'].update(pages=[]))); errors += e
+    print('pages 9 an empty list is a problem', has(r['problems'], 'tour', 'tours.visit.pages', 'list of page addresses'))
+    broken_visit = brain(lambda B: B['tours']['visit']['steps'][0].update(target={'css': '#hours-crad'}))
+    r1, e1, _ = run(broken_visit); r2, e2, _ = run(broken_visit, url=V2); errors += e1 + e2
+    print('pages 10 a misspelt target is left alone on other pages, and caught on its own page', r1['ok'] and not r2['ok'] and has(r2['problems'], 'target not found', 'tours.visit step 1', '#hours-crad'))
+    r, e, _ = run(brain(lambda B: B['tours'].pop('contact')), menu=True); errors += e
+    print('pages 11 no tour for this page: a note, and his menu offers none', r['ok'] and has(r['notes'], 'tour', 'tours', 'none of its tours') and VISIT not in r['menu'], r['menu'])
+
+    # the visit tour, start to finish on its own page, at phone and desktop sizes
+    PRESS = "t=>{const b=[...document.querySelectorAll('#gacts button')].find(b=>b.textContent===t);if(b)b.click();return !!b}"
+    SAY = "()=>{const b=document.getElementById('gbubble');return b.hidden?'':document.getElementById('gsay').innerText}"
+    for tag, W, H in [('phone', 390, 800), ('desk', 1280, 800)]:
+        c = b.new_context(viewport={'width': W, 'height': H}, has_touch=W <= 640); pg = c.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.goto(V2); pg.wait_for_timeout(3000)
+        said = []
+        pg.evaluate(PRESS, VISIT); pg.wait_for_timeout(2500); said.append(pg.evaluate(SAY))
+        ring = pg.evaluate("()=>{const r=document.querySelector('#hours-card').getBoundingClientRect(),g=document.getElementById('gring');return !g.hidden&&r.top>=0&&r.top<innerHeight}")
+        pg.evaluate(PRESS, 'Next'); pg.wait_for_timeout(2500); said.append(pg.evaluate(SAY))
+        pg.evaluate(PRESS, 'Take me there'); pg.wait_for_timeout(300)
+        focus = pg.evaluate("()=>document.activeElement.id")
+        pg.evaluate(PRESS, 'Got it'); pg.wait_for_timeout(2500); said.append(pg.evaluate(SAY))
+        print(tag, 'pages 12 the visit tour runs to the end on visit.html', 'Step 1 of 2' in said[0] and ring and 'Step 2 of 2' in said[1] and focus == 'visit-name' and BASE['lines']['menu']['after_tour'] in said[2], said, focus)
+        errors += errs
+        c.close()
     print('errors', errors)
     b.close()
 server.terminate()
@@ -145,4 +197,7 @@ broken = [
     ('no tours', brain(lambda B: B.update(tours={}))),
 ]
 print('schema 5 it turns away each broken brain', all(not ok(B) for _, B in broken), [n for n, B in broken if ok(B)])
+pages_ok = brain(lambda B: B['tours']['contact'].update(pages=['../index.html', '/kites/', 'https://example.com/a.html']))
+pages_bad = [brain(lambda B: B['tours']['contact'].update(pages='../index.html')), brain(lambda B: B['tours']['contact'].update(pages=[])), brain(lambda B: B['tours']['contact'].update(pages=['']))]
+print('schema 7 "pages" is a list of page addresses: a list fits, a plain string, an empty list or a blank address does not', ok(pages_ok) and not any(ok(B) for B in pages_bad))
 print('schema 6 a note for people (a key starting with _) is fine anywhere', ok(brain(lambda B: B.update(_note='hi') or B['lines'].update(_why='x') or B['tours']['contact']['steps'][0].update(_todo='x'))))

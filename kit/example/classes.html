@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Classes at Pebblewick Pottery (a made-up studio)</title>
+<link rel="stylesheet" href="site.css">
+<!-- Paño: kit/templates/adapter.html, part 1 -->
+<link rel="stylesheet" href="https://marquisphill.github.io/Pano/latest/pano.css">
+<link rel="stylesheet" href="pano/colors.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="index.html">Pebblewick Pottery</a>
+  <nav><a href="index.html">Home</a><a id="nav-classes" href="classes.html" aria-current="page">Classes</a><a href="#visit">Visit</a></nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Classes</h1>
+    <p>Small groups, all clay and tools included. No experience needed.</p>
+  </section>
+
+  <section id="classes">
+    <h2>This month</h2>
+    <div class="cards" id="class-list">
+      <article class="card"><h3>First pots</h3><p>Saturday mornings. Learn to centre the clay and throw a simple cup.</p></article>
+      <article class="card"><h3>Glazing evening</h3><p>Wednesday, 6 pm. Paint and dip pots made by the studio.</p></article>
+      <article class="card"><h3>Make a mug</h3><p>Two Sundays: throw it on the first, add the handle on the second.</p></article>
+    </div>
+  </section>
+
+  <section id="signup">
+    <h2>Sign up</h2>
+    <form id="signup-form" class="card" onsubmit="event.preventDefault(); document.getElementById('signup-thanks').hidden = false;">
+      <label for="signup-name">Your name</label><input id="signup-name" autocomplete="name">
+      <label for="signup-email">Email</label><input id="signup-email" type="email" autocomplete="email">
+      <label for="signup-class">Class</label>
+      <select id="signup-class"><option>First pots</option><option>Glazing evening</option><option>Make a mug</option></select>
+      <p><button id="signup-send" class="button" type="submit">Sign me up</button></p>
+      <p id="signup-thanks" hidden>Thanks! (This is an example: nothing was sent.)</p>
+    </form>
+  </section>
+</main>
+
+<footer id="visit">
+  <h2>Visit</h2>
+  <p id="visit-hours">Open Thursday to Sunday, 10 am to 4 pm.<br>4 Kiln Row, Pebblewick (not a real place).</p>
+  <p>Questions? <a id="visit-email" href="mailto:hello@example.com">hello@example.com</a></p>
+</footer>
+
+<!-- Paño: kit/templates/adapter.html, part 2 -->
+<script src="https://marquisphill.github.io/Pano/latest/pano.js"></script>
+<script src="pano/setup.js"></script>
+</body>
+</html>

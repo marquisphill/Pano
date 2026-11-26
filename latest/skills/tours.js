@@ -19,11 +19,19 @@
    A tour may carry "wait_for" (a "when" fact to wait for before it starts), "name" (shown in the
    step label where the brain's tour.step line uses {name}) and "then" (somewhere to offer afterwards).
 
+   On a site with several pages that all load the same brain, a tour may say which pages it is offered on:
+   "pages": ["../contact.html"]. Each entry is a page address relative to the brain file (as "extends" is), so
+   with the brain at pano/brain.json a page beside index.html is "../contact.html" and the home page is "../".
+   Left out, the tour is offered on every page. Pages are compared by path: "/" and "/index.html" are the same
+   page, ".html" may be left off (GitHub Pages serves contact.html at /contact too), and the query and hash are
+   ignored. On other pages the tour stays out of his menu, and Pano.check() leaves its targets alone.
+
    Where the page gave him a memory (adapter entry "memory"), he ticks off tours already watched,
    points out the next one, and ends each tour with what to watch next.
 
    Pano.check() asks this skill about every tour: a tour left out of his menu says which step and why,
-   and for the tours he offers, it looks for what each step points at on the page as it is now. */
+   and for the tours he offers, it looks for what each step points at on the page as it is now. A tour
+   for other pages gets a note saying so, and each of its page addresses must be there. */
 Pano.skill('tours', {
   needs: [],
   start(p, host) {
@@ -79,6 +87,14 @@ Pano.skill('tours', {
       return '';
     }
     const canRun = st => !whyNot(st);
+    // which pages a tour is for ("pages"); see the top of this file
+    const pagePath = u => {
+      const x = new URL(u, p.brainURL || location.href);
+      return x.origin + x.pathname.replace(/(^|\/)index\.html?$/i, '$1').replace(/\.html?$/i, '');
+    };
+    const samePage = u => { try { return pagePath(u) === pagePath(location.href); } catch (e) { return false; } };
+    const pagesOK = t => t.pages === undefined || (Array.isArray(t.pages) && t.pages.length > 0 && t.pages.every(u => typeof u === 'string' && u.trim()));
+    const forHere = t => t.pages === undefined || (pagesOK(t) && t.pages.some(samePage));
     const build = st => ({
       id: st.id, say: readSay(st.say), next: st.next, skip: st.skip, actLabel: st.actLabel,
       target: readTarget(st.target || {}),
@@ -131,10 +147,10 @@ Pano.skill('tours', {
     // Pano.check(): every tour, every step. A tour left out of his menu says which step and why; for the tours he
     // offers, what each step points at must be on the page now (or hidden, as a note: an earlier step may show it).
     const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
-    const TOUR_FIELDS = ['label', 'name', 'steps', 'wait_for', 'wait_ms', 'then'];
+    const TOUR_FIELDS = ['label', 'name', 'steps', 'pages', 'wait_for', 'wait_ms', 'then'];
     const STEP_FIELDS = ['say', 'target', 'done', 'act', 'actLabel', 'next', 'skip', 'id', 'jump', 'need', 'need_say', 'when', 'unless'];
     const shown = el => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
-    function check({ bad, note }) {
+    async function check({ bad, note }) {
       const B = p.brain || {}, T = B.tours === undefined ? {} : B.tours;
       if (!isObj(T)) return bad('tour', 'tours', 'should be a group of tours: { "id": { "label": "...", "steps": [ ... ] } }');
       const ids = Object.keys(T).filter(k => !k.startsWith('_'));
@@ -143,19 +159,34 @@ Pano.skill('tours', {
       if (M.show !== undefined && !Array.isArray(M.show)) bad('menu', 'menu.show', 'should be a list of tour ids: [ "...", ... ]');
       const show = Array.isArray(M.show) ? M.show : null, later = Array.isArray(M.show_later) ? M.show_later : [];
       (show || []).forEach(k => { if (!isObj(T[k])) bad('menu', 'menu.show', `lists "${k}", but there is no tour "${k}"`); });
+      if (ids.length && ids.every(k => isObj(T[k]) && pagesOK(T[k]) && !forHere(T[k]))) note('tour', 'tours', 'none of its tours is for this page ("pages"), so his menu offers none here');
+      const pageChecks = [];
       const sel = (css, where, what) => { try { return { el: $(css) }; } catch (e) { bad('tour', where, `${what} "${css}" is not a valid CSS selector`); return null; } };
       for (const key of ids) {
         const t = T[key], w = 'tours.' + key;
         if (!isObj(t) || !Array.isArray(t.steps) || !t.steps.length) { bad('tour', w, 'needs "steps": a list of at least one step'); continue; }
         if (typeof t.label !== 'string' || !t.label.trim()) bad('tour', w, 'needs a "label": the button for it in his menu');
         Object.keys(t).forEach(f => { if (!f.startsWith('_') && !TOUR_FIELDS.includes(f)) bad('unknown field', w + '.' + f, 'is not something a tour has; is it misspelt?'); });
-        if (t.wait_for && !knows(t.wait_for)) bad('tour left out', w, `it waits for "${t.wait_for}", which this page does not answer, so it is left out of his menu`);
+        // a tour for other pages: say so, check its page addresses are there, and leave its targets alone
+        if (!pagesOK(t)) bad('tour', w + '.pages', 'should be a list of page addresses, like [ "../contact.html" ] (relative to the brain file); leave it out to offer the tour on every page');
+        const here = forHere(t);
+        if (pagesOK(t) && !here) note('other page', w, `is for ${t.pages.map(u => '"' + u + '"').join(', ')}, not this page, so he does not offer it here and its targets are not checked here`);
+        if (pagesOK(t) && t.pages !== undefined) for (const u of t.pages) {
+          if (samePage(u)) continue;
+          let url; try { url = new URL(u, p.brainURL || location.href).href; } catch (e) { bad('tour', w + '.pages', `"${u}" is not a page address`); continue; }
+          const hint = /^(\.\.\/|\/|[a-z]+:)/i.test(u) ? '' : ` With the brain in a folder, a page beside the home page is "../${u}".`;
+          pageChecks.push(fetch(url, { cache: 'no-store' }).then(r => {
+            if (r.status === 404) bad('tour', w + '.pages', `"${u}" is ${url}, and there is no page there (404). Page addresses are relative to the brain file.` + hint);
+            else if (!r.ok) note('tour', w + '.pages', `"${u}" is ${url}, which answered ${r.status}, so it could not be confirmed`);
+          }, () => note('tour', w + '.pages', `"${u}" is ${url}, which could not be fetched, so it could not be confirmed`)));
+        }
+        if (here && t.wait_for && !knows(t.wait_for)) bad('tour left out', w, `it waits for "${t.wait_for}", which this page does not answer, so it is left out of his menu`);
         if (show && !show.includes(key) && !later.includes(key)) note('tour', w, 'is not in menu.show, so he does not offer it');
         const offered = GOALS.some(g => g[1] === key), varies = !!t.wait_for;
         t.steps.forEach((st, i) => {
           const ws = `${w} step ${i + 1}`;
           if (!isObj(st)) return bad('tour left out', ws, 'should be a step: { "say": "...", "target": { "css": "..." }, "next": "..." }');
-          const why = whyNot(st);
+          const why = here ? whyNot(st) : '';    // what this page can read is checked on the tour's own pages
           if (why) bad('tour left out', ws, why + ', so this tour is left out of his menu');
           Object.keys(st).forEach(f => { if (!f.startsWith('_') && !STEP_FIELDS.includes(f)) bad('unknown field', ws + '.' + f, 'is not something a step has; is it misspelt?'); });
           if (typeof st.say !== 'string' || !st.say.trim()) bad('tour', ws, 'needs "say": what he says at this step');
@@ -180,6 +211,7 @@ Pano.skill('tours', {
           if (st.need && st.need.filled) { const r = sel(st.need.filled, ws, 'need.filled'); if (r && !r.el) missing('need.filled: ', st.need.filled); }
         });
       }
+      await Promise.all(pageChecks);
     }
 
     return {
@@ -187,7 +219,7 @@ Pano.skill('tours', {
       brain(B) {
         RAW = {}; TOURS = {};
         for (const [key, t] of Object.entries(B.tours || {})) {
-          if (!t || !Array.isArray(t.steps) || !t.steps.every(canRun)) continue;
+          if (!t || !Array.isArray(t.steps) || !forHere(t) || !t.steps.every(canRun)) continue;
           if (t.wait_for && !knows(t.wait_for)) continue;
           RAW[key] = t;
           TOURS[key] = t.steps.map(build);
