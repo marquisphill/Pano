@@ -105,6 +105,7 @@ Some known quirks:
 - `clean.py` on desktop, line `bubble after`, sometimes prints `HIDDEN` and sometimes the "All organized!" note, on the same site. The test reads the bubble just as that note closes.
 - `clean.py 880 900 fold` stops with a timeout: at that width an open window covers the icon the test tries to double-click. It did this before phase 1 too.
 - `tours.py` sometimes prints a `click-race` line and an extra step. That is the test clicking a button as it is replaced.
+- `same.py` "after the note" sometimes prints `screenshot same False` on one size, with every computed style the same. On the phone it is the portfolio's own mail icon in the taskbar, drawn a few pixels to one side (seen in the kit's K1 and K2, on old and new files alike). Re-run to confirm.
 - A full run takes 20 minutes or more. `tours.py` is the slow one.
 - `wall.py` prints a Pillow deprecation warning. It is harmless.
 - `brain.py` lines starting `later` are for tours not yet in his menu. They should read `steps shown N of N | finished True | errors []`.
