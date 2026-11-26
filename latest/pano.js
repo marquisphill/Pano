@@ -124,7 +124,8 @@
        talks                   { fillPrompt(prompt) } (skills/talks.js)
        topics                  { open(target) } (skills/topics.js)
        chat                    { keys: { key } } (skills/chat.js)
-     Returns what the page may call: notice(what), busy(), rest(), menu(text), skills(), go(key). */
+     Returns what the page may call: notice(what), busy(), rest(), menu(text), skills(), go(key), check().
+     Pano.check() in the browser console lists what is wrong with the brain and adapter (see check() below). */
   function init(host) {
     host = host || {};
     mount();
@@ -439,9 +440,10 @@
       BRAIN = B;
       L = B.lines || {};
       each('brain', B);
-      gcat.setAttribute('aria-label', L.labels.cat_button);
-      gbub.setAttribute('aria-label', L.name);
-      $('#gx').setAttribute('aria-label', L.labels.close);
+      const lab = L.labels || {};      // (a brain missing these still loads; Pano.check() says what is missing)
+      gcat.setAttribute('aria-label', lab.cat_button || L.name || '');
+      gbub.setAttribute('aria-label', L.name || '');
+      $('#gx').setAttribute('aria-label', lab.close || '');
     }
     const brainURL = !host.brain ? '' : /[\/.]/.test(host.brain) ? new URL(host.brain, location.href).href : HOME + 'brain/' + host.brain + '.json';
     // A brain file may say "extends": another brain file. Its lines sit under this file's own (this file's win, key
@@ -450,7 +452,8 @@
     // address, relative to the file that names it. Only lines are passed down; tours, menu and the rest are each
     // file's own. The file a site's brain extends is kept whole as B.core, for what Phill's two sites share.
     // "topics_from": [...] names other brain files whose stories he also knows here (kept as B.more).
-    const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(r.status + ' for ' + u); return r.json(); });
+    const getJSON = u => fetch(u).then(r => { if (!r.ok) throw new Error(r.status + ' for ' + u); return r.text(); })
+      .then(t => { try { return JSON.parse(t); } catch (e) { throw new Error(u + ' is not valid JSON: ' + e.message); } });
     const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
     const merge = (a, b) => {
       if (!isObj(a) || !isObj(b)) return b === undefined ? a : b;
@@ -458,15 +461,19 @@
     };
     const brainAt = (f, from) => f === 'base' || f === 'base.json' ? HOME + 'base.json' : new URL(f, from).href;
     // a file and everything under it: { file, lines } with the lines of the whole chain merged
+    const chain = [];                // the brain files he loaded, the site's own first (for Pano.check())
+    let siteFile = null, brainError = null;
     async function loadChain(url, below) {
       if (below.includes(url) || below.length > 6) throw new Error('brain files extend each other in a loop: ' + [...below, url].join(' → '));
       const file = await getJSON(url);
+      chain.push(url);
       if (!file.extends) return { file, lines: file.lines || {} };
       const up = await loadChain(brainAt(file.extends, url), [...below, url]);
       return { file, lines: merge(up.lines, file.lines || {}) };
     }
     async function loadBrain() {
       const site = await getJSON(brainURL);
+      siteFile = site; chain.push(brainURL);
       const more = {};
       const [up] = await Promise.all([
         site.extends ? loadChain(brainAt(site.extends, brainURL), [brainURL]) : null,
@@ -476,7 +483,7 @@
     }
     const brainReady = !brainURL ? Promise.resolve(false) : loadBrain()
       .then(B => { useBrain(B); return true; })
-      .catch(e => { console.warn('Paño could not load his brain from ' + brainURL + ', so he is staying hidden.', e); return false; });
+      .catch(e => { brainError = e; console.warn('Paño could not load his brain from ' + brainURL + ', so he is staying hidden.', e); return false; });
 
     /* ---------- his skills: each one is a file in skills/, used only if this page has what it needs ---------- */
     const live = [], report = [];
@@ -800,7 +807,73 @@
       if (!greeted && canGreet()) setTimeout(() => guideMenu(live.map(sk => sk.hello && sk.hello()).find(Boolean) || L.hello), 700);
     }, 900);
 
+    /* ---------- Pano.check(): what is wrong with this page's brain and adapter, for whoever is setting him up ---------- */
+    // Problems are things that break: a missing or blank line, a misspelt key, a tour left out of his menu (and which
+    // step), something a tour points at that is not on the page. Notes are worth a look but may be fine: a target
+    // hidden right now, a field nothing reads. It prints a report in the console and returns it.
+    // Brain fields read by the skills only some pages have (anything else at the top of a brain is a note).
+    const FIELDS = { talks: ['talks'], topics: ['talk_topics', 'topics_from', 'show_fallback', 'cat_preference', 'sign_offs'], chat: ['claude_chat', 'facts', 'fallbacks'] };
+    const KNOWN_TOP = ['extends', 'lines', 'tours', 'menu', 'site', 'schema_version', 'updated', 'about', 'load_order', 'audience', 'persona', 'guardrails'];
+    const MAPS = ['lines.background.options', 'lines.background.modes'];   // keyed by the page's own names
+    async function check() {
+      await skillsReady;
+      const loaded = await brainReady;
+      const problems = [], notes = [];
+      const bad = (kind, where, say) => problems.push({ kind, where, say });
+      const note = (kind, where, say) => notes.push({ kind, where, say });
+      const BASE = HOME + 'base.json';
+      if (!brainURL) bad('brain', 'adapter', 'the adapter names no brain: Pano.init({ brain: "..." })');
+      else if (!loaded) bad('brain', brainURL, 'could not be loaded, so he stays hidden: ' + (brainError ? brainError.message : 'it never arrived'));
+      else {
+        // his lines: every one base.json has must be here, filled in, and every key here must be one he says
+        let base = null;
+        try { base = (await getJSON(BASE)).lines || {}; } catch (e) { note('base', BASE, 'could not be fetched, so his lines were not compared with it'); }
+        if (base) {
+          const isLine = v => typeof v === 'string' || (Array.isArray(v) && v.length > 0 && v.every(x => typeof x === 'string'));
+          const blank = v => typeof v === 'string' ? !v.trim() : v.some(x => !x.trim());
+          const need = (b, v, path) => {
+            for (const k of Object.keys(b)) {
+              if (k.startsWith('_')) continue;
+              const w = path + '.' + k, bv = b[k], vv = isObj(v) ? v[k] : undefined;
+              if (vv === undefined) bad('missing line', w, 'is missing, so he would say nothing there');
+              else if (isObj(bv)) { if (!isObj(vv)) bad('missing line', w, 'should be a group: { ... }'); else if (!MAPS.includes(w)) need(bv, vv, w); }
+              else if (Array.isArray(bv) && !bv.every(x => typeof x === 'string')) { if (!Array.isArray(vv)) bad('missing line', w, 'should be a list: [ ... ]'); }
+              else if (!isLine(vv)) bad('missing line', w, 'should be a line ("...") or a list of lines to pick from');
+              else if (blank(vv) && !(typeof bv === 'string' && !bv)) bad('blank line', w, 'is blank, so he would say nothing there');
+            }
+          };
+          const extra = (b, v, path) => {
+            for (const k of Object.keys(v)) {
+              const w = path + '.' + k;
+              if (k.startsWith('_') || (path === 'lines' && SKILLS.includes(k))) continue;   // a note; or a skill's own lines (lines.talks)
+              if (!(k in b)) bad('unknown line', w, 'is not a line he says; is the key misspelt? (Start it with _ to keep it as a note.)');
+              else if (isObj(b[k]) && isObj(v[k]) && !MAPS.includes(w)) extra(b[k], v[k], w);
+            }
+          };
+          need(base, L, 'lines'); extra(base, L, 'lines');
+          if (!chain.includes(BASE) && problems.some(x => x.kind === 'missing line')) note('brain', 'extends', 'this brain does not build on base.json; "extends": "base" gives every line its neutral wording');
+        }
+        // the top of the site's own brain file
+        for (const k of Object.keys(siteFile || {})) {
+          if (k.startsWith('_') || KNOWN_TOP.includes(k)) continue;
+          const owner = Object.keys(FIELDS).find(n => FIELDS[n].includes(k));
+          if (owner && !live.some(s => s.name === owner)) note('unused field', k, `only his ${owner} skill reads it, and that is off on this page`);
+          else if (!owner) note('unknown field', k, 'nothing in Paño reads it; is it misspelt? (Start it with _ to keep it as a note.)');
+        }
+        // each skill checks its own part: tours check their steps, the background its names and styles
+        for (const s of live) if (s.check) { try { s.check({ bad, note }); } catch (e) { note('check', s.name, 'could not be checked: ' + e.message); } }
+      }
+      const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+      const short = u => u === BASE ? 'base' : u;
+      const text = [`Paño check: ${problems.length ? plural(problems.length, 'problem') : 'no problems'}${notes.length ? ', ' + plural(notes.length, 'note') : ''}.${chain.length ? ' Brain: ' + chain.map(short).join(' → ') : ''}`,
+        ...problems.map(x => `  ✗ ${x.where}: ${x.say}`), ...notes.map(x => `  · ${x.where}: ${x.say}`),
+        '  Skills: ' + report.map(r => r.on ? r.name + ' on' : `${r.name} off (${r.why})`).join('; ')];
+      console.log(text.join('\n'));
+      return { ok: !problems.length, brain: chain.map(short), problems, notes, skills: report.map(r => ({ ...r })) };
+    }
+
     return Pano.here = {
+      check,                                                                // what is wrong with this page's brain and adapter
       notice: (what, ...more) => each('notice', what, ...more),             // tell him something happened: 'window-opened', 'window-closed'
       skills: () => report.map(r => ({ ...r })),                            // which skills are on here, and why not
       busy: guideBusy,                                                      // on a tour, or his bubble is showing
@@ -811,5 +884,8 @@
   }
 
   // Pano.here is what the latest init() returned, for the page's console and the tests
-  window.Pano = { init, skill, skills: SKILLS, early: EARLY, late: LATE, here: null, version: 'latest' };
+  // Pano.check() in the console: what is wrong with this page's brain and adapter (see check() above)
+  const check = () => Pano.here ? Pano.here.check()
+    : (console.log('Paño check: Pano.init() has not run on this page.'), Promise.resolve({ ok: false, brain: [], problems: [{ kind: 'adapter', where: 'page', say: 'Pano.init() has not run on this page' }], notes: [], skills: [] }));
+  window.Pano = { init, skill, check, skills: SKILLS, early: EARLY, late: LATE, here: null, version: 'latest' };
 })();

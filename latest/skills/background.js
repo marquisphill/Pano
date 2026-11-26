@@ -108,7 +108,31 @@ html[data-cb="mono"]{filter:grayscale(1) contrast(1.2)}
       } else p.rest(p.L.background.done);
     }
 
+    // Pano.check(): the page has its desk element and a style for each background; his words match its names
+    function styledNames(attr) {     // the names the page's own stylesheets give [data-wall="..."] (or data-cb) a look for
+      const names = new Set(); let all = true;
+      const scan = rules => { for (const r of rules) { if (r.selectorText) for (const m of r.selectorText.matchAll(new RegExp(attr + '\\s*=\\s*["\']?([\\w-]+)', 'g'))) names.add(m[1]); if (r.cssRules) scan(r.cssRules); } };
+      for (const sh of document.styleSheets) { try { scan(sh.cssRules); } catch (e) { all = false; } }
+      return { names, all };
+    }
+    function check({ bad, note }) {
+      if (!(deskEl instanceof Element) || !deskEl.isConnected) bad('background', 'adapter: background.desk', 'is not an element on this page');
+      if (!WALLS.length) bad('background', 'adapter: background.walls', 'lists no backgrounds');
+      const B = p.L.background || {}, words = B.options || {}, mwords = B.modes || {};
+      const walls = styledNames('data-wall'), cbs = styledNames('data-cb');
+      WALLS.forEach((k, i) => {
+        if (!words[k]) note('background', 'lines.background.options.' + k, `has no words, so his button for this background says "${k}"`);
+        if (i && !walls.names.has(k)) (walls.all ? bad : note)('background', 'adapter: background.walls', `the page has no style for [data-wall="${k}"], so choosing "${k}" would change nothing`);
+      });
+      Object.keys(words).forEach(k => { if (!k.startsWith('_') && !WALLS.includes(k)) note('background', 'lines.background.options.' + k, `"${k}" is not one of this page's backgrounds (${WALLS.join(', ')})`); });
+      CB_MODES.forEach(m => {
+        if (!mwords[m]) note('background', 'lines.background.modes.' + m, `has no words, so his button for this mode says "${m}"`);
+        if (!cbs.names.has(m)) (cbs.all ? bad : note)('background', 'adapter: background.modes', `"${m}" is not a colorblind mode he knows (protan, deutan, tritan, mono)`);
+      });
+    }
+
     return {
+      check,
       menu: () => [{ label: p.L.menu.change_background, fn: () => askWall() }],
       ignoresTaps: () => recoloring,     // mid-reveal he does not answer taps
       keepsHimHere: () => recoloring     // and does not tuck away

@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Paño brain (kit format)",
+  "description": "The brain a site writes to put Paño on it with the kit: his name, any lines it changes, and its tours. It builds on base.json (\"extends\": \"base\"), which has neutral wording for every line, so every line here is optional apart from his name. Tour steps use only what the engine reads by itself (css), so a site needs no code of its own for them. Phill's own brains (latest/brain/) use more than this format allows. See kit/BRAIN.md.",
+  "type": "object",
+  "properties": {
+    "extends": {
+      "type": "string",
+      "minLength": 1,
+      "description": "\"base\" for the neutral lines shipped with the engine. Or the address of another brain file (relative to this one) that itself extends base."
+    },
+    "site": {
+      "type": "string",
+      "description": "A short name for the site. Optional."
+    },
+    "lines": {
+      "type": "object",
+      "description": "What he says, grouped by where he says it. Write only the lines you want to change; the rest come from base.json. A line is a string, or a list of strings to pick from at random. Only <b> and <span> tags.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "His name. Shown at the top of his bubble, and used wherever a line says {cat_name}."
+        },
+        "labels": {
+          "type": "object",
+          "description": "What screen readers say for his button and the bubble's close button.",
+          "properties": {
+            "cat_button": {
+              "$ref": "#/$defs/line"
+            },
+            "close": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "hello": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/line"
+            }
+          ],
+          "description": "His first words on a visit."
+        },
+        "menu": {
+          "type": "object",
+          "description": "His menu: what he asks, the buttons that are always there, and his goodbye.",
+          "properties": {
+            "ask": {
+              "$ref": "#/$defs/line"
+            },
+            "after_tour": {
+              "$ref": "#/$defs/line"
+            },
+            "lost": {
+              "$ref": "#/$defs/line"
+            },
+            "change_background": {
+              "$ref": "#/$defs/line"
+            },
+            "organize": {
+              "$ref": "#/$defs/line"
+            },
+            "close_all": {
+              "$ref": "#/$defs/line"
+            },
+            "leave_first": {
+              "$ref": "#/$defs/line"
+            },
+            "leave_again": {
+              "$ref": "#/$defs/line"
+            },
+            "bye": {
+              "$ref": "#/$defs/line"
+            },
+            "show_menu": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "tour": {
+          "type": "object",
+          "description": "Words around every tour. In \"step\", {n} and {total} are the step numbers and {name} is the tour's name.",
+          "properties": {
+            "step": {
+              "$ref": "#/$defs/line"
+            },
+            "do_it": {
+              "$ref": "#/$defs/line"
+            },
+            "stop": {
+              "$ref": "#/$defs/line"
+            },
+            "seen_mark": {
+              "$ref": "#/$defs/line"
+            },
+            "intro": {
+              "$ref": "#/$defs/line"
+            },
+            "wrap": {
+              "$ref": "#/$defs/line"
+            },
+            "watched": {
+              "$ref": "#/$defs/line"
+            },
+            "next_up": {
+              "$ref": "#/$defs/line"
+            },
+            "next_talk": {
+              "$ref": "#/$defs/line"
+            },
+            "seen_all": {
+              "$ref": "#/$defs/line"
+            },
+            "back_to_menu": {
+              "$ref": "#/$defs/line"
+            },
+            "im_good": {
+              "$ref": "#/$defs/line"
+            },
+            "im_good_bye": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "touch": {
+          "type": "object",
+          "description": "Word swaps for touch screens (\"Click\" becomes \"Tap\"), applied to tour lines.",
+          "properties": {
+            "swaps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "find": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "say": {
+                    "type": "string"
+                  },
+                  "whole_word": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "find",
+                  "say"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "background": {
+          "type": "object",
+          "description": "Change the background and the colorblind modes (only where the adapter has \"background\").",
+          "properties": {
+            "ask": {
+              "$ref": "#/$defs/line"
+            },
+            "options": {
+              "type": "object",
+              "description": "His words for each of the page's backgrounds, keyed by the names in the adapter's background.walls.",
+              "patternProperties": {
+                "^_": {
+                  "description": "A note for people. Paño ignores any key that starts with _."
+                }
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "default_mark": {
+              "$ref": "#/$defs/line"
+            },
+            "never_mind": {
+              "$ref": "#/$defs/line"
+            },
+            "ask_colorblind": {
+              "$ref": "#/$defs/line"
+            },
+            "yes": {
+              "$ref": "#/$defs/line"
+            },
+            "no": {
+              "$ref": "#/$defs/line"
+            },
+            "ask_mode": {
+              "$ref": "#/$defs/line"
+            },
+            "modes": {
+              "type": "object",
+              "description": "His words for each colorblind mode: protan, deutan, tritan, mono.",
+              "patternProperties": {
+                "^_": {
+                  "description": "A note for people. Paño ignores any key that starts with _."
+                }
+              },
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "changing": {
+              "$ref": "#/$defs/line"
+            },
+            "note": {
+              "type": "string",
+              "description": "An extra line after a colorblind mode is applied. Leave it empty to skip it."
+            },
+            "thanks": {
+              "$ref": "#/$defs/line"
+            },
+            "done": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "cleanup": {
+          "type": "object",
+          "description": "Window tidying (only on sites with a window system).",
+          "properties": {
+            "offer": {
+              "$ref": "#/$defs/line"
+            },
+            "organize": {
+              "$ref": "#/$defs/line"
+            },
+            "close": {
+              "$ref": "#/$defs/line"
+            },
+            "yes": {
+              "$ref": "#/$defs/line"
+            },
+            "no": {
+              "$ref": "#/$defs/line"
+            },
+            "declined": {
+              "$ref": "#/$defs/line"
+            },
+            "nothing": {
+              "$ref": "#/$defs/line"
+            },
+            "organized": {
+              "$ref": "#/$defs/line"
+            },
+            "cleaned": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        },
+        "bin": {
+          "type": "object",
+          "description": "The Recycle Bin (only on sites with a window system).",
+          "properties": {
+            "refuse": {
+              "$ref": "#/$defs/line"
+            }
+          },
+          "patternProperties": {
+            "^_": {
+              "description": "A note for people. Paño ignores any key that starts with _."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "patternProperties": {
+        "^_": {
+          "description": "A note for people. Paño ignores any key that starts with _."
+        }
+      },
+      "additionalProperties": false
+    },
+    "tours": {
+      "type": "object",
+      "description": "His guided tours, by id. Each becomes a button in his menu.",
+      "minProperties": 1,
+      "patternProperties": {
+        "^_": {
+          "description": "A note for people. Paño ignores any key that starts with _."
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tour"
+      }
+    },
+    "menu": {
+      "type": "object",
+      "properties": {
+        "show": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Which tours his menu offers, in order. Leave it out to offer every tour in the order written."
+        },
+        "show_later": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tours that are written but not offered yet."
+        }
+      },
+      "patternProperties": {
+        "^_": {
+          "description": "A note for people. Paño ignores any key that starts with _."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "extends",
+    "lines",
+    "tours"
+  ],
+  "patternProperties": {
+    "^_": {
+      "description": "A note for people. Paño ignores any key that starts with _."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "line": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "tour": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The button for this tour in his menu, e.g. \"How do I book a class?\""
+        },
+        "name": {
+          "type": "string",
+          "description": "A short name, used where tour.step says {name}. Optional."
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        }
+      },
+      "required": [
+        "label",
+        "steps"
+      ],
+      "patternProperties": {
+        "^_": {
+          "description": "A note for people. Paño ignores any key that starts with _."
+        }
+      },
+      "additionalProperties": false
+    },
+    "step": {
+      "type": "object",
+      "description": "One stop on a tour: he walks to the target, rings it and says \"say\". The visitor moves on with the \"next\" button, or by doing what \"done\" describes.",
+      "properties": {
+        "say": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What he says. Only <b> tags. \"Click\" becomes \"Tap\" on touch screens."
+        },
+        "target": {
+          "type": "object",
+          "description": "What he points at.",
+          "properties": {
+            "css": {
+              "type": "string",
+              "minLength": 1,
+              "description": "A CSS selector for one element on the page. Prefer an id: \"#contact-form\"."
+            },
+            "when_visible": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Only point once this element is showing."
+            }
+          },
+          "required": [
+            "css"
+          ],
+          "additionalProperties": false
+        },
+        "done": {
+          "type": "object",
+          "description": "What counts as the visitor doing it: this element becomes visible.",
+          "properties": {
+            "css_visible": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "css_visible"
+          ],
+          "additionalProperties": false
+        },
+        "act": {
+          "type": "object",
+          "description": "What the \"Do it for me\" button does: click, focus or submit one element.",
+          "properties": {
+            "click": {
+              "type": "string",
+              "minLength": 1
+            },
+            "focus": {
+              "type": "string",
+              "minLength": 1
+            },
+            "submit": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "minProperties": 1,
+          "maxProperties": 1,
+          "additionalProperties": false
+        },
+        "actLabel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The act button's words, in place of \"Do it for me\"."
+        },
+        "next": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A button that moves on, e.g. \"Next\" or \"Got it\"."
+        },
+        "skip": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A second button that moves on."
+        },
+        "need": {
+          "type": "object",
+          "description": "Next waits until this box has something typed in it.",
+          "properties": {
+            "filled": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "filled"
+          ],
+          "additionalProperties": false
+        },
+        "need_say": {
+          "type": "string",
+          "description": "What he says if Next is pressed before the box is filled."
+        }
+      },
+      "required": [
+        "say",
+        "target"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "next"
+          ]
+        },
+        {
+          "required": [
+            "done"
+          ]
+        }
+      ],
+      "patternProperties": {
+        "^_": {
+          "description": "A note for people. Paño ignores any key that starts with _."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -20,7 +20,10 @@
    step label where the brain's tour.step line uses {name}) and "then" (somewhere to offer afterwards).
 
    Where the page gave him a memory (adapter entry "memory"), he ticks off tours already watched,
-   points out the next one, and ends each tour with what to watch next. */
+   points out the next one, and ends each tour with what to watch next.
+
+   Pano.check() asks this skill about every tour: a tour left out of his menu says which step and why,
+   and for the tours he offers, it looks for what each step points at on the page as it is now. */
 Pano.skill('tours', {
   needs: [],
   start(p, host) {
@@ -61,19 +64,21 @@ Pano.skill('tours', {
       if (!known) return t;
       return () => t.replace(GAP, (all, k, or) => HELP.values[k] ? p.esc(HELP.values[k](p) || or || '') : all);
     }
-    // does this page support it? Every part of the step must be readable here.
-    function canRun(st) {
+    // does this page support it? Every part of the step must be readable here. whyNot() says what is not (for Pano.check()).
+    const keys = d => Object.keys(d).filter(k => !k.startsWith('_')).map(k => '"' + k + '"').join(', ') || 'nothing';
+    function whyNot(st) {
       const t = st.target || {};
-      if (!t.css && !kindOf(t, 'target')) return false;
-      if (t.when_window && !(HELP.done && HELP.done.window)) return false;
-      if (st.done && !st.done.css_visible && !kindOf(st.done, 'done')) return false;
-      if (st.act && !st.act.click && !st.act.focus && !st.act.submit && !kindOf(st.act, 'act')) return false;
-      if (st.when && !knows(st.when)) return false;
-      if (st.unless && !knows(st.unless)) return false;
-      if (st.jump && !knows(st.jump.when)) return false;
-      if (st.need && !st.need.filled) return false;
-      return true;
+      if (!t.css && !kindOf(t, 'target')) return st.target ? `its target has no "css", and this page has no reader for ${keys(t)}` : 'it has no "target" (what he points at)';
+      if (t.when_window && !(HELP.done && HELP.done.window)) return 'its target has "when_window", and this page has no window reader';
+      if (st.done && !st.done.css_visible && !kindOf(st.done, 'done')) return `its "done" has no "css_visible", and this page has no reader for ${keys(st.done)}`;
+      if (st.act && !st.act.click && !st.act.focus && !st.act.submit && !kindOf(st.act, 'act')) return `its "act" has no "click", "focus" or "submit", and this page has no reader for ${keys(st.act)}`;
+      if (st.when && !knows(st.when)) return `it has "when": "${st.when}", which this page does not answer`;
+      if (st.unless && !knows(st.unless)) return `it has "unless": "${st.unless}", which this page does not answer`;
+      if (st.jump && !knows(st.jump.when)) return `its "jump" waits for "${st.jump.when}", which this page does not answer`;
+      if (st.need && !st.need.filled) return 'its "need" has no "filled"';
+      return '';
     }
+    const canRun = st => !whyNot(st);
     const build = st => ({
       id: st.id, say: readSay(st.say), next: st.next, skip: st.skip, actLabel: st.actLabel,
       target: readTarget(st.target || {}),
@@ -123,7 +128,62 @@ Pano.skill('tours', {
       return true;
     }
 
+    // Pano.check(): every tour, every step. A tour left out of his menu says which step and why; for the tours he
+    // offers, what each step points at must be on the page now (or hidden, as a note: an earlier step may show it).
+    const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+    const TOUR_FIELDS = ['label', 'name', 'steps', 'wait_for', 'wait_ms', 'then'];
+    const STEP_FIELDS = ['say', 'target', 'done', 'act', 'actLabel', 'next', 'skip', 'id', 'jump', 'need', 'need_say', 'when', 'unless'];
+    const shown = el => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
+    function check({ bad, note }) {
+      const B = p.brain || {}, T = B.tours === undefined ? {} : B.tours;
+      if (!isObj(T)) return bad('tour', 'tours', 'should be a group of tours: { "id": { "label": "...", "steps": [ ... ] } }');
+      const ids = Object.keys(T).filter(k => !k.startsWith('_'));
+      if (!ids.length) note('tour', 'tours', 'this brain has no tours, so his menu offers none');
+      const M = isObj(B.menu) ? B.menu : {};
+      if (M.show !== undefined && !Array.isArray(M.show)) bad('menu', 'menu.show', 'should be a list of tour ids: [ "...", ... ]');
+      const show = Array.isArray(M.show) ? M.show : null, later = Array.isArray(M.show_later) ? M.show_later : [];
+      (show || []).forEach(k => { if (!isObj(T[k])) bad('menu', 'menu.show', `lists "${k}", but there is no tour "${k}"`); });
+      const sel = (css, where, what) => { try { return { el: $(css) }; } catch (e) { bad('tour', where, `${what} "${css}" is not a valid CSS selector`); return null; } };
+      for (const key of ids) {
+        const t = T[key], w = 'tours.' + key;
+        if (!isObj(t) || !Array.isArray(t.steps) || !t.steps.length) { bad('tour', w, 'needs "steps": a list of at least one step'); continue; }
+        if (typeof t.label !== 'string' || !t.label.trim()) bad('tour', w, 'needs a "label": the button for it in his menu');
+        Object.keys(t).forEach(f => { if (!f.startsWith('_') && !TOUR_FIELDS.includes(f)) bad('unknown field', w + '.' + f, 'is not something a tour has; is it misspelt?'); });
+        if (t.wait_for && !knows(t.wait_for)) bad('tour left out', w, `it waits for "${t.wait_for}", which this page does not answer, so it is left out of his menu`);
+        if (show && !show.includes(key) && !later.includes(key)) note('tour', w, 'is not in menu.show, so he does not offer it');
+        const offered = GOALS.some(g => g[1] === key), varies = !!t.wait_for;
+        t.steps.forEach((st, i) => {
+          const ws = `${w} step ${i + 1}`;
+          if (!isObj(st)) return bad('tour left out', ws, 'should be a step: { "say": "...", "target": { "css": "..." }, "next": "..." }');
+          const why = whyNot(st);
+          if (why) bad('tour left out', ws, why + ', so this tour is left out of his menu');
+          Object.keys(st).forEach(f => { if (!f.startsWith('_') && !STEP_FIELDS.includes(f)) bad('unknown field', ws + '.' + f, 'is not something a step has; is it misspelt?'); });
+          if (typeof st.say !== 'string' || !st.say.trim()) bad('tour', ws, 'needs "say": what he says at this step');
+          if (!st.next && !st.done && !st.jump) bad('tour', ws, 'has no way to move on: give it "next" (a button) or "done" (what counts as doing it)');
+          if (why || !offered) return;
+          // what it points at, on the page as it is right now. Missing is a problem unless the page may have changed
+          // by then: an earlier step had something to do ("act" or "done"), or the step depends on the page.
+          const tg = st.target, later = varies || st.when || st.unless || t.steps.slice(0, i).some(x => isObj(x) && (x.act || x.done));
+          const missing = (what, css) => (later ? note : bad)('target not found', ws, `${what}nothing on this page matches "${css}"` + (later ? ' yet (fine if an earlier step adds it)' : ''));
+          if (tg.css) {
+            const r = sel(tg.css, ws, 'target.css');
+            if (r && !r.el) missing('', tg.css);
+            else if (r && !shown(r.el)) note('target hidden', ws, `"${tg.css}" is on the page but hidden right now (fine if an earlier step shows it)`);
+          } else {
+            let el = null; try { el = readTarget(tg)(); } catch (e) {}
+            if (!el) note('target not found', ws, 'this page cannot find what it points at right now (fine if an earlier step opens it)');
+          }
+          if (tg.when_visible) sel(tg.when_visible, ws, 'target.when_visible');
+          if (st.done && st.done.css_visible) sel(st.done.css_visible, ws, 'done.css_visible');
+          const a = isObj(st.act) ? st.act : {};
+          for (const k of ['click', 'focus', 'submit']) if (a[k]) { const r = sel(a[k], ws, 'act.' + k); if (r && !r.el) missing(`act.${k}: `, a[k]); }
+          if (st.need && st.need.filled) { const r = sel(st.need.filled, ws, 'need.filled'); if (r && !r.el) missing('need.filled: ', st.need.filled); }
+        });
+      }
+    }
+
     return {
+      check,
       brain(B) {
         RAW = {}; TOURS = {};
         for (const [key, t] of Object.entries(B.tours || {})) {
