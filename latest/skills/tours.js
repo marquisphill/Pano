@@ -109,6 +109,15 @@ Pano.skill('tours', {
     });
 
     let RAW = {}, TOURS = {}, GOALS = [];
+    // Two tours with the same label: one with "pages" that names this page, one with no "pages" (the way there from
+    // every other page). On this page he offers the first, in the place of the second.
+    function mineFirst(keys, T) {
+      const mine = new Map();
+      keys.forEach(k => { if (T[k].pages !== undefined && !mine.has(T[k].label)) mine.set(T[k].label, k); });
+      const out = [];
+      keys.forEach(k => { const m = T[k].pages === undefined && mine.get(T[k].label); const use = m || k; if (!out.includes(use)) out.push(use); });
+      return out;
+    }
     // a tour whose steps depend on the page is put together when it starts, not when his brain arrives
     const depends = t => !!t.wait_for || t.steps.some(st => st.when || st.unless);
     function begin(k) {
@@ -185,6 +194,8 @@ Pano.skill('tours', {
         if (here && t.wait_for && !knows(t.wait_for)) bad('tour left out', w, `it waits for "${t.wait_for}", which this page does not answer, so it is left out of his menu`);
         if (show && !show.includes(key) && !later.includes(key)) note('tour', w, 'is not in menu.show, so he does not offer it');
         const offered = GOALS.some(g => g[1] === key), varies = !!t.wait_for;
+        const instead = !offered && here && t.pages === undefined && GOALS.find(g => g[0] === t.label && T[g[1]] && T[g[1]].pages !== undefined);
+        if (instead) note('other page', w, `has the same label as tours.${instead[1]}, whose "pages" names this page, so here he offers that one instead`);
         t.steps.forEach((st, i) => {
           const ws = `${w} step ${i + 1}`;
           if (!isObj(st)) return bad('tour left out', ws, 'should be a step: { "say": "...", "target": { "css": "..." }, "next": "..." }');
@@ -228,7 +239,7 @@ Pano.skill('tours', {
         }
         // his menu offers the tours in menu.show, in that order; a brain with no menu.show offers all its tours
         const show = B.menu && Array.isArray(B.menu.show) ? B.menu.show : Object.keys(B.tours || {});
-        GOALS = show.filter(k => TOURS[k]).map(k => [B.tours[k].label, k]);
+        GOALS = mineFirst(show.filter(k => TOURS[k]), B.tours).map(k => [B.tours[k].label, k]);
       },
       menu: () => GOALS.map(([label, k]) => p.remembers
         ? { label: (watched(k) ? p.L.tour.seen_mark : '') + label, pri: k === nextKey(), fn: () => begin(k) }

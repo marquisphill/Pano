@@ -140,6 +140,22 @@ with sync_playwright() as p:
     print('pages 10 a misspelt target is left alone on other pages, and caught on its own page', r1['ok'] and not r2['ok'] and has(r2['problems'], 'target not found', 'tours.visit step 1', '#hours-crad'))
     r, e, _ = run(brain(lambda B: B['tours'].pop('contact')), menu=True); errors += e
     print('pages 11 no tour for this page: a note, and his menu offers none', r['ok'] and has(r['notes'], 'tour', 'tours', 'none of its tours') and VISIT not in r['menu'], r['menu'])
+    # (K4) a tour with no "pages" and the same label as one with "pages" is the way there from every other page:
+    # on the page the other one names, he offers that one instead, in the same place in his menu
+    WAY = {'label': VISIT, 'steps': [{'say': 'Visits have their own page. Click <b>Visit</b> up here.', 'target': {'css': 'body'}, 'next': 'Got it'}]}
+    way = brain(lambda B: B['tours'].update({'visit-here': WAY}))
+    way_first = {**{k: v for k, v in BRAIN.items() if k != 'tours'}, 'tours': {'visit-here': WAY, 'contact': BRAIN['tours']['contact'], 'visit': BRAIN['tours']['visit']}}
+    r1, e1, _ = run(way, menu=True); r2, e2, _ = run(way, url=V2, menu=True); r3, e3, _ = run(way_first, url=V2, menu=True); errors += e1 + e2 + e3
+    print('pages 13 same label: the way there on other pages, the page\'s own tour on its page, once, in the same place',
+          r1['ok'] and r1['menu'].count(VISIT) == 1 and r2['ok'] and r2['menu'].count(VISIT) == 1 and r3['menu'].index(VISIT) == 0
+          and has(r2['notes'], 'other page', 'tours.visit-here', 'tours.visit'), r1['menu'], r2['menu'], r3['menu'])
+    c = b.new_context(viewport={'width': 1280, 'height': 800}); pg = c.new_page()
+    pg.route('**/pano/brain.json', lambda r: r.fulfill(status=200, content_type='application/json', body=json.dumps(way)))
+    pg.goto(V2); pg.wait_for_timeout(2500)
+    pg.evaluate("t=>{const b=[...document.querySelectorAll('#gacts button')].find(b=>b.textContent===t);if(b)b.click()}", VISIT); pg.wait_for_timeout(2500)
+    said = pg.evaluate("()=>document.getElementById('gsay').innerText")
+    print('pages 14 on its own page, that button starts the page\'s own tour', 'Step 1 of 2' in said and 'opening hours' in said, repr(said[:80]))
+    c.close()
 
     # the visit tour, start to finish on its own page, at phone and desktop sizes
     PRESS = "t=>{const b=[...document.querySelectorAll('#gacts button')].find(b=>b.textContent===t);if(b)b.click();return !!b}"

@@ -6,7 +6,7 @@ Pebblewick Pottery is a made-up studio: the place, the address and the email (`e
 - **Two pages,** `index.html` and `classes.html`, both loading the same brain.
 - **Three things he helps with,** in `pano/brain.json`, each showing one way to write a tour:
   - *What do you make?* is only on the home page, where the gallery is (`"pages": ["../index.html"]`).
-  - *How do I join a class?* crosses pages: on the home page it points at the Classes link (`join-here`), and on the classes page the tour with the same label shows the sign-up form (`join`).
+  - *How do I join a class?* crosses pages: on the classes page, `join` shows the sign-up form (`"pages": ["../classes.html"]`); on every other page, `join-here`, with the same label and no `pages`, points at the Classes link.
   - *When can I visit?* points at the footer, which every page has, so it has no `pages`.
 - **The background changer** with the kit's light set of backgrounds, and the colorblind modes.
 

@@ -6,7 +6,8 @@ For every page that loads Paño, at a phone size and a desktop size, it:
   - runs Pano.check() and prints its problems (✗) and notes (·),
   - lists his menu,
   - walks every tour he offers on that page, step by step: each step must show, point at something that is
-    on screen (not under a header or bar that stays on screen), and move on, and the tour must finish,
+    on screen (not under a header or bar that stays on screen), and move on, and the tour must finish; his
+    bubble must stay on the screen; a step whose "act" clicks a link must lead to a page that is there,
   - lists page errors and files that failed to load (a file from another site, such as a web font, is only a
     note: test machines often can't reach those, and they are not Paño's),
   - and, on desktop, checks that each background the page styles can be seen.
@@ -65,6 +66,16 @@ SEEN = """([css, narrow]) => {
     if (hits >= 3) covered = name(by);
   }
   return { found: true, seen, ring, covered };
+}"""
+# how many pixels of his bubble are off the part of the page the visitor sees (a phone shows less than a page that is
+# wider than the screen), and whether the page is wider than the screen
+OFF = """() => {
+  const b = document.getElementById('gbubble'), v = window.visualViewport || { offsetLeft: 0, offsetTop: 0, width: innerWidth, height: innerHeight };
+  const wide = document.documentElement.scrollWidth > Math.ceil(v.width) + 1;
+  if (!b || b.hidden) return { off: 0, wide };
+  const r = b.getBoundingClientRect();
+  const off = Math.max(0, v.offsetLeft - r.left, r.right - (v.offsetLeft + v.width), v.offsetTop - r.top, r.bottom - (v.offsetTop + v.height) - 2);
+  return { off: Math.round(off), wide };
 }"""
 # wait until the page has stopped scrolling (a long page takes a while to scroll smoothly to a target)
 SETTLED = """() => new Promise(res => {
@@ -252,6 +263,8 @@ def main():
             except Exception:
                 return False
 
+        cut = set()
+
         def walk(c, url, key, tour, narrow):
             """Run one tour from his menu to the end. Returns (finished, what went wrong)."""
             pg, errs, failed = open_page(c, url)
@@ -281,6 +294,11 @@ def main():
                         R.bad(f'tour "{key}" {n}: "{css}" is hidden under {s["covered"]}, which stays on screen (a header or bar), when he points at it')
                     elif not s['ring']:
                         R.bad(f'tour "{key}" {n}: the ring is not around "{css}"')
+                    o = pg.evaluate(OFF)
+                    if o['off'] > 4 and key not in cut:
+                        cut.add(key)
+                        R.bad(f'tour "{key}" {n}: his bubble runs {o["off"]}px off the screen, so part of what he says or his buttons can\'t be seen'
+                              + (' (this page is wider than the screen)' if o['wide'] else ''))
                     need = (st.get('need') or {}).get('filled')
                     if need:
                         pg.evaluate("s=>{const e=document.querySelector(s);if(e){e.value='Test';e.dispatchEvent(new Event('input',{bubbles:true}))}}", need)
@@ -338,6 +356,13 @@ def main():
                     continue
                 r = pg.evaluate("()=>Pano.check()")
                 R.now['greeted'] = greeted
+                cut.clear()
+                if greeted:
+                    o = pg.evaluate(OFF)
+                    if o['off'] > 4:
+                        R.bad(f'his bubble runs {o["off"]}px off the screen when he says hello' + (' (this page is wider than the screen)' if o['wide'] else ''))
+                    if o['wide'] and narrow:
+                        R.note('this page is wider than the screen at this size (it scrolls sideways). That is the site\'s own layout; Paño keeps to the part that is shown, but it is worth telling the person')
                 if not greeted:
                     R.bad('he did not appear and greet visitors')
                 R.line(f'  Pano.check(): {len(r["problems"]) or "no"} problem{"" if len(r["problems"]) == 1 else "s"}, {len(r["notes"])} note{"" if len(r["notes"]) == 1 else "s"}. Brain: {" → ".join(r["brain"])}')
@@ -359,8 +384,22 @@ def main():
                         brain = {}
                 tours = {k: t for k, t in (brain.get('tours') or {}).items() if not k.startswith('_') and isinstance(t, dict) and isinstance(t.get('steps'), list)}
                 here = {k: t for k, t in tours.items() if for_page(t, r['brain'][0], pg.url) and t.get('label') in menu}
+                # (two tours with one label: the one whose "pages" names this page is the one he offers here)
+                mine = {t.get('label') for t in here.values() if t.get('pages') is not None}
+                here = {k: t for k, t in here.items() if not (t.get('pages') is None and t.get('label') in mine)}
                 if tours and not here:
                     R.note('he offers no tours on this page')
+                for key, t in here.items():
+                    for i, st in enumerate(t['steps']):
+                        click = st.get('act', {}).get('click') if isinstance(st, dict) and isinstance(st.get('act'), dict) else None
+                        if not click:
+                            continue
+                        href = pg.evaluate("s=>{let e=null;try{e=document.querySelector(s)}catch(x){}const a=e&&e.closest('a[href]');return a?a.href:''}", click)
+                        if not href or urlsplit(href).netloc != urlsplit(base).netloc or href.split('#')[0] == pg.url.split('#')[0]:
+                            continue
+                        status = pg.evaluate("u=>fetch(u,{cache:'no-store'}).then(r=>r.status,()=>0)", href)
+                        if not 200 <= status < 400:
+                            R.bad(f'tour "{key}" step {i + 1}: its "act" clicks a link to {href}, and there is no page there ({status or "could not be fetched"})')
 
                 # the backgrounds: each one the page styles must show (desktop only)
                 if not narrow and any(s['name'] == 'background' and s['on'] for s in r['skills']):

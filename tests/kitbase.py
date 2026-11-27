@@ -29,8 +29,8 @@ FILL = "s=>getComputedStyle(document.querySelector(s)).fill"
 STROKE = "s=>getComputedStyle(document.querySelector(s)).stroke"
 
 
-def fresh(b, W, H, routes=None):
-    c = b.new_context(viewport={'width': W, 'height': H}, has_touch=W <= 640)
+def fresh(b, W, H, routes=None, mobile=False):
+    c = b.new_context(viewport={'width': W, 'height': H}, has_touch=W <= 640, is_mobile=mobile)
     pg = c.new_page(); errs, got, warns, said = [], [], [], []
     pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.on('console', lambda m: warns.append(m.text) if m.type == 'warning' else None)
@@ -160,6 +160,43 @@ with sync_playwright() as p:
     c, pg, errs, got, warns = fresh(b, 390, 800)
     pg.evaluate(PRESS, TOUR['label']); pg.wait_for_timeout(2500)
     print('room 3 a target the page can scroll to needs no room', not pg.evaluate("()=>!!document.querySelector('.groom')"))
+    c.close()
+
+    # (K4) a header fixed to the top of the screen: what he points at comes in below it, even when it is already
+    # partly on screen (here B sits just above A, so after the step on A it is under the header)
+    hdr = {'two': {'label': 'Two', 'steps': [{'say': 'A.', 'target': {'css': '#ha'}, 'next': 'Next'}, {'say': 'B.', 'target': {'css': '#hb'}, 'next': 'OK'}]}}
+    for tag, W in (('phone', 390), ('desk', 1280)):
+        c, pg, errs, got, warns = fresh(b, W, 800, {'**/pano/brain.json': {'extends': 'base', 'lines': {'name': 'Biscuit'}, 'tours': hdr}})
+        pg.evaluate("()=>{document.body.style.paddingTop='80px';document.body.insertAdjacentHTML('afterbegin','<header id=\"fixhead\" style=\"position:fixed;top:0;left:0;right:0;height:80px;background:#333;z-index:10\"></header>"
+                    "<div id=\"hb\" style=\"height:60px;margin-top:900px;background:#fc0\">B</div><div id=\"ha\" style=\"height:60px;margin-top:140px;background:#fc0\">A</div>')}")
+        pg.evaluate(PRESS, 'Two'); pg.wait_for_timeout(2500)
+        pg.evaluate(PRESS, 'Next'); pg.wait_for_timeout(2500)
+        top = pg.evaluate("()=>[document.getElementById('hb').getBoundingClientRect().top,document.getElementById('fixhead').getBoundingClientRect().bottom]")
+        print(tag, 'header 1 a target is brought in below a header fixed to the top of the screen', top[0] >= top[1], top)
+        print(tag, 'header errors', errs)
+        c.close()
+
+    # (K4) the room below the page also works where the page is a flex column of fixed height (a footer pushed to the
+    # bottom with flex, as many Bootstrap sites do), which used to squeeze it to nothing
+    c, pg, errs, got, warns = fresh(b, 390, 800, {'**/pano/brain.json': {'extends': 'base', 'lines': {'name': 'Biscuit'}, 'tours': foot}})
+    pg.evaluate("()=>{document.head.insertAdjacentHTML('beforeend','<style>html,body{height:100%}body{display:flex;flex-direction:column}footer{margin-top:auto}</style>')}")
+    pg.evaluate(PRESS, 'What is at the bottom?'); pg.wait_for_timeout(3000)
+    spot = pg.evaluate("()=>{const r=document.querySelector('footer').getBoundingClientRect(),b=document.getElementById('gbubble').getBoundingClientRect();return {top:r.top,bottom:r.bottom,bubbleTop:b.top}}")
+    print('room 4 phone, flex page: the footer still comes up above his bubble', spot['top'] >= 0 and spot['bottom'] <= spot['bubbleTop'], spot)
+    print('room 4 errors', errs)
+    c.close()
+
+    # (K4) a phone page wider than the screen (a long word that doesn't wrap): his bubble and his spot stay on the
+    # part of the page that is shown, not the bigger area the browser lays fixed things out on
+    c, pg, errs, got, warns = fresh(b, 390, 800, mobile=True)
+    pg.evaluate("()=>document.body.insertAdjacentHTML('afterbegin','<div style=\"width:450px;height:4px\"></div>')")
+    pg.wait_for_timeout(500)
+    pg.evaluate("()=>{document.getElementById('gx').click()}"); pg.wait_for_timeout(1500)
+    pg.evaluate("()=>document.getElementById('gcat').click()"); pg.wait_for_timeout(2000)
+    box = pg.evaluate("()=>{const b=document.getElementById('gbubble').getBoundingClientRect(),c=document.getElementById('gcat').getBoundingClientRect(),v=visualViewport;return {wide:innerWidth,shown:v.width,shownH:v.height,bub:[b.left,b.right,b.bottom].map(Math.round),cat:[c.right,c.bottom].map(Math.round),open:!document.getElementById('gbubble').hidden}}")
+    inside = box['open'] and box['wide'] > box['shown'] and box['bub'][0] >= 0 and box['bub'][1] <= box['shown'] and box['bub'][2] <= box['shownH'] + 2 and box['cat'][0] <= box['shown'] and box['cat'][1] <= box['shownH']
+    print('wide 1 phone page wider than the screen: his bubble and he stay on the part that is shown', inside, box)
+    print('wide errors', errs)
     c.close()
 
     # done.css_visible (K4): an element that is always in the page but hidden by its styles (a popup opened by a

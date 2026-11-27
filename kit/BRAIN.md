@@ -148,7 +148,9 @@ Every page loads the same brain. A tour whose targets are on one page should say
 - Left out, the tour is offered on every page. That suits a tour of something every page has: the menu bar, the footer.
 - On other pages the tour is not in his menu, and `Pano.check()` leaves its targets alone (a note says it is for another page). It does check that each address in `pages` is there.
 
-**A tour that crosses pages** is two tours with the same `label`. On the pages where the thing is not, the first tour points at the link to it and ends ("Click <b>Classes</b> up here, then ask me again there"). On the page where it is, the second tour shows it. The example site does this with `join-here` and `join`.
+**A tour that crosses pages** is two tours with the same `label`. One has `pages` and shows the thing on its own page. The other has no `pages`: it points at the link to that page and ends ("Click <b>Classes</b> up here, then ask me again there"). On a page named in the first tour's `pages`, he offers the first one, in the second one's place in his menu; on every other page, the second. So a page added to the site later gets the second tour without any change to the brain. The example site does this with `join` and `join-here`.
+
+Its link step can also take the visitor there: `"act": { "click": "#classes-link" }` with `"actLabel": "Take me there"`, plus a `next`, as the tour's last step. `act` can click a link that is folded away on phones (behind a ☰ button), so the step can point at the whole menu bar, which shows at every size, and click the link inside it.
 
 ## Menu
 

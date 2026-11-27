@@ -134,6 +134,30 @@
     const $ = (s, r = document) => r.querySelector(s);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const narrow = () => innerWidth <= 640;
+    // What the visitor can see: normally the whole window. On a phone, a page wider than the screen (a long address
+    // that doesn't wrap, say) makes the browser lay out fixed things over a bigger area than it shows, so his spots and
+    // his bubble keep to the part that is shown (only then, and only at the page's own zoom: pinch-zooming is left alone).
+    function shownBox() {
+      const v = window.visualViewport;
+      if (!v || Math.abs(v.scale - 1) > .01 || v.width >= innerWidth - 1) return null;
+      return { x: v.offsetLeft, y: v.offsetTop, w: v.width, h: innerHeight * v.width / innerWidth };
+    }
+    const viewL = () => { const b = shownBox(); return b ? b.x : 0; };
+    const viewT = () => { const b = shownBox(); return b ? b.y : 0; };
+    const viewR = () => { const b = shownBox(); return b ? b.x + b.w : innerWidth; };
+    const viewB = () => { const b = shownBox(); return b ? b.y + b.h : innerHeight; };
+    // ...and his bubble's CSS keeps to it too (--pano-vl/vr/vt/vb, see pano.css), checked each time it is placed
+    let shownKey = '';
+    function fitShown() {
+      const b = shownBox(), root = document.documentElement.style;
+      const key = b ? [b.x, b.y, b.w, b.h].map(Math.round).join() : '';
+      if (key === shownKey) return false;
+      shownKey = key;
+      if (!b) { ['--pano-vl', '--pano-vr', '--pano-vt', '--pano-vb'].forEach(v => root.removeProperty(v)); return true; }
+      root.setProperty('--pano-vl', Math.round(b.x) + 'px'); root.setProperty('--pano-vr', Math.round(innerWidth - b.x - b.w) + 'px');
+      root.setProperty('--pano-vt', Math.round(b.y) + 'px'); root.setProperty('--pano-vb', Math.round(innerHeight - b.y - b.h) + 'px');
+      return true;
+    }
     const ga = host.ga || (() => {});
 
     /* ---------- spring easing via CSS linear() ---------- */
@@ -194,17 +218,17 @@
     let catPos = { x: 0, y: 0 }, tour = null, stepToken = 0, ringTarget = null, ringRAF = 0, msgSeq = 0, idleT = 0;
 
     const bar = () => narrow() ? BAR.narrow : BAR.wide;
-    const dockSpot = () => ({ x: innerWidth - CAT_W() - 16, y: innerHeight - BAR.narrow - kb - safe() - CAT_H() - 12 });
+    const dockSpot = () => ({ x: viewR() - CAT_W() - 16, y: viewB() - BAR.narrow - kb - safe() - CAT_H() - 12 });
     // first visit: tucked into the bottom-right corner, just above the taskbar
-    const cornerSpot = () => ({ x: innerWidth - CAT_W() - (narrow() ? 8 : 14), y: innerHeight - bar() - safe() - CAT_H() - 6 });
-    const clampSpot = (p, w, h) => ({ x: Math.min(innerWidth - w, Math.max(0, p.x)), y: Math.min(innerHeight - h, Math.max(0, p.y)) });
+    const cornerSpot = () => ({ x: viewR() - CAT_W() - (narrow() ? 8 : 14), y: viewB() - bar() - safe() - CAT_H() - 6 });
+    const clampSpot = (p, w, h) => ({ x: Math.min(viewR() - w, Math.max(viewL(), p.x)), y: Math.min(viewB() - h, Math.max(viewT(), p.y)) });
     // head mode: just his head, parked at the top middle (or wherever the user dragged it)
     const HEAD_W = () => narrow() ? 120 : 144, HEAD_H = () => narrow() ? 90 : 108;
     const FULL_VB = '0 0 100 120', HEAD_VB = '5 3 72 54';
     let headMode = false, headHome = false, headMoved = false;
     try { sessionStorage.removeItem('panoHeadPos'); } catch (e) {}   // an older version kept this
     // his head's home is always the top middle of the screen
-    const headSpot = () => clampSpot({ x: innerWidth / 2 - HEAD_W() / 2, y: 6 }, HEAD_W(), HEAD_H());
+    const headSpot = () => clampSpot({ x: (viewL() + viewR()) / 2 - HEAD_W() / 2, y: viewT() + 6 }, HEAD_W(), HEAD_H());
     // where he stands to talk: on phones inside the docked bubble; once he's lived at the top, just under his head spot
     function homeSpot() {
       if (narrow()) return dockSpot();
@@ -251,7 +275,7 @@
           L = Math.max(L, q.left); T = Math.max(T, q.top); R = Math.min(R, q.right); B = Math.min(B, q.bottom);
         }
       }
-      L = Math.max(L, 0); T = Math.max(T, 0); R = Math.min(R, innerWidth); B = Math.min(B, innerHeight - bar());
+      L = Math.max(L, viewL()); T = Math.max(T, viewT()); R = Math.min(R, viewR()); B = Math.min(B, viewB() - bar());
       return R - L > 2 && B - T > 2 ? { left: L, top: T, right: R, bottom: B, width: R - L, height: B - T } : null;
     }
     const overlapArea = (a, b) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
@@ -271,12 +295,12 @@
       }
       if (top) {
         const b = gbub.getBoundingClientRect();
-        setCat({ x: innerWidth - CAT_W() - 16, y: b.bottom - CAT_H() - 10 }); catTopDocked = true;
+        setCat({ x: viewR() - CAT_W() - 16, y: b.bottom - CAT_H() - 10 }); catTopDocked = true;
       } else if (catTopDocked) { setCat(dockSpot()); catTopDocked = false; }
     }
     function placeBubble() {
       if (gbub.hidden) return;
-      if (narrow()) return placeBubbleNarrow();
+      if (narrow()) { fitShown(); return placeBubbleNarrow(); }
       const bw = gbub.offsetWidth, bh = gbub.offsetHeight, cx = catPos.x + CAT_W() / 2;
       const left = Math.min(innerWidth - bw - 8, Math.max(8, cx - bw / 2));
       let top = catPos.y - bh - 14, below = false;
@@ -367,17 +391,32 @@
         requestAnimationFrame(tick);
       });
     }
-    // wide: put the target about a third of the way down the screen
-    function scrollWide(el) {
-      const r = el.getBoundingClientRect();
-      if (r.top >= 16 && r.bottom <= innerHeight - BAR.wide - 6 - safe()) return Promise.resolve();
-      return scrollPage(scrollY + r.top - Math.max(16, Math.min(innerHeight * .3, (innerHeight - r.height) / 2)));
+    // a header or menu bar fixed to the top of the screen: how far down it reaches (0 if there is none)
+    function topBar() {
+      let low = 0;
+      for (const fx of [.15, .5, .85]) {
+        for (let e = document.elementFromPoint(viewL() + (viewR() - viewL()) * fx, viewT() + 2); e && e !== document.body && e !== document.documentElement; e = e.parentElement) {
+          if (e.closest('#gcat, #gbubble, #gring')) break;
+          const pos = getComputedStyle(e).position;
+          if (pos !== 'fixed' && pos !== 'sticky') continue;
+          const r = e.getBoundingClientRect();
+          if (r.top <= viewT() + 2 && r.bottom > 0 && r.bottom - viewT() < (viewB() - viewT()) * .5) low = Math.max(low, r.bottom - viewT());
+          break;
+        }
+      }
+      return Math.round(low);
     }
-    // narrow: the bubble is a bottom sheet, so fit the target in the space above it
+    // wide: put the target about a third of the way down the screen (below a header fixed to the top)
+    function scrollWide(el) {
+      const r = el.getBoundingClientRect(), top = topBar();
+      if (r.top >= top + 16 && r.bottom <= innerHeight - BAR.wide - 6 - safe()) return Promise.resolve();
+      return scrollPage(scrollY + r.top - Math.max(top + 16, Math.min(innerHeight * .3, (innerHeight - r.height) / 2)));
+    }
+    // narrow: the bubble is a bottom sheet, so fit the target in the space above it (and below a header fixed to the top)
     function scrollNarrow(el) {
-      const r = el.getBoundingClientRect(), avail = gbub.getBoundingClientRect().top - 12;
-      if (r.top >= 12 && r.bottom <= avail) return Promise.resolve();
-      const y = scrollY + r.top - Math.max(12, (avail - r.height) / 2);
+      const r = el.getBoundingClientRect(), avail = gbub.getBoundingClientRect().top - 12, top = topBar() + viewT();
+      if (r.top >= top + 12 && r.bottom <= avail) return Promise.resolve();
+      const y = scrollY + r.top - Math.max(top + 12, top + (avail - top - r.height) / 2);
       makeRoom(y);
       return scrollPage(y);
     }
@@ -389,7 +428,7 @@
       if (short <= 0) return;
       if (!room) {
         room = document.createElement('div'); room.className = 'groom'; room.setAttribute('aria-hidden', 'true');
-        room.style.cssText = 'display:block;height:0;margin:0;padding:0;pointer-events:none';
+        room.style.cssText = 'display:block;flex:none;height:0;margin:0;padding:0;pointer-events:none';
         document.body.appendChild(room);
       }
       room.style.height = (room.offsetHeight + short) + 'px';
@@ -759,7 +798,13 @@
       else guideMenu(L.menu.ask);
     });
     $('#gx').addEventListener('click', () => guideRest());
+    fitShown();
+    if (window.visualViewport) {
+      const refit = () => { if (fitShown() && !gcat.hidden && narrow() && !headMode && !dragging) { setCat(homeSpot()); placeBubble(); } };
+      visualViewport.addEventListener('resize', refit); visualViewport.addEventListener('scroll', refit);
+    }
     addEventListener('resize', () => {
+      fitShown();
       if (gcat.hidden) return;
       if (headMode) setCat(headMoved ? clampSpot(catPos, HEAD_W(), HEAD_H()) : headSpot());
       else if (!tour && !dragging) setCat(gbub.hidden && !hasInteracted ? cornerSpot() : homeSpot());
@@ -781,7 +826,7 @@
         const vv = window.visualViewport;
         if (!vv || watchKeyboard.on) return; watchKeyboard.on = true;
         const onVV = () => {
-          const k = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
+          const k = Math.max(0, Math.round(viewB() - vv.height - vv.offsetTop));
           if (Math.abs(k - kb) < 2) return;
           kb = k; document.documentElement.style.setProperty('--pano-kb', kb + 'px');
           if (!gcat.hidden && narrow() && !headMode && !dragging && !(gbub.hidden && !hasInteracted)) setCat(dockSpot());

@@ -34,9 +34,8 @@
       ]
     },
     "join-here": {
-      "_why": "Classes have their own page. On the home page, this tour points the way there; on classes.html, the tour below (with the same label) shows the form.",
+      "_why": "Classes have their own page. On every other page (it has no \"pages\"), this tour points the way there; on classes.html, the tour below, with the same label and \"pages\", shows the form instead.",
       "label": "How do I join a class?",
-      "pages": ["../index.html"],
       "steps": [
         { "say": "Classes are on their own page. Click <b>Classes</b> up here, then ask me again there and I’ll show you the sign-up form.", "target": { "css": "#nav-classes" }, "act": { "click": "#nav-classes" }, "actLabel": "Take me there", "next": "Got it" }
       ]

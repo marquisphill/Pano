@@ -17,7 +17,8 @@
      --pano-leg, --pano-paw                        darker shades of it: the line between his legs; his licking paw's outline
      --pano-eyes, --pano-mouth, --pano-tongue
      --pano-close                                  the bubble's close button
-   His engine sets --pano-bar (space kept clear at the bottom on phones) and --pano-kb (keyboard height). */
+   His engine sets --pano-bar (space kept clear at the bottom on phones) and --pano-kb (keyboard height), and on a phone
+   page wider than the screen --pano-vl, --pano-vr, --pano-vt, --pano-vb (the part of the window not shown). */
 
 /* ---------- the cat guide ---------- */
 .gcat{position:fixed;left:0;top:0;width:76px;height:92px;z-index:9050;padding:0;margin:0;border:0;background:none;cursor:pointer;filter:drop-shadow(0 6px 12px var(--pano-shadow,rgba(0,0,0,.5)));will-change:transform}
@@ -113,8 +114,8 @@
 @media (max-width:640px){
   .gcat{width:54px;height:65px;z-index:9065}
   .gcat.head{width:120px;height:90px;z-index:2147483000}
-  .gbubble{left:8px!important;right:8px;top:auto!important;bottom:calc(var(--pano-bar,52px) + env(safe-area-inset-bottom,0px) + var(--pano-kb,0px));width:auto;max-width:none;padding-left:40px;padding-right:76px}
+  .gbubble{left:calc(8px + var(--pano-vl,0px))!important;right:calc(8px + var(--pano-vr,0px));top:auto!important;bottom:calc(var(--pano-bar,52px) + env(safe-area-inset-bottom,0px) + var(--pano-kb,0px) + var(--pano-vb,0px));width:auto;max-width:none;padding-left:40px;padding-right:76px}
   .gbubble .gx{right:auto;left:6px}
-  .gbubble.gtop{top:calc(8px + env(safe-area-inset-top,0px))!important;bottom:auto}
+  .gbubble.gtop{top:calc(8px + env(safe-area-inset-top,0px) + var(--pano-vt,0px))!important;bottom:auto}
   .gbubble::after{display:none}
 }
