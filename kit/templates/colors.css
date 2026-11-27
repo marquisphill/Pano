@@ -22,13 +22,16 @@
   --pano-step: #8fa898;          /* "Step 1 of 3" */
   --pano-accent: #3ddc84;        /* main buttons, the ring around what he points at, focus outlines */
   --pano-accent-ink: #04140b;    /* text on main buttons */
-  --pano-glow: rgba(61, 220, 132, .55);   /* the ring's pulse: --pano-accent, half see-through... */
+  --pano-ring: #3ddc84;          /* the ring around what he points at: --pano-accent, unless that is hard to see on the
+                                    site's own page (a pale yellow on white, say); then a darker shade of it */
+  --pano-glow: rgba(61, 220, 132, .55);   /* the ring's pulse: --pano-ring, half see-through... */
   --pano-glow-0: rgba(61, 220, 132, 0);   /* ...fading to nothing */
   --pano-btn: #15241b;           /* other buttons */
   --pano-btn-line: #22402e;
   --pano-btn-hover: #1a3324;
   --pano-close: #8fa898;         /* the bubble's close button */
-  /* Also available: --pano-radius, --pano-font, --pano-btn-radius, --pano-ring-radius, --pano-shadow. */
+  /* Also available: --pano-font (the bubble's text size, 13.5px; not a typeface: the bubble uses the page's own),
+     --pano-radius (bubble corners, 14px), --pano-btn-radius (999px), --pano-ring-radius (12px), --pano-shadow. */
 }
 
 /* ---- The background changer (delete this part if the site has none) ----

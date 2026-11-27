@@ -6,8 +6,9 @@ For every page that loads Paño, at a phone size and a desktop size, it:
   - runs Pano.check() and prints its problems (✗) and notes (·),
   - lists his menu,
   - walks every tour he offers on that page, step by step: each step must show, point at something that is
-    on screen, and move on, and the tour must finish,
-  - lists page errors and files that failed to load,
+    on screen (not under a header or bar that stays on screen), and move on, and the tour must finish,
+  - lists page errors and files that failed to load (a file from another site, such as a web font, is only a
+    note: test machines often can't reach those, and they are not Paño's),
   - and, on desktop, checks that each background the page styles can be seen.
 It also looks for a TODO left in the site's pano/ files, and for a page that loads a copy of Paño's engine
 instead of the hosted one.
@@ -403,8 +404,13 @@ def main():
                     R.bad('page error: ' + e[:200])
                 known = ' '.join(x['say'] for x in r['problems'])     # page addresses Pano.check() already reported
                 for f in dict.fromkeys(failed):
-                    if not f.endswith('/favicon.ico') and f.split(' ')[-1] not in known:
+                    addr = f.split(' ')[-1]
+                    if f.endswith('/favicon.ico') or addr in known:
+                        continue
+                    if urlsplit(addr).netloc in (urlsplit(base).netloc, urlsplit(HOSTED).netloc):
                         R.bad('did not load: ' + f)
+                    else:     # another site's file (fonts, icons, analytics): not Paño's, and often blocked on test machines
+                        R.note('did not load (a file from another site, not Paño\'s or this site\'s; if it loads in a normal browser, ignore this): ' + f)
                 c.close()
         browser.close()
     srv.shutdown()

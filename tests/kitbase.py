@@ -162,6 +162,23 @@ with sync_playwright() as p:
     print('room 3 a target the page can scroll to needs no room', not pg.evaluate("()=>!!document.querySelector('.groom')"))
     c.close()
 
+    # done.css_visible (K4): an element that is always in the page but hidden by its styles (a popup opened by a
+    # class) is not showing, so the step waits for it, and moves on once it really shows
+    pop = {'pop': {'label': 'Open the popup', 'steps': [
+        {'say': 'Open it.', 'target': {'css': '#contact-form'}, 'done': {'css_visible': '#pop.open'}},
+        {'say': 'There it is.', 'target': {'css': '#pop'}, 'next': 'OK'}]}}
+    c, pg, errs, got, warns = fresh(b, 1280, 800, {'**/pano/brain.json': {'extends': 'base', 'lines': {'name': 'Biscuit'}, 'tours': pop}})
+    pg.evaluate("()=>{const d=document.createElement('div');d.id='pop';d.textContent='A popup';d.style.cssText='display:none;padding:20px';"
+                "document.head.insertAdjacentHTML('beforeend','<style>#pop.open{display:block!important}</style>');document.body.prepend(d)}")
+    pg.evaluate("()=>{const d=document.getElementById('pop');d.className='closed'}")
+    pg.evaluate(PRESS, 'Open the popup'); pg.wait_for_timeout(2500)
+    waiting = 'Open it.' in pg.evaluate(SAY)
+    pg.evaluate("()=>{document.getElementById('pop').className='open'}"); pg.wait_for_timeout(2500)
+    moved = 'There it is.' in pg.evaluate(SAY)
+    print('visible 1 done.css_visible waits while the element is hidden by the page\'s styles, and moves on when it shows', waiting and moved, waiting, moved)
+    print('visible errors', errs)
+    c.close()
+
     # touch.swaps (K4): whole words in any alphabet, phrases, and words with brackets, on phones only
     swaps = {'swaps': [{'find': 'Haz clic en', 'say': 'Toca', 'whole_word': True}, {'find': 'aquí', 'say': 'acá', 'whole_word': True},
                        {'find': '(clic)', 'say': '(toque)', 'whole_word': True}, {'find': 'clic', 'say': 'toque', 'whole_word': True}]}

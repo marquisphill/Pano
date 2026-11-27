@@ -65,12 +65,12 @@ Wait for the answers. For anything left unanswered, use the default and say so. 
 ## Step 3. Read the site and plan the tours
 
 1. **List the pages** and read each one, the HTML and how it looks at a phone size and a desktop size.
-2. **For each of the 3 things,** find where a visitor does it, and plan 1 to 3 steps. Each step points at one element and says one short thing about it. The last step is usually the thing itself: the form, the button, the price list.
+2. **For each of the 3 things,** find where a visitor does it, and plan 1 to 3 steps (up to 5 if the thing really has more parts). Each step points at one element and says one short thing about it. The last step is usually the thing itself: the form, the button, the price list.
 3. **Pick targets that will last:**
    - an element with an `id`. If it has none, add one in the HTML: short and plain, like `id="signup-form"`. It changes nothing a visitor sees.
    - never a selector that depends on layout (`main > div:nth-child(3)`): it breaks when the site changes.
    - visible when the page loads, at **every** screen size. Watch for menus that fold behind a ☰ button on phones: a link inside one is hidden there. Point at something that shows at every size instead (a button on the page, a link in the footer), or at the ☰ button itself.
-   - something inside a closed panel (tabs, a popup, a dropdown) needs a step before it that opens it: point at the opener, give it an `act` that clicks it and a `done` with what becomes visible.
+   - something inside a closed panel (tabs, a popup, a dropdown) needs a step before it that opens it: point at the opener, give it an `act` that clicks it and a `done` with what becomes visible. `done.css_visible` waits until that element is really showing (not hidden by the page's styles), so a popup that is always in the page but shown by a class works: `"#project-popup"`. Make a step inside a popup the tour's last: while a popup is open, a visitor using the keyboard can't reach his bubble (tapping and clicking work).
 4. **On a site with several pages,** every page loads the same brain, so give each tour `pages`: the pages it can run on (see "Tours on a site with several pages" in BRAIN.md). A tour of something every page has (the menu bar, the footer) needs no `pages`. For a thing on another page, write two tours with the same label: one that points at the link to it on the other pages, and one that shows it on its own page.
 5. **Show the person the plan** in a few lines (each tour's menu button and its steps, one line each) and ask them to confirm or change it.
 
@@ -94,7 +94,8 @@ Copy the templates into the site's `pano/` folder and fill them in.
 **`pano/colors.css`** (from `templates/colors.css`):
 - His fur: `--pano-fur`, with `--pano-leg` and `--pano-paw` about 20% darker and `--pano-name` a little lighter (it is his name above each bubble, so it must read well on the bubble).
 - His bubble: by default dark green. To match the site, take its colors. Keep the text readable: `--pano-ink` on `--pano-bubble`, `--pano-name` and `--pano-soft` on `--pano-bubble`, and `--pano-accent-ink` on `--pano-accent` each need a contrast of at least 4.5 to 1.
-- Backgrounds: the light set suits a site with dark text; for light text on a dark site, use the dark set (and use the same names in `setup.js` and in `lines.background.options`). Set `--pano-page` to the site's own page color.
+- The ring around what he points at (`--pano-ring`, and `--pano-glow` for its pulse) is drawn on the site's page, not on the bubble, so it must stand out against the page: at least 3 to 1 on its main background. If `--pano-accent` is too pale for that (yellow on white), give the ring a darker shade.
+- Backgrounds: the light set suits a site with dark text; for light text on a dark site, use the dark set (and use the same names in `setup.js` and in `lines.background.options`). Set `--pano-page` to the site's own page color. A background shows only through the parts of the page that have no color of their own (sections, cards and photos keep theirs); that is expected, and worth telling the person.
 - Delete any line left at its default if you like; every value in the template is his default.
 - No background changer and his default colors: you can leave this file out, and its line on each page.
 
@@ -112,7 +113,7 @@ python3 path/to/Pano/kit/check_site.py path/to/their-site
 
 It serves the site on this computer and, for every page at a phone size and a desktop size: checks he appears, runs `Pano.check()`, lists his menu, walks every tour he offers there to the end, checks each step's target is on screen with the ring around it, and checks each background can be seen. If this computer can't reach `marquisphill.github.io` (many cloud sessions can't), or the files there are older than the clone's, it answers for that address from the clone it sits in; its second line says which. To choose a clone, add `--engine path/to/Pano`.
 
-- **Fix every ✗ and run it again, until it ends with "All good".** Notes (·) may be fine; read them.
+- **Fix every ✗ and run it again, until it ends with "All good".** Notes (·) may be fine; read them. A file from another site that did not load (a web font, icons) is only a note: test machines often can't reach those, and the site's own page is not yours to change.
 - **Look at him.** Take screenshots at a phone size and a desktop size with his bubble open, and check his colors and bubble suit the site.
 - **If you can't run it**, open each page in a browser, type `Pano.check()` in the console, fix every problem it lists, and walk each tour by hand at a phone size (about 390 pixels wide) and a desktop size.
 
@@ -123,6 +124,7 @@ It serves the site on this computer and, for every page at a phone size and a de
 - What you checked, and anything you couldn't.
 - How to change him later: edit `pano/brain.json` (BRAIN.md lists every field), then run `Pano.check()` in the browser console on any page.
 - How to remove him: delete the 4 lines from each page and the `pano/` folder.
+- That he shows on the live site once the changes are published (on GitHub Pages: committed and pushed). Leave the changes for the person to look over: don't commit or publish them unless they asked you to.
 
 ## The adapter (`setup.js`), entry by entry
 

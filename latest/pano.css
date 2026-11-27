@@ -6,10 +6,11 @@
      --pano-bubble, --pano-line, --pano-ink        bubble background, border, text
      --pano-name, --pano-soft, --pano-step         his name, quiet text, the step label
      --pano-accent, --pano-accent-ink              main buttons, ring, focus outline; text on main buttons
+     --pano-ring                                   the ring around what he points at (--pano-accent if not set)
      --pano-glow, --pano-glow-0                    the ring's pulse (start and end colors)
      --pano-btn, --pano-btn-line, --pano-btn-hover plain buttons
      --pano-btn-h, --pano-btn-pad, --pano-btn-radius, --pano-btn-font, --pano-btn-align
-     --pano-radius, --pano-font, --pano-ring-radius
+     --pano-radius, --pano-font, --pano-ring-radius bubble corners, bubble text size, ring corners
      --pano-shadow, --pano-bubble-shadow
    His own colors, with his red as the default:
      --pano-fur                                    his fur
@@ -87,7 +88,7 @@
 .gx{position:absolute;right:6px;top:6px;width:30px;height:30px;padding:0;border:0;background:none;border-radius:50%;display:grid;place-items:center;cursor:pointer}
 .gx:hover{background:var(--pano-btn,#15241b)}
 .gx svg{width:10px;height:10px}
-.gring{position:fixed;z-index:9055;pointer-events:none;border:2px solid var(--pano-accent,#3ddc84);border-radius:var(--pano-ring-radius,12px);animation:gring 1.4s ease-out infinite;transition:opacity .2s}
+.gring{position:fixed;z-index:9055;pointer-events:none;border:2px solid var(--pano-ring,var(--pano-accent,#3ddc84));border-radius:var(--pano-ring-radius,12px);animation:gring 1.4s ease-out infinite;transition:opacity .2s}
 .gring[hidden]{display:none}
 @keyframes gring{0%{box-shadow:0 0 0 0 var(--pano-glow,rgba(61,220,132,.55))}100%{box-shadow:0 0 0 14px var(--pano-glow-0,rgba(61,220,132,0))}}
 @media (prefers-reduced-motion:reduce){.gtail,.geyes,.gring,.gcat.talk .ghead,.gwavy path,.gcat.lick .gtongue,.gcat.lick .gpp,.gthink i{animation:none}}

@@ -37,7 +37,10 @@ Pano.skill('tours', {
   start(p, host) {
     const $ = p.$;
     const HELP = host.tours || {};
-    const visible = sel => { const e = $(sel); return e && !e.hidden ? e : null; };
+    // showing: on the page, not hidden by an attribute or by the page's styles (a popup that is always in the page
+    // but shown only by a class counts as showing only while it is open). Pano.check() uses the same test.
+    const shown = el => !el.hidden && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
+    const visible = sel => { const e = $(sel); return e && shown(e) ? e : null; };
     const kindOf = (d, part) => Object.keys(d).find(k => HELP[part] && HELP[part][k]);
     const fact = name => !!(HELP.when && HELP.when[name] && HELP.when[name](p));
     const knows = name => !!(HELP.when && HELP.when[name]);
@@ -149,7 +152,6 @@ Pano.skill('tours', {
     const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
     const TOUR_FIELDS = ['label', 'name', 'steps', 'pages', 'wait_for', 'wait_ms', 'then'];
     const STEP_FIELDS = ['say', 'target', 'done', 'act', 'actLabel', 'next', 'skip', 'id', 'jump', 'need', 'need_say', 'when', 'unless'];
-    const shown = el => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
     async function check({ bad, note }) {
       const B = p.brain || {}, T = B.tours === undefined ? {} : B.tours;
       if (!isObj(T)) return bad('tour', 'tours', 'should be a group of tours: { "id": { "label": "...", "steps": [ ... ] } }');

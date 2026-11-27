@@ -119,9 +119,9 @@ At each step he walks over to something on the page, puts a ring around it, and 
 | --- | --- | --- |
 | `say` | yes | What he says at this step. Short: one or two sentences. `<b>` for bold. On touch screens, `touch.swaps` turns "Click" into "Tap". |
 | `target.css` | yes | What he points at: a CSS selector for one element. Prefer an id (`"#contact-form"`). It must be on the page when the step starts. On a page that scrolls, he scrolls it into view. |
-| `target.when_visible` | no | A selector: he waits until that element is showing before he points. |
+| `target.when_visible` | no | A selector: he waits until that element is showing before he points (really showing: not hidden by the `hidden` attribute or by the page's styles). |
 | `next` | one of `next` or `done` | A button that moves on: "Next", "Got it". |
-| `done.css_visible` | one of `next` or `done` | A selector: the step moves on by itself once that element is showing (the visitor opened something, say). |
+| `done.css_visible` | one of `next` or `done` | A selector: the step moves on by itself once that element is showing (the visitor opened something, say). Showing means really on screen, so a popup that is always in the page and opened by a class works. |
 | `act` | no | Adds a button that does it for the visitor: `{ "click": "#menu-button" }`, `{ "focus": "#email" }` or `{ "submit": "#search-form" }`. One of the three. |
 | `actLabel` | no | That button's words, in place of `tour.do_it`. |
 | `skip` | no | A second button that moves on, for a step the visitor may not need. |
