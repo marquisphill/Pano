@@ -3,8 +3,9 @@
    so delete any line you don't change. */
 
 :root {
-  /* His fur and face. For a new fur color, make --pano-leg and --pano-paw the same color about 20% darker,
-     --pano-name the same color a little lighter (it is his name above each bubble), and keep the eyes dark. */
+  /* His fur and face. For a new fur color, make --pano-leg and --pano-paw the same color darker (about 20% and 25%,
+     as below), --pano-name the same color, lighter on a dark bubble or darker on a light one (it is his name above
+     each bubble), and keep the eyes dark. */
   --pano-fur: #ff4d4f;
   --pano-leg: #c93436;
   --pano-paw: #b92c2e;
