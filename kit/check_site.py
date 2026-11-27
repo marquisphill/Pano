@@ -37,7 +37,7 @@ PRESS = "t=>{const b=[...document.querySelectorAll('#gacts button')].find(b=>b.t
 STEP_SHOWN = "prev=>{const b=document.getElementById('gbubble'),s=document.getElementById('gsay');return !b.hidden&&!!s.querySelector('.gstep')&&s.innerText!==prev}"
 MENU_BACK = "prev=>{const b=document.getElementById('gbubble'),s=document.getElementById('gsay');return !b.hidden&&!s.querySelector('.gstep')&&s.innerText!==prev&&document.querySelectorAll('#gacts button').length>0}"
 GREETED = "()=>{const c=document.getElementById('gcat'),b=document.getElementById('gbubble');return c&&!c.hidden&&b&&!b.hidden&&document.querySelectorAll('#gacts button').length>0}"
-# is the target on screen (above his bubble on a phone), and is the ring around it?
+# is the target on screen (above his bubble on a phone), not under a bar that stays on screen, and is the ring around it?
 SEEN = """([css, narrow]) => {
   let el = null; try { el = document.querySelector(css); } catch (e) { return { found: false, bad: true }; }
   if (!el) return { found: false };
@@ -46,8 +46,31 @@ SEEN = """([css, narrow]) => {
   const seen = r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < limit && r.right > 0 && r.left < innerWidth;
   const q = g.getBoundingClientRect();
   const ring = !g.hidden && q.width > 0 && q.left < r.right + 20 && q.right > r.left - 20 && q.top < r.bottom + 20 && q.bottom > r.top - 20;
-  return { found: true, seen, ring };
+  // the part of it on screen: is most of it under something fixed to the screen (a header or bar that stays put)?
+  let covered = '';
+  if (seen) {
+    const top = Math.max(r.top, 0), bottom = Math.min(r.bottom, limit), left = Math.max(r.left, 0), right = Math.min(r.right, innerWidth);
+    const stuck = n => { for (let e = n; e && e !== document.documentElement; e = e.parentElement) { const p = getComputedStyle(e).position; if (p === 'fixed' || p === 'sticky') return e; } return null; };
+    const name = e => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\\s+/).slice(0, 2).join('.') : '');
+    let hits = 0, by = null;
+    const spots = [[.5, .5], [.2, .25], [.8, .25], [.2, .75], [.8, .75]];
+    for (const [fx, fy] of spots) {
+      const h = document.elementFromPoint(left + (right - left) * fx, top + (bottom - top) * fy);
+      if (!h || el.contains(h) || h.contains(el) || h.closest('#gcat, #gbubble, #gring')) continue;
+      const s = stuck(h);
+      if (s && !s.contains(el)) { hits++; by = by || s; }
+    }
+    if (hits >= 3) covered = name(by);
+  }
+  return { found: true, seen, ring, covered };
 }"""
+# wait until the page has stopped scrolling (a long page takes a while to scroll smoothly to a target)
+SETTLED = """() => new Promise(res => {
+  let last = -1, still = 0; const t0 = performance.now();
+  const tick = () => { if (Math.abs(scrollY - last) < .5) still++; else still = 0; last = scrollY;
+    if (still > 15 || performance.now() - t0 > 6000) return res(true); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+})"""
 WALLS = """() => {
   const names = new Set();
   const scan = rules => { for (const r of rules) { if (r.selectorText && r.selectorText.includes('pano-backdrop')) for (const m of r.selectorText.matchAll(/data-wall\\s*=\\s*["']?([\\w-]+)/g)) names.add(m[1]); if (r.cssRules) scan(r.cssRules); } };
@@ -119,18 +142,28 @@ def engine_route(root):
 
 
 class Report:
+    """What it prints, and the same in a form other programs can read (--json)."""
     def __init__(self):
         self.problems = 0
+        self.data = {'bad': [], 'notes': [], 'pages': []}
+        self.now = self.data
 
     def line(self, text=''):
         print(text, flush=True)
 
     def bad(self, text):
         self.problems += 1
+        self.now['bad'].append(text)
         print('  ✗ ' + text, flush=True)
 
     def note(self, text):
+        self.now['notes'].append(text)
         print('  · ' + text, flush=True)
+
+    def page(self, rel, tag, W, H):
+        self.now = {'page': rel, 'size': tag, 'width': W, 'height': H, 'greeted': False, 'menu': [], 'tours': [],
+                    'errors': [], 'bad': [], 'notes': []}
+        self.data['pages'].append(self.now)
 
 
 def main():
@@ -138,6 +171,7 @@ def main():
     ap.add_argument('site', help='the site folder (the one with index.html in it)')
     ap.add_argument('--pages', nargs='*', help='pages to check, relative to the site folder (default: every page that loads pano.js)')
     ap.add_argument('--engine', help='a clone of the Pano repo, to answer for https://marquisphill.github.io/Pano/')
+    ap.add_argument('--json', metavar='FILE', help='also write what it found to FILE, for other programs (Pano\'s tests/kit_smoke.py reads it)')
     a = ap.parse_args()
 
     site = os.path.abspath(a.site)
@@ -222,7 +256,9 @@ def main():
                     if not wait(pg, STEP_SHOWN, prev, 10000):
                         said = pg.evaluate(SAY).replace('\n', ' ')
                         return False, f'{n} never showed' + (f' (he said: "{said[:90]}")' if said else ''), errs
-                    pg.wait_for_timeout(700)    # he walks over and the page scrolls
+                    pg.wait_for_timeout(700)    # he walks over and the page scrolls...
+                    pg.evaluate(SETTLED)        # ...until it stops
+                    pg.wait_for_timeout(250)
                     text = pg.evaluate(SAY)
                     css = (st.get('target') or {}).get('css', '')
                     s = pg.evaluate(SEEN, [css, narrow]) if css else {'found': False}
@@ -230,6 +266,8 @@ def main():
                         return False, f'{n}: nothing on the page matches "{css}"', errs
                     if not s['seen']:
                         R.bad(f'tour "{key}" {n}: "{css}" is not on screen when he points at it' + (' (it is behind his bubble or below it)' if narrow else ''))
+                    elif s.get('covered'):
+                        R.bad(f'tour "{key}" {n}: "{css}" is hidden under {s["covered"]}, which stays on screen (a header or bar), when he points at it')
                     elif not s['ring']:
                         R.bad(f'tour "{key}" {n}: the ring is not around "{css}"')
                     need = (st.get('need') or {}).get('filled')
@@ -266,6 +304,7 @@ def main():
                 narrow = W <= 640
                 R.line()
                 R.line(f'{rel}, {tag} ({W}×{H})')
+                R.page(rel, tag, W, H)
                 c = context(W, H)
                 pg, errs, failed = open_page(c, url)
                 if not wait(pg, "()=>window.Pano&&Pano.here", ms=10000):
@@ -287,6 +326,7 @@ def main():
                     c.close()
                     continue
                 r = pg.evaluate("()=>Pano.check()")
+                R.now['greeted'] = greeted
                 if not greeted:
                     R.bad('he did not appear and greet visitors')
                 R.line(f'  Pano.check(): {len(r["problems"]) or "no"} problem{"" if len(r["problems"]) == 1 else "s"}, {len(r["notes"])} note{"" if len(r["notes"]) == 1 else "s"}. Brain: {" → ".join(r["brain"])}')
@@ -299,6 +339,7 @@ def main():
                     R.note('off on this page: ' + '; '.join(off))
                 menu = pg.evaluate(MENU) if greeted else []
                 R.line('  Menu: ' + ' | '.join(menu))
+                R.now['menu'] = menu
                 brain = {}
                 if r['brain']:
                     try:
@@ -341,12 +382,14 @@ def main():
                 for key, t in here.items():
                     ok, why, terr = walk(c, url, key, t, narrow)
                     tours_walked.add(key)
+                    R.now['tours'].append({'key': key, 'label': t['label'], 'steps': len(t['steps']), 'finished': ok, 'why': why})
                     if ok:
                         R.line(f'  Tour "{key}" ({t["label"]}): finished, {len(t["steps"])} step{"" if len(t["steps"]) == 1 else "s"}')
                     else:
                         R.bad(f'tour "{key}" ({t["label"]}): {why}')
                     errs += terr
                 for e in dict.fromkeys(errs):
+                    R.now['errors'].append(e)
                     R.bad('page error: ' + e[:200])
                 known = ' '.join(x['say'] for x in r['problems'])     # page addresses Pano.check() already reported
                 for f in dict.fromkeys(failed):
@@ -356,6 +399,10 @@ def main():
         browser.close()
     srv.shutdown()
     R.line()
+    if a.json:
+        R.data.update(site=site, engine=engine, problems=R.problems, all_good=not R.problems, tours_walked=sorted(tours_walked))
+        with open(a.json, 'w', encoding='utf-8') as fh:
+            json.dump(R.data, fh, indent=1, ensure_ascii=False)
     if R.problems:
         R.line(f'{R.problems} thing{"" if R.problems == 1 else "s"} to fix (marked ✗ above).')
         sys.exit(1)
