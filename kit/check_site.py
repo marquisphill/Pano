@@ -20,7 +20,8 @@ It ends with "All good" or the number of things to fix. Nothing in the site is c
 
 Paño's own files come from https://marquisphill.github.io/Pano/. If this computer can't reach that address
 (many AI cloud sessions can't), give --engine the folder of a clone of the Pano repo, and the browser is
-answered from it instead. Run from inside a clone, the clone is used by itself when the address can't be reached.
+answered from it instead. Run from inside a clone, the clone is used by itself when the address can't be reached,
+or when the files there are older than the clone's (they have no Pano.check()).
 """
 import argparse, json, mimetypes, os, re, sys, threading, urllib.request
 from functools import partial
@@ -118,12 +119,17 @@ def find_pages(site):
     return sorted(out, key=lambda p: (p.count('/'), p.lower() != 'index.html', p))
 
 
-def reachable(url):
+def fetch(url):
+    """The file's text, or None if this computer can't get it."""
     try:
-        urllib.request.urlopen(url, timeout=6).read(64)
-        return True
+        return urllib.request.urlopen(url, timeout=6).read().decode('utf-8', 'replace')
     except Exception:
-        return False
+        return None
+
+
+def has_check(js):
+    """Is this pano.js new enough for the kit (does it have Pano.check())?"""
+    return bool(re.search(r'window\.Pano\s*=\s*\{[^}]*\bcheck\b', js or ''))
 
 
 def engine_route(root):
@@ -183,11 +189,15 @@ def main():
     engine = a.engine
     if engine and not os.path.isfile(os.path.join(engine, 'latest', 'pano.js')):
         sys.exit(f'--engine should be the Pano repo\'s folder (the one with latest/ inside); {engine} is not.')
-    auto = False
-    if not engine and not reachable(HOSTED + 'latest/pano.js'):
-        if os.path.isfile(os.path.join(CLONE, 'latest', 'pano.js')):
-            engine, auto = CLONE, True
-        else:
+    auto = ''
+    if not engine:
+        hosted = fetch(HOSTED + 'latest/pano.js')
+        clone = os.path.join(CLONE, 'latest', 'pano.js')
+        why = ('that address could not be reached' if hosted is None
+               else 'the files there are older than this kit' if not has_check(hosted) else '')
+        if why and os.path.isfile(clone) and has_check(open(clone, encoding='utf-8', errors='replace').read()):
+            engine, auto = CLONE, why
+        elif hosted is None:
             sys.exit('This computer can\'t reach ' + HOSTED + ', where Paño\'s files live. Clone https://github.com/marquisphill/Pano '
                      'and run again with --engine <the clone>.')
 
@@ -201,7 +211,7 @@ def main():
     base = f'http://127.0.0.1:{srv.server_address[1]}/'
     R = Report()
     R.line(f'Paño site check: {site}')
-    R.line(f'Paño\'s files: {HOSTED}' + (f' (answered from {engine}{", since that address could not be reached" if auto else ""})' if engine else ''))
+    R.line(f'Paño\'s files: {HOSTED}' + (f' (answered from {engine}{", since " + auto if auto else ""})' if engine else ''))
     tours_walked = set()
 
     # the site's own Paño files: no TODO left from the templates

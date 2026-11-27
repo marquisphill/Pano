@@ -66,7 +66,7 @@ Every line, with base's wording:
 | `tour.do_it` | Do it for me | The button a step's `act` adds, unless the step has its own `actLabel`. |
 | `tour.stop` | Stop the tour | The quiet button on every step. |
 | `tour.seen_mark`, `tour.intro`, `tour.wrap`, `tour.watched`, `tour.next_up`, `tour.next_talk`, `tour.seen_all`, `tour.back_to_menu`, `tour.im_good`, `tour.im_good_bye` | (see `base.json`) | Only where the site gives him a memory between visits. Kit sites don't, so these are never said; leave them to base. |
-| `touch.swaps` | Click → Tap, click → tap | A list of `{ "find": "Click", "say": "Tap", "whole_word": true }`, applied in order to tour lines on touch screens. For a site in another language, swap that language's words, or make it `[]`. |
+| `touch.swaps` | Click → Tap, click → tap | A list of `{ "find": "Click", "say": "Tap", "whole_word": true }`, applied in order to tour lines on touch screens. `find` is matched exactly as written, capitals included (so list "Click" and "click" separately). With `whole_word`, it only matches where no letter or digit touches it, in any alphabet ("aquí", "Toca"). Without it, only the first match in each line is swapped. For a site in another language, swap that language's words (longer phrases first), or make it `[]`. |
 | `background.ask` | Which background would you like? | When a visitor picks "Change the background". |
 | `background.options` | (none) | His words for each background, by the names in the site's `setup.js` (`"sky": "Sky blue"`). A background with no words is shown by its name. |
 | `background.default_mark` | " (default)" | Added after the first background's words. |

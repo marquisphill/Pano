@@ -527,8 +527,13 @@
       }
     }
     // touch screens get "tap" instead of "click"
+    // touch.swaps on touch screens. A whole_word swap matches the words as written (no pattern characters), and only
+    // where no letter or digit, in any alphabet, touches them: "aquí" and "Toca" work as well as "Click".
+    const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const swapWord = (out, w) => out.replace(new RegExp('(^|[^\\p{L}\\p{N}_])(' + escRe(w.find) + ')(?![\\p{L}\\p{N}_])', 'gu'), (m, pre) => pre + w.say);
     const forTouch = t => (narrow() || matchMedia('(pointer: coarse)').matches)
-      ? L.touch.swaps.reduce((out, w) => w.whole_word ? out.replace(new RegExp('\\b' + w.find + '\\b', 'g'), w.say) : out.replace(w.find, w.say), t)
+      ? ((L.touch && L.touch.swaps) || []).reduce((out, w) => !w || typeof w.find !== 'string' || !w.find || typeof w.say !== 'string' ? out
+        : w.whole_word ? swapWord(out, w) : out.replace(w.find, w.say), t)
       : t;
 
     function guideBusy() { return !!tour || !gbub.hidden; }

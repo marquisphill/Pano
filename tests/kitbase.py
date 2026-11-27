@@ -161,5 +161,18 @@ with sync_playwright() as p:
     pg.evaluate(PRESS, TOUR['label']); pg.wait_for_timeout(2500)
     print('room 3 a target the page can scroll to needs no room', not pg.evaluate("()=>!!document.querySelector('.groom')"))
     c.close()
+
+    # touch.swaps (K4): whole words in any alphabet, phrases, and words with brackets, on phones only
+    swaps = {'swaps': [{'find': 'Haz clic en', 'say': 'Toca', 'whole_word': True}, {'find': 'aquí', 'say': 'acá', 'whole_word': True},
+                       {'find': '(clic)', 'say': '(toque)', 'whole_word': True}, {'find': 'clic', 'say': 'toque', 'whole_word': True}]}
+    es = {'contact': {'label': 'Contacto', 'steps': [{'say': 'Haz clic en <b>Enviar</b> aquí, no allí (clic). Un clicador no.', 'target': {'css': '#contact-form'}, 'next': 'Vale'}]}}
+    for tag, W in (('phone', 390), ('desk', 1280)):
+        c, pg, errs, got, warns = fresh(b, W, 800, {'**/pano/brain.json': {'extends': 'base', 'lines': {'name': 'Chispa', 'touch': swaps}, 'tours': es}})
+        pg.evaluate(PRESS, 'Contacto'); pg.wait_for_timeout(2500)
+        said = pg.evaluate(SAY).split('\n')[-1]
+        want = 'Toca Enviar acá, no allí (toque). Un clicador no.' if tag == 'phone' else 'Haz clic en Enviar aquí, no allí (clic). Un clicador no.'
+        print(tag, 'swaps 1 touch swaps: accented words, phrases and brackets swap on phones, and only there', said == want, repr(said))
+        print(tag, 'swaps errors', errs)
+        c.close()
     b.close()
 server.terminate()

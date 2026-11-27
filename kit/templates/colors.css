@@ -44,9 +44,10 @@
 #pano-backdrop[data-wall="mint"],  #pano-backdrop .wallnext[data-wall="mint"]  { background: linear-gradient(180deg, #ecfaf2, #c6eed8); }
 #pano-backdrop[data-wall="paper"], #pano-backdrop .wallnext[data-wall="paper"] { background: radial-gradient(#d8d2c4 1px, transparent 1.5px) 0 0 / 18px 18px, #faf7f0; }
 
-/* The dark set, for a site with light text on a dark page:
+/* The dark set, for a site with light text on a dark page (leave out any look that is close to the site's own page color:
+   choosing it would seem to change nothing):
 #pano-backdrop[data-wall="dusk"],   #pano-backdrop .wallnext[data-wall="dusk"]   { background: linear-gradient(180deg, #1c2040, #3a2a4a); }
 #pano-backdrop[data-wall="forest"], #pano-backdrop .wallnext[data-wall="forest"] { background: linear-gradient(180deg, #0f2419, #1f3d2c); }
-#pano-backdrop[data-wall="ink"],    #pano-backdrop .wallnext[data-wall="ink"]    { background: #101317; }
+#pano-backdrop[data-wall="ember"],  #pano-backdrop .wallnext[data-wall="ember"]  { background: linear-gradient(180deg, #2a1712, #4a2618); }
 #pano-backdrop[data-wall="stars"],  #pano-backdrop .wallnext[data-wall="stars"]  { background: radial-gradient(rgba(255,255,255,.22) 1px, transparent 1.5px) 0 0 / 22px 22px, #0d1020; }
 */

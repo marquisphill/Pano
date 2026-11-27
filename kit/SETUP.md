@@ -55,12 +55,12 @@ Ask these in one message, numbered, with the examples, so they can answer in one
 
 1. **What is the site, and who visits it?**
 2. **What are the 3 things Paño should help visitors do?** Each becomes a guided tour. For example: "book a class", "see the prices", "get in touch".
-3. **His name and colors.** He is a cat. By default he is Paño, with red fur. Give him another name if you like, and a fur color (or "match my site").
+3. **His name and colors.** He is a cat. By default he is Paño, a boy cat with red fur. Give him another name if you like, and a fur color (or "match my site").
 4. **His tone, and his language.** For example: warm and plain, playful, or formal. By default: friendly, plain English.
 5. **Should he offer the background changer?** It lets visitors choose a background behind the page, and a colorblind mode for the whole site. By default: yes.
 6. **Is there anything he must never say?**
 
-Wait for the answers. For anything left unanswered, use the default and say so.
+Wait for the answers. For anything left unanswered, use the default and say so. He stays a boy cat ("he") unless the person says otherwise; in a language where words change with that (Spanish, French, German...), write his lines that way.
 
 ## Step 3. Read the site and plan the tours
 
@@ -89,7 +89,7 @@ Copy the templates into the site's `pano/` folder and fill them in.
 **`pano/setup.js`** (from `templates/setup.js`):
 - Set `site` to a short name for the site (letters and dashes). It keeps what he remembers in visitors' browsers apart from other sites on the same domain.
 - No background changer: delete the two `desk` lines and the `background` entry.
-- A bar fixed to the bottom of the screen (a cookie notice that stays, a bottom menu on phones): set `layout.bar.narrow` (phones) or `layout.bar.wide` (wider screens) to its height in pixels, so he and his bubble stay clear of it.
+- A bar fixed to the bottom of the screen (a cookie notice that stays, a bottom menu on phones): set `layout.bar.narrow` (screens up to 640 pixels wide, where his bubble sits across the bottom) or `layout.bar.wide` (wider screens) to its height in pixels, so he and his bubble stay clear of it. If the bar shows on screens wider than 640 pixels too (a bottom menu up to 768, say), set both: on wide screens he then rests that much higher.
 
 **`pano/colors.css`** (from `templates/colors.css`):
 - His fur: `--pano-fur`, with `--pano-leg` and `--pano-paw` about 20% darker and `--pano-name` a little lighter (it is his name above each bubble, so it must read well on the bubble).
@@ -110,7 +110,7 @@ python -m playwright install chromium        # skip if Chromium is already insta
 python3 path/to/Pano/kit/check_site.py path/to/their-site
 ```
 
-It serves the site on this computer and, for every page at a phone size and a desktop size: checks he appears, runs `Pano.check()`, lists his menu, walks every tour he offers there to the end, checks each step's target is on screen with the ring around it, and checks each background can be seen. If this computer can't reach `marquisphill.github.io` (many cloud sessions can't), it answers for that address from the clone it sits in; to choose a clone, add `--engine path/to/Pano`.
+It serves the site on this computer and, for every page at a phone size and a desktop size: checks he appears, runs `Pano.check()`, lists his menu, walks every tour he offers there to the end, checks each step's target is on screen with the ring around it, and checks each background can be seen. If this computer can't reach `marquisphill.github.io` (many cloud sessions can't), or the files there are older than the clone's, it answers for that address from the clone it sits in; its second line says which. To choose a clone, add `--engine path/to/Pano`.
 
 - **Fix every ✗ and run it again, until it ends with "All good".** Notes (·) may be fine; read them.
 - **Look at him.** Take screenshots at a phone size and a desktop size with his bubble open, and check his colors and bubble suit the site.
