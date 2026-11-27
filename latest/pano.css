@@ -6,7 +6,7 @@
      --pano-bubble, --pano-line, --pano-ink        bubble background, border, text
      --pano-name, --pano-soft, --pano-step         his name, quiet text, the step label
      --pano-accent, --pano-accent-ink              main buttons, ring, focus outline; text on main buttons
-     --pano-ring                                   the ring around what he points at (--pano-accent if not set)
+     --pano-ring                                   the ring around what he points at, and his focus outline (--pano-accent if not set)
      --pano-glow, --pano-glow-0                    the ring's pulse (start and end colors)
      --pano-btn, --pano-btn-line, --pano-btn-hover plain buttons
      --pano-btn-h, --pano-btn-pad, --pano-btn-radius, --pano-btn-font, --pano-btn-align
@@ -39,7 +39,7 @@
 .gcat.chomp .gmouth{transform:scale(2.3,3.1)}
 .gcat.chomp .ghead{transform:rotate(-10deg) scale(1.12)}
 .gcat.chomp .geyes{animation:none;transform:scaleY(.55)}
-.gcat:focus-visible{outline:2px solid var(--pano-accent,#3ddc84);outline-offset:4px;border-radius:8px}
+.gcat:focus-visible{outline:2px solid var(--pano-ring,var(--pano-accent,#3ddc84));outline-offset:4px;border-radius:8px}
 .gcat{touch-action:none;cursor:grab}
 /* being recycled: wary over the bin, then unimpressed, then a contemptuous paw lick */
 .glid{transform:translateY(-9px);transition:transform .45s ease}
