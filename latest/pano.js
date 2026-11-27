@@ -137,9 +137,12 @@
     // What the visitor can see: normally the whole window. On a phone, a page wider than the screen (a long address
     // that doesn't wrap, say) makes the browser lay out fixed things over a bigger area than it shows, so his spots and
     // his bubble keep to the part that is shown (only then, and only at the page's own zoom: pinch-zooming is left alone).
+    // (A phone browser then grows the window both wider and taller than what it shows. A desktop scrollbar only takes
+    // width, and a phone keyboard only height, so neither counts; and only on a touch screen.)
     function shownBox() {
       const v = window.visualViewport;
-      if (!v || Math.abs(v.scale - 1) > .01 || v.width >= innerWidth - 1) return null;
+      if (!v || Math.abs(v.scale - 1) > .01 || v.width >= innerWidth - 1 || innerHeight <= v.offsetTop + v.height + 1) return null;
+      if (!matchMedia('(pointer: coarse)').matches) return null;
       return { x: v.offsetLeft, y: v.offsetTop, w: v.width, h: innerHeight * v.width / innerWidth };
     }
     const viewL = () => { const b = shownBox(); return b ? b.x : 0; };
